@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import type { SubsystemId } from '../data/research'
 
 export type Clutter = 'low' | 'extreme'
-export type Section = 'hero' | 'problem' | 'how' | 'progress' | 'cost' | 'team'
+export type Section = 'hero' | 'problem' | 'how' | 'cost' | 'team'
 
 export interface Ping {
   id: number

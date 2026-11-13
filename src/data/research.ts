@@ -125,7 +125,7 @@ export function buoyancy(payloadKg: number) {
 export const HOW_SUMMARY =
   'Like the Amazon river dolphin, Delphylax listens instead of looking. Sonar finds objects under the muddy water, an AMG8833 heat sensor spots people at the surface, and a servo drops a glowing marker where rescuers should look.'
 
-/** The six labelled parts in the How-it-works diagram. `data: true` parts are sensors, drawn in the teal data accent. */
+/** The six labelled parts in the How-it-works diagram. `color` is the pin colour; sensors use the blue / pink data colours. */
 export const HOW_IT_WORKS = [
   {
     id: 'hulls',
@@ -133,6 +133,7 @@ export const HOW_IT_WORKS = [
     short: 'Two 76 cm PVC pipes, 42 cm apart',
     body: 'Two 76 cm PVC pipes (114 mm wide), 42 cm apart, with 3D-printed nose and tail cones. Foam inside means a leak can’t sink it. An 8 mm deck sits on four printed saddles.',
     data: false,
+    color: '#f8fafc',
   },
   {
     id: 'thrusters',
@@ -140,6 +141,7 @@ export const HOW_IT_WORKS = [
     short: 'Two, one spinning each way',
     body: 'Two brushless underwater thrusters sit under the back of the hulls. Running one faster than the other steers the boat.',
     data: false,
+    color: '#3b82f6',
   },
   {
     id: 'sonar',
@@ -147,6 +149,7 @@ export const HOW_IT_WORKS = [
     short: 'Fish-finder sonar, finds objects under the water',
     body: 'A wireless fish-finder sonar on a float at the bow finds objects under muddy water. Readings are shown on the fish finder’s screen for now; linking them to the ESP32 is planned.',
     data: true,
+    color: '#7fb3d5',
   },
   {
     id: 'thermal',
@@ -154,6 +157,7 @@ export const HOW_IT_WORKS = [
     short: 'AMG8833, spots people at the surface',
     body: 'An AMG8833 8×8 heat sensor in the bow bezel spots people at the surface by body warmth. It cannot see under the water.',
     data: true,
+    color: '#ec4899',
   },
   {
     id: 'markers',
@@ -161,6 +165,7 @@ export const HOW_IT_WORKS = [
     short: 'Servo disc, four glowing markers',
     body: 'A servo turns a disc under a rack of four tubes and drops one glowing marker at a time where something is found. Tagging each drop with a GPS position is planned.',
     data: false,
+    color: '#ff6b57',
   },
   {
     id: 'brain',
@@ -168,6 +173,7 @@ export const HOW_IT_WORKS = [
     short: 'Remote-controlled; tilt and leak cut-off',
     body: 'The ESP32 in the airtight deck box reads the sensors and drives the thrusters. A rescuer steers by remote control from the bank; the ESP32 cuts the motors if the boat tips past a safe angle or the leak sensor gets wet. Self-driving search is planned, not built.',
     data: false,
+    color: '#38bdf8',
   },
 ] as const
 
@@ -373,11 +379,10 @@ export const BUSINESS = {
     { who: 'Municipal flood-response units', why: 'Street-by-street sweeps of flooded underpasses and low-lying districts.' },
     { who: 'Towns without rescue-robot budgets', why: 'At about 1/26 the price of EMILY, a basic scout becomes affordable.' },
   ],
-  /** roles: Eddie's is from the project notes; the other two are placeholders to fill in */
   team: [
     { name: 'Eddie', role: 'Project lead · design, build and electronics' },
-    { name: 'Minnie', role: 'Team member' },
-    { name: 'Luna', role: 'Team member' },
+    { name: 'Minnie', role: 'Policy researcher' },
+    { name: 'Luna', role: 'Writer and communications director' },
   ],
   sources: [
     {
@@ -395,20 +400,12 @@ export const BUSINESS = {
   ],
 } as const
 
-/** The short checklist in the Build progress section. */
-export const BUILD_CHECKLIST = {
-  summary: 'The hulls, deck, electronics box and power wiring are done. The boat is waiting on its thrusters, speed controllers and sensors before the first water test.',
-  done: ['Hulls cut', 'Deck drilled', 'Electronics box mounted', 'Power wiring', 'Leak sensor tested', 'Marker servo tested'],
-  next: ['Thrusters and speed controllers', 'Sensors', 'First water test'],
-} as const
-
 export const SECTIONS = [
   { id: 'hero', index: '01', label: 'Overview', depth: 0 },
   { id: 'problem', index: '02', label: 'Problem', depth: -0.6 },
   { id: 'how', index: '03', label: 'How it works', depth: -1.2 },
-  { id: 'progress', index: '04', label: 'Build progress', depth: -1.5 },
-  { id: 'cost', index: '05', label: 'Cost & impact', depth: -2.4 },
-  { id: 'team', index: '06', label: 'Team', depth: -3.0 },
+  { id: 'cost', index: '04', label: 'Cost & impact', depth: -2.4 },
+  { id: 'team', index: '05', label: 'Team', depth: -3.0 },
 ] as const
 
 /** Depth the camera sits at while the Try-the-sonar overlay is open (m). */

@@ -6,7 +6,8 @@
   --color-ink-2: #b7c3cc;
   --color-coral: #e8654f;
   --color-coral-2: #ff8a73;
-  --color-teal: #4dd4c6;
+  --color-electric: #5b8fb8;
+  --color-cyan: #7fb3d5;
 
   --font-display: 'Space Grotesk', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
@@ -14,22 +15,23 @@
 }
 
 /*
-  Palette rules:
-  - coral (#e8654f / #ff8a73) only for buttons, links and one highlighted word per headline
-  - teal (#4dd4c6) only for sonar / thermal data and live readouts
-  - body text #eef3f6, secondary text #b7c3cc (both > 4.5:1 on the card and page backgrounds)
+  Navy base, coral accents, electric blue / pink for sonar data.
+  Readability rules: body text #eef3f6 at 16px+, secondary text #b7c3cc, nothing under 12px.
 */
 :root {
   color-scheme: dark;
   --bg: #0f1519;
-  --card: #161e24;
-  --card-2: #1b252c;
-  --border: #28343c;
+  --glass: rgba(22, 30, 36, 0.82);
+  --glass-strong: rgba(19, 27, 33, 0.92);
+  --glass-border: #26323a;
   --text: #eef3f6;
   --text-2: #b7c3cc;
   --coral: #e8654f;
   --coral-2: #ff8a73;
-  --teal: #4dd4c6;
+  --blue: #7fb3d5;
+  --glow-blue: 0 0 18px rgba(59, 158, 255, 0.35);
+  --glow-pink: 0 0 18px rgba(255, 95, 162, 0.35);
+  --glow-red: 0 0 22px rgba(232, 101, 79, 0.45);
 }
 
 html {
@@ -73,32 +75,33 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Solid cards: slightly lighter than the page, one subtle border, no blur, no glow. */
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
+/* Glass cards: translucent navy with blur, one subtle border. */
+.card,
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
   border-radius: 14px;
-}
-.card-2 {
-  background: var(--card-2);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-}
-/* legacy names still used by a few shared primitives: render as plain cards */
-.glass,
-.glass-strong {
-  background: var(--card);
-  border: 1px solid var(--border);
-}
-
-/* HUD style is reserved for the sonar / thermal readout panels. */
-.hud-panel {
-  position: relative;
-  background: rgba(12, 20, 26, 0.82);
-  border: 1px solid rgba(77, 212, 198, 0.35);
-  border-radius: 10px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+}
+.card-2,
+.glass-strong {
+  background: var(--glass-strong);
+  border: 1px solid #2c3942;
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* HUD panels for sonar / thermal readouts: glass with corner marks and a blue edge glow. */
+.hud-panel {
+  position: relative;
+  background: var(--glass-strong);
+  border: 1px solid rgba(127, 179, 213, 0.4);
+  border-radius: 10px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--glow-blue);
 }
 .hud-panel::before,
 .hud-panel::after {
@@ -106,7 +109,7 @@ body {
   position: absolute;
   width: 10px;
   height: 10px;
-  border-color: var(--teal);
+  border-color: var(--blue);
   border-style: solid;
 }
 .hud-panel::before {
@@ -137,16 +140,20 @@ body {
   font-size: 1rem;
   color: #0f1519;
   background: var(--coral);
+  box-shadow: var(--glow-red);
   transition:
     background 0.2s,
+    box-shadow 0.25s,
     transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .btn-primary:hover {
   background: var(--coral-2);
+  box-shadow: 0 0 30px rgba(255, 138, 115, 0.6);
   transform: translateY(-1px);
 }
 .btn-primary:disabled {
   opacity: 0.45;
+  box-shadow: none;
   transform: none;
 }
 .btn-secondary {
@@ -159,18 +166,23 @@ body {
   font-weight: 600;
   font-size: 1rem;
   color: var(--text);
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: rgba(22, 30, 36, 0.7);
+  border: 1px solid #3a4852;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition:
     border-color 0.2s,
+    box-shadow 0.25s,
     transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .btn-secondary:hover {
   border-color: var(--coral);
+  box-shadow: var(--glow-red);
   transform: translateY(-1px);
 }
 .btn-secondary:disabled {
   opacity: 0.45;
+  box-shadow: none;
   transform: none;
 }
 
@@ -194,33 +206,34 @@ body {
   font-family: var(--font-body);
   font-size: 0.9375rem;
   font-weight: 500;
-  border: 1px solid var(--border);
-  background: var(--card);
+  border: 1px solid var(--glass-border);
+  background: rgba(22, 30, 36, 0.7);
   color: var(--text-2);
   transition: all 0.2s;
   cursor: pointer;
 }
 .toggle:hover {
-  border-color: #3a4852;
+  border-color: var(--blue);
   color: var(--text);
 }
 .toggle[data-active='true'] {
   border-color: var(--coral);
-  background: rgba(232, 101, 79, 0.14);
+  background: rgba(232, 101, 79, 0.16);
   color: var(--text);
+  box-shadow: var(--glow-red);
 }
 
 .sim-tag {
   display: inline-block;
   padding: 0 7px;
-  border: 1px solid rgba(77, 212, 198, 0.4);
+  border: 1px solid #3a4852;
   border-radius: 4px;
   font-family: var(--font-body);
   font-size: 12px;
   font-weight: 500;
   line-height: 1.6;
-  color: var(--teal);
-  background: rgba(77, 212, 198, 0.08);
+  color: var(--text-2);
+  background: rgba(15, 21, 25, 0.6);
   white-space: nowrap;
   vertical-align: middle;
 }
@@ -257,7 +270,7 @@ input[type='range'] {
   appearance: none;
   height: 4px;
   border-radius: 9999px;
-  background: linear-gradient(90deg, #2a8f85, var(--teal));
+  background: linear-gradient(90deg, #3b9eff, #ff5fa2);
   outline: none;
 }
 input[type='range']::-webkit-slider-thumb {
@@ -266,8 +279,8 @@ input[type='range']::-webkit-slider-thumb {
   width: 18px;
   height: 18px;
   border-radius: 9999px;
-  background: var(--text);
-  border: 2px solid var(--bg);
+  background: var(--coral);
+  border: 2px solid var(--text);
   cursor: pointer;
 }
 

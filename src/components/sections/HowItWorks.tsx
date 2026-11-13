@@ -5,15 +5,13 @@ import { useSiteStore } from '../../store/useSiteStore'
 import { HOW_IT_WORKS, HOW_SUMMARY, HULL, SPECS, TIMELINE, PIVOT_REASON, WATER_TEST, buoyancy, hullSpeed } from '../../data/research'
 import { SectionShell, Kicker, Title, Accent, Lead, Reveal } from '../ui/primitives'
 
-const TEAL = '#4dd4c6'
-
 /* ---------- More details: hull calculator ---------- */
 function BuoyancyChart({ payload }: { payload: number }) {
   const b = buoyancy(payload)
   const rows = [
-    { label: 'Hull', value: HULL.weightKg, color: '#5f7382' },
-    { label: 'Load', value: b.mass, color: '#eef3f6' },
-    { label: 'Float', value: HULL.capacityKg, color: '#8da2b0' },
+    { label: 'Hull', value: HULL.weightKg, color: '#5b8fb8' },
+    { label: 'Load', value: b.mass, color: '#e8654f' },
+    { label: 'Float', value: HULL.capacityKg, color: '#7fb3d5' },
   ]
   const W = 420
   const H = 136
@@ -175,13 +173,13 @@ export function HowItWorks() {
                     <li key={p.id}>
                       <button
                         onClick={() => select(open ? null : p.id)}
-                        className="card w-full px-4 py-3 text-left transition-colors hover:border-[#3a4852]"
-                        style={{ borderColor: open ? (p.data ? TEAL : '#eef3f6') : undefined }}
+                        className="glass hud-corner w-full px-4 py-3 text-left transition-all hover:translate-x-1"
+                        style={{ borderColor: open ? p.color : undefined, boxShadow: open ? `0 0 24px ${p.color}44` : undefined }}
                         aria-expanded={open}
                       >
                         <span className="flex items-center gap-3">
                           <span className="font-mono text-xs text-[#b7c3cc]">{String(i + 1).padStart(2, '0')}</span>
-                          <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: p.data ? TEAL : '#eef3f6' }} />
+                          <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: p.color, boxShadow: `0 0 10px ${p.color}` }} />
                           <span className="flex-1">
                             <span className="block text-base font-semibold text-[#eef3f6]">{p.name}</span>
                             <span className="block text-sm text-[#b7c3cc]">{p.short}</span>

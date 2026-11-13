@@ -18,8 +18,6 @@ const WAYPOINTS: Record<string, Waypoint> = {
   problem: { pos: new THREE.Vector3(-3.4, -0.5, 3.8), look: new THREE.Vector3(0.6, -0.25, 0), fov: 44 },
   // surface level, exploded parts rise above: the labelled diagram
   how: { pos: new THREE.Vector3(3.0, 1.7, 5.8), look: new THREE.Vector3(-0.5, 0.45, 0), fov: 40 },
-  // low three-quarter view from the bow while the photo grid scrolls past
-  progress: { pos: new THREE.Vector3(-3.0, 0.9, 5.4), look: new THREE.Vector3(1.2, 0.2, 0), fov: 40 },
   cost: { pos: new THREE.Vector3(5.6, -0.6, -4.2), look: new THREE.Vector3(-1.6, -0.5, 0.4), fov: 38 },
   team: { pos: new THREE.Vector3(0.2, 1.5, 5.2), look: new THREE.Vector3(0.2, 0.2, 0), fov: 38 },
   // diver's view for the Try-the-sonar overlay: hulls overhead, sonar field on the riverbed ahead

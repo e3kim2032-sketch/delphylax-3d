@@ -5,7 +5,6 @@ import { HudOverlay } from './components/hud/HudOverlay'
 import { Hero } from './components/sections/Hero'
 import { Problem } from './components/sections/Problem'
 import { HowItWorks } from './components/sections/HowItWorks'
-import { Progress } from './components/sections/Progress'
 import { CostImpact } from './components/sections/CostImpact'
 import { Team } from './components/sections/Team'
 import { SandboxOverlay } from './components/sections/SandboxOverlay'
@@ -26,8 +25,8 @@ function Loader() {
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0f1519]">
       <div className="relative">
-        <span className="sonar-ring absolute inset-0 rounded-full border border-[#4dd4c6]" />
-        <span className="sonar-ring absolute inset-0 rounded-full border border-[#4dd4c6]" style={{ animationDelay: '0.8s' }} />
+        <span className="sonar-ring absolute inset-0 rounded-full border border-[#5b8fb8]" />
+        <span className="sonar-ring absolute inset-0 rounded-full border border-[#e8654f]" style={{ animationDelay: '0.8s' }} />
         <DelphylaxMark size={72} animated={false} />
       </div>
       <div className="mt-6 text-sm text-[#b7c3cc]">Loading the boat…</div>
@@ -77,7 +76,6 @@ export default function App() {
         <Hero />
         <Problem />
         <HowItWorks />
-        <Progress />
         <CostImpact />
         <Team />
       </main>

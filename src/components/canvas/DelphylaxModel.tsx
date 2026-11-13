@@ -436,8 +436,6 @@ const PIN_POS: Record<SubsystemId, [number, number, number]> = {
   markers: mm(0, 420, 240),
   brain: mm(-120, 60, 330),
 }
-const PIN_NEUTRAL = '#eef3f6'
-const PIN_DATA = '#4dd4c6'
 
 function Callouts() {
   const select = useSiteStore((s) => s.selectSubsystem)
@@ -459,14 +457,15 @@ function Callouts() {
               e.stopPropagation()
               select(selected === s.id ? null : s.id)
             }}
-            className="card flex items-center gap-2 !rounded-md px-3 py-1.5 text-left text-[13px] font-medium whitespace-nowrap transition-colors"
+            className="glass-strong flex items-center gap-2 !rounded-md px-3 py-1.5 text-left text-[13px] font-medium whitespace-nowrap transition-all"
             style={{
               opacity: 0,
               pointerEvents: 'auto',
-              borderColor: selected === s.id ? (s.data ? PIN_DATA : PIN_NEUTRAL) : undefined,
+              borderColor: selected === s.id ? s.color : undefined,
+              boxShadow: selected === s.id ? `0 0 24px ${s.color}66` : undefined,
             }}
           >
-            <span className="block h-2 w-2 rounded-full" style={{ background: s.data ? PIN_DATA : PIN_NEUTRAL }} />
+            <span className="block h-2 w-2 rounded-full" style={{ background: s.color, boxShadow: `0 0 10px ${s.color}` }} />
             <span className="text-[#eef3f6]">{s.name}</span>
           </button>
         </Html>

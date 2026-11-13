@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { CRISIS } from '../../data/research'
 import { SectionShell, Kicker, Title, Accent, Reveal, SimTag } from '../ui/primitives'
 
-const TEAL = '#4dd4c6'
-const TEAL_DIM = '#2a8f85'
+const BLUE = '#5b8fb8'
+const CORAL = '#e8654f'
+const TARGET = '#ff2d55'
 
 /** Camera vs sonar in muddy water, with a drag-to-compare divider. Simulated. */
 function VisibilityCompare() {
@@ -11,7 +12,7 @@ function VisibilityCompare() {
   const W = 640
   const H = 400
   return (
-    <figure className="card overflow-hidden">
+    <figure className="glass-strong hud-corner overflow-hidden">
       <div className="relative" style={{ aspectRatio: `${W}/${H}` }}>
         <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 h-full w-full">
           <defs>
@@ -25,8 +26,8 @@ function VisibilityCompare() {
               <stop offset="100%" stopColor="#000" stopOpacity="0" />
             </radialGradient>
             <radialGradient id="sonarbg" cx="0.08" cy="0.5" r="1">
-              <stop offset="0%" stopColor="#0c2a2c" />
-              <stop offset="100%" stopColor="#070d12" />
+              <stop offset="0%" stopColor="#0b1d4d" />
+              <stop offset="100%" stopColor="#030712" />
             </radialGradient>
             <clipPath id="sonarclip">
               <rect x={(split / 100) * W} y="0" width={W} height={H} />
@@ -46,7 +47,7 @@ function VisibilityCompare() {
           <g clipPath="url(#sonarclip)">
             <rect width={W} height={H} fill="url(#sonarbg)" />
             {[60, 120, 180, 240, 300, 360, 420, 480, 540].map((r, i) => (
-              <circle key={r} cx="40" cy={H / 2} r={r} fill="none" stroke={i % 2 ? TEAL_DIM : TEAL} strokeOpacity={0.4 - i * 0.03} strokeWidth="1.2" />
+              <circle key={r} cx="40" cy={H / 2} r={r} fill="none" stroke={i % 2 ? CORAL : BLUE} strokeOpacity={0.4 - i * 0.03} strokeWidth="1.2" />
             ))}
             {[1, 2, 3, 4, 5].map((m) => (
               <g key={m}>
@@ -61,14 +62,14 @@ function VisibilityCompare() {
               const d = 60 + ((i * 97) % 480)
               const x = 40 + Math.cos((a * Math.PI) / 180) * d
               const y = H / 2 + Math.sin((a * Math.PI) / 180) * d * 0.55
-              return <circle key={i} cx={x} cy={y} r={1.4} fill={TEAL} opacity="0.35" />
+              return <circle key={i} cx={x} cy={y} r={1.4} fill="#7fb3d5" opacity="0.35" />
             })}
             <g transform={`translate(${40 + 4.6 * 110}, ${H / 2 + 44})`}>
-              <ellipse cx="0" cy="0" rx="34" ry="12" fill={TEAL} opacity="0.2" />
-              <path d="M-24 2 C-18 -8 -6 -10 2 -6 L14 -8 C20 -9 24 -4 22 0 C18 4 10 4 4 4 L-20 6 Z" fill="#eef3f6" />
-              <circle cx="20" cy="-7" r="6" fill="#eef3f6" />
-              <rect x="-40" y="-22" width="80" height="34" fill="none" stroke={TEAL} strokeWidth="1.2" strokeDasharray="6 4" />
-              <text x="0" y="-30" fill={TEAL} fontFamily="JetBrains Mono, monospace" fontSize="13" textAnchor="middle">
+              <ellipse cx="0" cy="0" rx="34" ry="12" fill={TARGET} opacity="0.18" />
+              <path d="M-24 2 C-18 -8 -6 -10 2 -6 L14 -8 C20 -9 24 -4 22 0 C18 4 10 4 4 4 L-20 6 Z" fill={TARGET} />
+              <circle cx="20" cy="-7" r="6" fill={TARGET} />
+              <rect x="-40" y="-22" width="80" height="34" fill="none" stroke={TARGET} strokeWidth="1.2" strokeDasharray="6 4" />
+              <text x="0" y="-30" fill="#ffb4a6" fontFamily="JetBrains Mono, monospace" fontSize="13" textAnchor="middle">
                 echo · 4.6 m
               </text>
             </g>
@@ -109,8 +110,8 @@ export function Problem() {
             </Title>
           </Reveal>
           <Reveal delay={1}>
-            <div className="card mt-10 inline-block min-w-64 px-7 py-6">
-              <div className="font-mono text-6xl font-semibold leading-none text-[#eef3f6]">{CRISIS.livesLost}</div>
+            <div className="glass hud-corner mt-10 inline-block min-w-64 px-7 py-6" style={{ borderColor: 'rgba(255,107,87,0.4)' }}>
+              <div className="font-mono text-6xl font-semibold leading-none text-[#ff6b57]">{CRISIS.livesLost}</div>
               <div className="mt-3 max-w-xs text-base leading-snug text-[#b7c3cc]">
                 lives lost when water trapped a family in a Seoul semi-basement, {CRISIS.event.split(', ')[1]}
               </div>

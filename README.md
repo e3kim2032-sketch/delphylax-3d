@@ -41,7 +41,7 @@ src/
       Effects.tsx             post-processing
     hud/HudOverlay.tsx        tactical HUD: depth gauge, sensor monitor (sonar trace + 8×8 thermal), waypoints
     ui/DelphylaxLogo.tsx      vector mark + lockup (vectorised from the hand-drawn sketch)
-    sections/                 Hero · Problem · HowItWorks · Progress · CostImpact · Team · SandboxOverlay
+    sections/                 Hero · Problem · HowItWorks · CostImpact · Team · SandboxOverlay
 ```
 
 ## Data provenance

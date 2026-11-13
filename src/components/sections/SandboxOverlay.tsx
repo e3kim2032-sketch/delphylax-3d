@@ -8,7 +8,8 @@ import { Waveform } from '../hud/Waveform'
 import { ThermalGrid } from '../hud/ThermalGrid'
 import { sceneRefs } from '../canvas/sceneRefs'
 
-const TEAL = '#4dd4c6'
+const BLUE = '#7fb3d5'
+const LOCK = '#ff6b57'
 
 function useRafText(fn: () => string, interval = 80) {
   const ref = useRef<HTMLSpanElement>(null)
@@ -39,7 +40,7 @@ function SensorMonitor() {
         <span className="flex items-center gap-1.5 text-[#b7c3cc]">
           <Activity size={12} /> {IDENTITY.model} <SimTag />
         </span>
-        <span style={{ color: TEAL }}>{lock.active ? '● LOCK' : '○ SCAN'}</span>
+        <span style={{ color: lock.active ? LOCK : BLUE }}>{lock.active ? '● LOCK' : '○ SCAN'}</span>
       </div>
       <div className="flex gap-3">
         <div>
@@ -54,19 +55,19 @@ function SensorMonitor() {
       <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-[#b7c3cc]">
         <div>
           HDG
-          <div className="text-base" style={{ color: TEAL }}>
+          <div className="text-base" style={{ color: BLUE }}>
             <span ref={hdg}>178°</span>
           </div>
         </div>
         <div>
           SCAN
-          <div className="text-base" style={{ color: TEAL }}>
+          <div className="text-base" style={{ color: BLUE }}>
             <span ref={scan}>0%</span>
           </div>
         </div>
         <div>
           SWEEPS
-          <div className="text-base" style={{ color: TEAL }}>
+          <div className="text-base" style={{ color: BLUE }}>
             {String(pingCount).padStart(4, '0')}
           </div>
         </div>
@@ -93,12 +94,12 @@ function RevealMeter() {
     <div>
       <div className="flex justify-between text-xs text-[#b7c3cc]">
         <span>Sonar echo return</span>
-        <span ref={txt} className="font-mono" style={{ color: TEAL }}>
+        <span ref={txt} className="font-mono" style={{ color: BLUE }}>
           0%
         </span>
       </div>
       <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-        <div ref={bar} className="h-full rounded-full" style={{ width: '0%', background: TEAL, transition: 'width 0.1s linear' }} />
+        <div ref={bar} className="h-full rounded-full" style={{ width: '0%', background: 'linear-gradient(90deg,#3b9eff,#ff5fa2,#ff2d55)', transition: 'width 0.1s linear' }} />
       </div>
     </div>
   )
@@ -109,12 +110,12 @@ function TargetStatus() {
   const sparsity = useSiteStore((s) => s.sparsity)
   const markers = useSiteStore((s) => s.markers)
   return (
-    <div className="hud-panel space-y-3 p-4" style={{ borderColor: lock.active ? TEAL : undefined }}>
+    <div className="hud-panel space-y-3 p-4" style={{ borderColor: lock.active ? 'rgba(255,107,87,0.7)' : undefined, boxShadow: lock.active ? 'var(--glow-red)' : undefined }}>
       <div className="flex items-center justify-between text-xs">
         <span className="flex items-center gap-2 text-[#b7c3cc]">
           Target status <SimTag />
         </span>
-        <span className={`font-mono ${lock.active ? 'blink' : ''}`} style={{ color: TEAL }}>
+        <span className={`font-mono ${lock.active ? 'blink' : ''}`} style={{ color: lock.active ? LOCK : BLUE }}>
           {lock.active ? '● LOCKED' : '○ SEARCHING'}
         </span>
       </div>
@@ -122,14 +123,14 @@ function TargetStatus() {
       <div className="grid grid-cols-2 gap-3 text-xs text-[#b7c3cc]">
         <div>
           RANGE
-          <div className="font-mono text-2xl" style={{ color: TEAL }}>
+          <div className="font-mono text-2xl" style={{ color: BLUE }}>
             {lock.distanceM ? lock.distanceM.toFixed(1) : '--.-'}
             <span className="text-sm text-[#b7c3cc]"> m</span>
           </div>
         </div>
         <div>
           CONFIDENCE
-          <div className="font-mono text-2xl" style={{ color: TEAL }}>
+          <div className="font-mono text-2xl" style={{ color: BLUE }}>
             {(lock.confidence * 100).toFixed(0)}
             <span className="text-sm text-[#b7c3cc]"> %</span>
           </div>
@@ -173,7 +174,7 @@ function Reticle() {
                 key={i}
                 className="absolute h-5 w-5"
                 style={{
-                  borderColor: TEAL,
+                  borderColor: LOCK,
                   borderStyle: 'solid',
                   top: i < 2 ? 0 : 'auto',
                   bottom: i >= 2 ? 0 : 'auto',
@@ -186,7 +187,7 @@ function Reticle() {
                 }}
               />
             ))}
-            <Crosshair className="blink absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" size={18} style={{ color: TEAL }} />
+            <Crosshair className="blink absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" size={18} style={{ color: BLUE }} />
           </div>
         </motion.div>
       )}

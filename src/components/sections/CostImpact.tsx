@@ -7,7 +7,7 @@ export function CostImpact() {
     <SectionShell id="cost">
       <div className="pointer-events-auto w-full max-w-6xl">
         <Reveal>
-          <Kicker index="05">Cost & impact</Kicker>
+          <Kicker index="04">Cost & impact</Kicker>
           <Title>
             A scout on every <Accent>rescue truck.</Accent>
           </Title>
@@ -21,7 +21,7 @@ export function CostImpact() {
           <div className="mt-12 grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-stretch">
             <div className="card px-7 py-6">
               <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[#b7c3cc]">Delphylax</div>
-              <div className="mt-3 font-mono text-5xl font-semibold text-[#eef3f6]">${COST.usdApprox}</div>
+              <div className="mt-3 font-mono text-5xl font-semibold text-[#ff8a73]">${COST.usdApprox}</div>
               <div className="mt-3 text-sm leading-snug text-[#b7c3cc]">Build cost, est. {COST.total.toLocaleString('en-US')} won · parts and 3D printing, planning estimate</div>
             </div>
             <div className="flex items-center justify-center px-2 py-1 text-center">
@@ -32,7 +32,7 @@ export function CostImpact() {
             </div>
             <div className="card px-7 py-6">
               <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[#b7c3cc]">EMILY robotic lifeguard</div>
-              <div className="mt-3 font-mono text-5xl font-semibold text-[#eef3f6]">${COST.emilyUsd.toLocaleString('en-US')}</div>
+              <div className="mt-3 font-mono text-5xl font-semibold text-[#7fb3d5]">${COST.emilyUsd.toLocaleString('en-US')}</div>
               <div className="mt-3 text-sm leading-snug text-[#b7c3cc]">
                 About, {COST.emilySource} · reaches {COST.emilySpeedMph} mph, so this compares price, not ability
               </div>

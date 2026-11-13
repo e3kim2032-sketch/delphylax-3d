@@ -8,7 +8,7 @@ export function Team() {
     <SectionShell id="team" className="!items-start pb-12 sm:pb-16">
       <div className="pointer-events-auto w-full max-w-6xl">
         <Reveal>
-          <Kicker index="06">Team & sources</Kicker>
+          <Kicker index="05">Team & sources</Kicker>
           <Title>
             Built by <Accent>three of us.</Accent>
           </Title>
@@ -18,7 +18,9 @@ export function Team() {
           <ul className="mt-12 grid gap-4 sm:grid-cols-3">
             {BUSINESS.team.map((m) => (
               <li key={m.name} className="card flex items-center gap-4 p-5">
-                <div className="font-display flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[#28343c] bg-[#1b252c] text-xl font-700 text-[#eef3f6]">{m.name[0]}</div>
+                <div className="font-display flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-700 text-white" style={{ background: 'linear-gradient(135deg,#2f5f85,#e8654f)' }}>
+                  {m.name[0]}
+                </div>
                 <div>
                   <div className="font-display text-lg font-700 text-[#eef3f6]">{m.name}</div>
                   <div className="text-sm text-[#b7c3cc]">{m.role}</div>

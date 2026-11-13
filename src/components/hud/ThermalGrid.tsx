@@ -39,7 +39,7 @@ export function ThermalGrid({ size = 64 }: { size?: number }) {
           const base = 0.08 + noise[y * 8 + x] * 0.14
           const v = Math.min(1, base + warm)
           // sequential heat ramp: deep blue → pink → crimson/white
-          const col1 = v < 0.5 ? lerpColor('#0b1a24', '#1f6f68', v * 2) : v < 0.8 ? lerpColor('#1f6f68', '#4dd4c6', (v - 0.5) / 0.3) : lerpColor('#4dd4c6', '#eafffc', (v - 0.8) / 0.2)
+          const col1 = v < 0.5 ? lerpColor('#0b1a3f', '#5b8fb8', v * 2) : v < 0.8 ? lerpColor('#5b8fb8', '#e8654f', (v - 0.5) / 0.3) : lerpColor('#e8654f', '#ffe4ec', (v - 0.8) / 0.2)
           ctx.fillStyle = col1
           ctx.fillRect(x * cell + 0.5, y * cell + 0.5, cell - 1, cell - 1)
         }

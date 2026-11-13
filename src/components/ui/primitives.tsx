@@ -31,8 +31,8 @@ export function SectionShell({ id, children, className = '', align = 'left' }: {
 export function Kicker({ index, children }: { index: string; children: ReactNode }) {
   return (
     <div className="mb-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#b7c3cc]">
-      <span className="font-mono">{index}</span>
-      <span className="h-px w-8 bg-[#3a4852]" />
+      <span className="font-mono text-[#ff8a73]">{index}</span>
+      <span className="h-px w-8 bg-[#e8654f]" />
       <span>{children}</span>
     </div>
   )
@@ -57,7 +57,7 @@ export function SimTag() {
 
 /** A number with its label. `tone="data"` is for sonar / thermal readings only. */
 export function Stat({ value, unit, label, tone = 'plain', className = '' }: { value: string; unit?: string; label: string; tone?: 'plain' | 'data'; className?: string }) {
-  const color = tone === 'data' ? '#4dd4c6' : '#eef3f6'
+  const color = tone === 'data' ? '#7fb3d5' : '#eef3f6'
   return (
     <div className={`card px-6 py-5 ${className}`}>
       <div className="font-mono text-3xl font-semibold" style={{ color }}>
