@@ -9,13 +9,6 @@ gsap.registerPlugin(ScrollTrigger)
 
 let lenisInstance: Lenis | null = null
 
-/** Freeze page scroll while the sonar overlay is open. */
-export function setScrollLocked(locked: boolean) {
-  if (!lenisInstance) return
-  if (locked) lenisInstance.stop()
-  else lenisInstance.start()
-}
-
 export function scrollToSection(id: Section, offset = 0) {
   const el = document.getElementById(id)
   if (!el) return

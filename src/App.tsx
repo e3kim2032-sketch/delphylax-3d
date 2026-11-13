@@ -1,13 +1,14 @@
 import { lazy, Suspense, useEffect } from 'react'
-import { useScrollSync, setScrollLocked } from './hooks/useScrollSync'
+import { useScrollSync } from './hooks/useScrollSync'
 import { useSiteStore } from './store/useSiteStore'
 import { HudOverlay } from './components/hud/HudOverlay'
 import { Hero } from './components/sections/Hero'
-import { Problem } from './components/sections/Problem'
-import { HowItWorks } from './components/sections/HowItWorks'
-import { CostImpact } from './components/sections/CostImpact'
-import { Team } from './components/sections/Team'
-import { SandboxOverlay } from './components/sections/SandboxOverlay'
+import { Crisis } from './components/sections/Crisis'
+import { Engineering } from './components/sections/Engineering'
+import { BuildLog } from './components/sections/BuildLog'
+import { Sandbox } from './components/sections/Sandbox'
+import { Matrix } from './components/sections/Matrix'
+import { Business } from './components/sections/Business'
 import { DelphylaxMark } from './components/ui/DelphylaxLogo'
 
 const Scene = lazy(() => import('./components/canvas/Scene').then((m) => ({ default: m.Scene })))
@@ -29,7 +30,7 @@ function Loader() {
         <span className="sonar-ring absolute inset-0 rounded-full border border-[#e8654f]" style={{ animationDelay: '0.8s' }} />
         <DelphylaxMark size={72} animated={false} />
       </div>
-      <div className="mt-6 text-sm text-[#b7c3cc]">Loading the boat…</div>
+      <div className="mt-6 font-mono text-xs tracking-[0.35em] text-[#aab8c2]">INITIALISING ACOUSTIC ARRAY</div>
     </div>
   )
 }
@@ -38,28 +39,18 @@ export default function App() {
   useScrollSync()
   const webglOk = useSiteStore((s) => s.webglOk)
   const section = useSiteStore((s) => s.section)
-  const sandboxOpen = useSiteStore((s) => s.sandboxOpen)
+  const setSandbox = useSiteStore((s) => s.setSandbox)
   const toggleExploded = useSiteStore((s) => s.toggleExploded)
 
   useEffect(() => {
     if (!supportsWebGL()) useSiteStore.getState().setWebglOk(false)
   }, [])
 
-  // the exploded model is the labelled diagram in "How it works"
   useEffect(() => {
-    document.documentElement.dataset.section = sandboxOpen ? 'sandbox' : section
-    toggleExploded(section === 'how' && !sandboxOpen)
-  }, [section, sandboxOpen, toggleExploded])
-
-  useEffect(() => {
-    setScrollLocked(sandboxOpen)
-    if (!sandboxOpen) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') useSiteStore.getState().closeSandbox()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [sandboxOpen])
+    setSandbox(section === 'sandbox')
+    document.documentElement.dataset.section = section
+    if (section !== 'engineering') toggleExploded(false)
+  }, [section, setSandbox, toggleExploded])
 
   return (
     <>
@@ -68,16 +59,17 @@ export default function App() {
           <Scene />
         </Suspense>
       ) : (
-        <div className="fixed inset-0 z-0" style={{ background: 'radial-gradient(ellipse at 30% 20%, #163a52 0%, #0f1519 60%)' }} />
+        <div className="fixed inset-0 z-0 grid-bg" style={{ background: 'radial-gradient(ellipse at 30% 20%, #163a52 0%, #0f1519 60%)' }} />
       )}
       <HudOverlay />
-      {sandboxOpen && <SandboxOverlay />}
-      <main className={`relative z-10 transition-opacity duration-300 ${sandboxOpen ? 'pointer-events-none invisible opacity-0' : ''}`}>
+      <main className="relative z-10">
         <Hero />
-        <Problem />
-        <HowItWorks />
-        <CostImpact />
-        <Team />
+        <Crisis />
+        <Engineering />
+        <BuildLog />
+        <Sandbox />
+        <Matrix />
+        <Business />
       </main>
     </>
   )

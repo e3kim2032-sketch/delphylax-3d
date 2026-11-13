@@ -207,8 +207,7 @@ export function SonarField() {
       boxRef.current.rotation.y = t * 0.6
       boxRef.current.visible = s > 0.02
     }
-    // the lock label is part of the Try-the-sonar mode only; never over the page
-    if (labelRef.current) labelRef.current.style.opacity = active && st.sandboxOpen ? '1' : '0'
+    if (labelRef.current) labelRef.current.style.opacity = active ? '1' : '0'
   })
 
   const boxGeo = useMemo(() => new THREE.EdgesGeometry(new THREE.BoxGeometry(1.5, 0.6, 1.0)), [])
@@ -267,17 +266,17 @@ function LockLabel({ labelRef }: { labelRef: RefObject<HTMLDivElement | null> })
       <Html center distanceFactor={7.5} zIndexRange={[40, 0]} style={{ pointerEvents: 'none' }} portal={sceneRefs.htmlPortal as RefObject<HTMLElement>}>
         <div
           ref={labelRef}
-          className="hud-panel px-3 py-2 font-mono text-xs leading-tight whitespace-nowrap transition-opacity duration-300"
-          style={{ opacity: 0, minWidth: 180 }}
+          className="glass-strong hud-corner px-3 py-2 font-mono text-xs leading-tight whitespace-nowrap transition-opacity duration-300"
+          style={{ opacity: 0, borderColor: 'rgba(255,42,85,0.7)', minWidth: 180 }}
         >
-          <div className="text-xs tracking-[0.2em] text-[#ff8a73]">● TARGET · SIMULATED</div>
-          <div className="mt-1 flex justify-between gap-4 text-[#eef3f6]">
+          <div className="text-xs tracking-[0.25em] text-[#ff6b57]">● TARGET · SIMULATED</div>
+          <div className="mt-1 flex justify-between gap-4 text-white">
             <span>RANGE</span>
-            <span className="text-[#ff8a73]">{lock.distanceM.toFixed(1)} m</span>
+            <span className="text-[#ffb4a6]">{lock.distanceM.toFixed(1)}m</span>
           </div>
-          <div className="flex justify-between gap-4 text-[#eef3f6]">
+          <div className="flex justify-between gap-4 text-white">
             <span>CONFIDENCE</span>
-            <span className="text-[#ff8a73]">{(lock.confidence * 100).toFixed(0)}%</span>
+            <span className="text-[#ffb4a6]">{(lock.confidence * 100).toFixed(1)}%</span>
           </div>
         </div>
       </Html>

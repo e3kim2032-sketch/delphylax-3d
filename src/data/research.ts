@@ -17,7 +17,7 @@ export const IDENTITY = {
   former: 'Floodscout',
   tagline: 'Guardian of Zero-Visibility Waters',
   oneLiner:
-    'A 94 cm catamaran rescue scout that searches muddy flood water with sonar and drops a glowing marker where rescuers should look, without sending a person in.',
+    'A 94 cm catamaran rescue scout for street floods. Sonar finds objects under the water and a heat sensor spots people at the surface, then it drops a glowing marker so rescuers know exactly where to look — without sending a person in.',
   competitions: ['Conrad Challenge', 'KSEF 2027'],
   inspiration:
     'Inspired by the Amazon river dolphin, which finds its way through muddy river water without being able to see.',
@@ -45,11 +45,6 @@ export const CRISIS = {
     { title: 'Rescuers go in blind', body: 'No one can tell what, or who, is under the water.' },
   ],
   question: 'How can rescuers see what is under muddy flood water, quickly, without sending a person in?',
-  /** the two sentences shown in the Problem section */
-  lines: [
-    'The water rose faster than the family could escape, and no one outside could see what was happening inside.',
-    'Muddy flood water hides everything below the surface, so rescuers wade in without knowing what, or who, is there.',
-  ],
 } as const
 
 /** Inia geoffrensis echolocation — the biomimetic inspiration (not a Delphylax measurement). */
@@ -121,58 +116,47 @@ export function buoyancy(payloadKg: number) {
   return { mass, used, reserveKg: HULL.capacityKg - mass }
 }
 
-/** One-paragraph summary for the How-it-works section. */
-export const HOW_SUMMARY =
-  'Like the Amazon river dolphin, Delphylax listens instead of looking. Sonar finds objects under the muddy water, an AMG8833 heat sensor spots people at the surface, and a servo drops a glowing marker where rescuers should look.'
-
-/** The six labelled parts in the How-it-works diagram. `color` is the pin colour; sensors use the blue / pink data colours. */
 export const HOW_IT_WORKS = [
   {
     id: 'hulls',
     name: 'Catamaran hulls',
-    short: 'Two 76 cm PVC pipes, 42 cm apart',
-    body: 'Two 76 cm PVC pipes (114 mm wide), 42 cm apart, with 3D-printed nose and tail cones. Foam inside means a leak can’t sink it. An 8 mm deck sits on four printed saddles.',
-    data: false,
+    short: 'Two 76 cm PVC pipes',
+    body: 'Two 76 cm PVC pipes (114 mm wide), 42 cm apart. 3D-printed nose and tail cones are glued on, and foam inside means a leak can’t sink it.',
     color: '#f8fafc',
+  },
+  {
+    id: 'cabin',
+    name: 'Deck & cabin',
+    short: 'Airtight box, coral shell, fin',
+    body: 'An 8 mm foam PVC deck sits on four printed saddles strapped to the pipes. An airtight box on the deck holds the electronics, under a coral 3D-printed shell with a dolphin fin.',
+    color: '#ff7f66',
   },
   {
     id: 'thrusters',
     name: 'Brushless thrusters',
-    short: 'Two, one spinning each way',
-    body: 'Two brushless underwater thrusters sit under the back of the hulls. Running one faster than the other steers the boat.',
-    data: false,
+    short: '2 × QC2221, CW + CCW',
+    body: 'Two brushless underwater thrusters, one spinning each way, sit under the back of the hulls. Running one faster than the other steers the boat.',
     color: '#3b82f6',
   },
   {
-    id: 'sonar',
-    name: 'Sonar',
-    short: 'Fish-finder sonar, finds objects under the water',
-    body: 'A wireless fish-finder sonar on a float at the bow finds objects under muddy water. Readings are shown on the fish finder’s screen for now; linking them to the ESP32 is planned.',
-    data: true,
-    color: '#7fb3d5',
-  },
-  {
-    id: 'thermal',
-    name: 'Heat sensor',
-    short: 'AMG8833, spots people at the surface',
-    body: 'An AMG8833 8×8 heat sensor in the bow bezel spots people at the surface by body warmth. It cannot see under the water.',
-    data: true,
+    id: 'senses',
+    name: 'Sonar + thermal senses',
+    short: 'Fish-finder sonar · AMG8833 · compass · GPS (planned)',
+    body: 'Sonar finds objects under the water; the AMG8833 heat sensor spots people at the surface. A compass knows which way the boat points, and GPS is planned. A tilt sensor and a leak sensor watch for danger. Sonar readings are shown on the fish finder’s screen for now; linking them to the ESP32 is planned.',
     color: '#ec4899',
   },
   {
     id: 'markers',
-    name: 'Marker dropper',
-    short: 'Servo disc, four glowing markers',
+    name: 'Glow-marker dropper',
+    short: 'Servo disc, 4 tubes',
     body: 'A servo turns a disc under a rack of four tubes and drops one glowing marker at a time where something is found. Tagging each drop with a GPS position is planned.',
-    data: false,
-    color: '#ff6b57',
+    color: '#e11d48',
   },
   {
     id: 'brain',
-    name: 'ESP32 brain',
-    short: 'Remote-controlled; tilt and leak cut-off',
-    body: 'The ESP32 in the airtight deck box reads the sensors and drives the thrusters. A rescuer steers by remote control from the bank; the ESP32 cuts the motors if the boat tips past a safe angle or the leak sensor gets wet. Self-driving search is planned, not built.',
-    data: false,
+    name: 'ESP32 safety brain',
+    short: 'Tilt + leak cut-off',
+    body: 'The ESP32 reads every sensor and drives the thrusters, and it cuts the motors if the boat tips past a safe angle or the leak sensor gets wet. A 3-cell 11.1 V battery feeds a 20 A fuse, then the thrusters; a converter makes 5 V for the computer and the servo.',
     color: '#38bdf8',
   },
 ] as const
@@ -381,8 +365,8 @@ export const BUSINESS = {
   ],
   team: [
     { name: 'Eddie', role: 'Project lead · design, build and electronics' },
-    { name: 'Minnie', role: 'Policy researcher' },
-    { name: 'Luna', role: 'Writer and communications director' },
+    { name: 'Minnie', role: 'Communications director and policy researcher' },
+    { name: 'Luna', role: 'Researcher and FVI (Flood Vulnerability Index) program developer' },
   ],
   sources: [
     {
@@ -400,16 +384,30 @@ export const BUSINESS = {
   ],
 } as const
 
-export const SECTIONS = [
-  { id: 'hero', index: '01', label: 'Overview', depth: 0 },
-  { id: 'problem', index: '02', label: 'Problem', depth: -0.6 },
-  { id: 'how', index: '03', label: 'How it works', depth: -1.2 },
-  { id: 'cost', index: '04', label: 'Cost & impact', depth: -2.4 },
-  { id: 'team', index: '05', label: 'Team', depth: -3.0 },
+/**
+ * Build log photos. Drop a JPG into `public/build/` named `<id>.jpg` and it
+ * replaces the placeholder slot; until then the slot shows the caption only.
+ */
+export const BUILD_LOG = [
+  { id: '01-hull-pipes', date: 'Nov 5', caption: 'Hull pipes cut to 76 cm, nose and tail cones test-fitted' },
+  { id: '02-deck-template', date: 'Nov 6', caption: 'Deck drilled from a full-size paper template, 16 holes' },
+  { id: '03-cabin-box', date: 'Nov 7', caption: 'Electronics box drilled and bolted to the deck' },
+  { id: '04-power-harness', date: 'Nov 8', caption: 'Power wiring: 5 V converter, fuse holder and four Wago bars' },
+  { id: '05-leak-sensor', date: 'Nov 9', caption: 'Leak sensor wired to the ESP32 and tested' },
+  { id: '06-marker-servo', date: 'Nov 10', caption: 'Marker servo wired, tested and fitted in the rack' },
+  { id: '07-thrusters', date: 'Nov 11', caption: 'Thrusters (CW + CCW), battery and the first speed controller' },
+  { id: '08-first-float', date: 'Soon', caption: 'First water test: float, drive, thrust on a scale' },
 ] as const
 
-/** Depth the camera sits at while the Try-the-sonar overlay is open (m). */
-export const SANDBOX_DEPTH_M = -2.2
+export const SECTIONS = [
+  { id: 'hero', index: '01', label: 'Guardian', depth: 0 },
+  { id: 'crisis', index: '02', label: 'The Crisis', depth: -0.6 },
+  { id: 'engineering', index: '03', label: 'Engineering', depth: -1.4 },
+  { id: 'buildlog', index: '04', label: 'Build Log', depth: -1.6 },
+  { id: 'sandbox', index: '05', label: 'Field Test', depth: -2.2 },
+  { id: 'matrix', index: '06', label: 'Comparison', depth: -2.7 },
+  { id: 'business', index: '07', label: 'Business', depth: -3.0 },
+] as const
 
 /** Street-flood depth for the HUD gauge (m). */
 export const MAX_DEPTH_M = 3.0
