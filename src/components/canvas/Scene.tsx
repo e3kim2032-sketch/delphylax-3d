@@ -40,7 +40,7 @@ function PointerTracker() {
 export function Scene() {
   const setWebglOk = useSiteStore((s) => s.setWebglOk)
   return (
-    <div className="fixed inset-0 z-0" aria-hidden>
+    <div className="scene-root fixed inset-0 z-0" aria-hidden>
       <Canvas
         dpr={[1, 1.5]}
         gl={{ antialias: false, powerPreference: 'high-performance', alpha: false, stencil: false }}

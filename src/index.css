@@ -277,3 +277,47 @@ input[type='range']::-webkit-slider-thumb {
     animation: none;
   }
 }
+
+.sim-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid #3a4852;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: #c9d1d8;
+  background: rgba(15, 21, 25, 0.6);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* keep the hero headline readable over water and the 3D canvas */
+.hero-scrim {
+  position: relative;
+}
+.hero-scrim::before {
+  content: '';
+  position: absolute;
+  inset: -2rem -3rem -2rem -4rem;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 35% 45%, rgba(15, 21, 25, 0.72) 0%, rgba(15, 21, 25, 0.5) 45%, transparent 75%);
+}
+
+/* phones: the boat sits behind the text at low opacity so copy is always readable */
+@media (max-width: 767px) {
+  .hero-scrim::before {
+    display: none;
+  }
+  .scene-root canvas {
+    opacity: 0.42;
+    transition: opacity 0.4s;
+  }
+  html[data-section='sandbox'] .scene-root canvas,
+  html[data-section='engineering'] .scene-root canvas {
+    opacity: 0.6;
+  }
+}

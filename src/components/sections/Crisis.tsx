@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Droplets, Moon, AlertTriangle, EyeOff } from 'lucide-react'
 import { CRISIS } from '../../data/research'
-import { SectionShell, Kicker, Title, Reveal } from '../ui/primitives'
+import { SectionShell, Kicker, Title, Reveal, SimTag } from '../ui/primitives'
 
 const ICONS = [Droplets, Moon, AlertTriangle, EyeOff]
 
@@ -13,7 +13,7 @@ function VisibilityCompare() {
     <div className="glass-strong hud-corner rounded-lg p-3">
       <div className="mb-2 flex items-center justify-between font-mono text-[11px] ">
         <span className="text-white/70">Camera in muddy flood water · 0.2 m</span>
-        <span className="text-[#ff8a73]">Delphylax sonar + 8×8 thermal</span>
+        <span className="text-[#ff8a73]">Delphylax sonar + 8×8 thermal <SimTag /></span>
       </div>
       <div className="relative overflow-hidden rounded-md" style={{ aspectRatio: `${W}/${H}` }}>
         <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 h-full w-full">
@@ -75,7 +75,7 @@ function VisibilityCompare() {
               <circle cx="20" cy="-7" r="6" fill="#ff2d55" />
               <rect x="-40" y="-22" width="80" height="34" fill="none" stroke="#ff2d55" strokeWidth="1.2" strokeDasharray="6 4" />
               <text x="0" y="-28" fill="#ffb4a6" fontFamily="JetBrains Mono" fontSize="10" textAnchor="middle" letterSpacing="1.5">
-                HEAT + SONAR · 4.6 m · 98.4%
+                SIMULATED · HEAT + SONAR · 4.6 m · 98.4%
               </text>
             </g>
             <text x={W - 18} y="340" fill="#93a3ae" fontFamily="JetBrains Mono" fontSize="11" letterSpacing="2" textAnchor="end">
@@ -122,12 +122,12 @@ export function Crisis() {
                 <div className="mt-1 text-xs text-[#d7dde3]">lives — {CRISIS.livesLabel.toLowerCase()}</div>
               </div>
             </div>
-            <blockquote className="mt-5 border-l-2 border-[#e8654f] pl-4 text-sm italic text-[#f3ede1]/85">
-              “{CRISIS.quote}”
-              <footer className="mt-1 font-mono text-[11px] text-white/45 not-italic">
-                {CRISIS.event} · {CRISIS.sources[0]}
-              </footer>
-            </blockquote>
+            <div className="mt-5 border-l-2 border-[#e8654f] pl-4 text-sm text-[#f3ede1]/85">
+              {CRISIS.summary}
+              <div className="mt-1 font-mono text-[11px] text-white/45">
+                {CRISIS.event} · {CRISIS.summaryNote}: {CRISIS.sources.slice(0, 2).join('; ')}
+              </div>
+            </div>
           </Reveal>
           <Reveal delay={2}>
             <ul className="mt-6 grid grid-cols-2 gap-3">
@@ -151,7 +151,7 @@ export function Crisis() {
         <Reveal delay={2}>
           <VisibilityCompare />
           <p className="mt-3 text-xs text-[#a9b4bd]">
-            A rescuer wading in cannot see what is under the water. Tethered ROVs take minutes to rig, rely on cameras that fail in turbid
+            A rescuer wading in cannot see what is under the water. Tethered ROVs take minutes to rig, rely on cameras that struggle in turbid
             water, and snag on debris. Delphylax floats in, listens with sonar, confirms with heat, and drops a glowing marker.
           </p>
         </Reveal>

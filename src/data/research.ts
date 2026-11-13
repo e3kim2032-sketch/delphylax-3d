@@ -1,7 +1,7 @@
 /**
  * DELPHYLAX data layer.
  *
- * Source of truth: "Floodscout Delphylax: Project Overview" (Eddie Kim, 13 Nov 2026),
+ * Source of truth: "Floodscout Delphylax: Project Overview" (Eddie, 13 Nov 2026),
  * mirrored in delphylax-overview.md, plus the KSEF 2027 deck for the problem
  * statistics (ksef-research.md) and published Inia geoffrensis bioacoustics for
  * the biomimicry inspiration. Values the overview marks as estimates are flagged
@@ -19,8 +19,6 @@ export const IDENTITY = {
   oneLiner:
     'A 94 cm catamaran rescue scout for street floods. It searches muddy water with sonar and a heat sensor, then drops a glowing marker so rescuers know exactly where to look — without sending a person in.',
   competitions: ['Conrad Challenge', 'KSEF 2027'],
-  school: 'Chadwick International',
-  founder: 'Eddie Kim',
   inspiration:
     'Inspired by the Amazon river dolphin, which finds its way through muddy river water without being able to see.',
 } as const
@@ -31,7 +29,8 @@ export const CRISIS = {
   recordLabel: 'Heaviest rainfall since Seoul began keeping weather records',
   livesLost: 3,
   livesLabel: 'Lost when water trapped a family inside their semi-basement home',
-  quote: 'The water came in faster than they could get out, and no one outside could see in.',
+  summary: 'The water rose faster than the family could escape, and no one outside could see what was happening inside.',
+  summaryNote: 'Paraphrased from news reports',
   monsoonWindow: 'Late June – early August',
   sources: [
     'AFP / The Journal (2023)',
@@ -88,7 +87,7 @@ export const HULL = {
   pipeDiameterMm: 114,
   pipeSpacingMm: 420,
   pipeVolumeL: 7.8,
-  capacityKg: 15.6,
+  capacityKg: 15,
   weightKg: 5,
   dragKgfAt1ms: 0.18,
   topSpeedMs: 1.2,
@@ -242,6 +241,10 @@ export const COST = {
   total: PARTS_TOTAL + PRINTING.total, // 535,510
   topTwoShare: 0.43,
   usdRate: 1400,
+  /** one rounded set of headline numbers, used everywhere */
+  usdApprox: 380,
+  ratio: 26,
+  line: 'about $380 (535,510 won, estimate)',
   emilyUsd: 10000,
   emilySource: 'Military.com (2016)',
   emilySpeedMph: 25,
@@ -300,7 +303,7 @@ export const COMPETITORS = [
   {
     name: 'Delphylax',
     kind: 'Flood-rescue scout catamaran',
-    cost: '≈ ₩535,510 (≈ $380), estimate',
+    cost: 'About $380 (535,510 won, estimate)',
     deployment: 'Carried by one person, placed in the water',
     sensing: 'Fish-finder sonar + 8×8 thermal camera',
     marking: 'Drops a glowing marker, GPS-tagged',
@@ -313,7 +316,7 @@ export const COMPETITORS = [
     kind: 'Proven product, navies & lifeguards',
     cost: 'About $10,000 (Military.com, 2016)',
     deployment: 'Thrown in; reaches 25 mph',
-    sensing: 'Camera; not built to search under muddy water',
+    sensing: 'Uses a camera, which struggles in muddy water',
     marking: 'Carries flotation to a visible victim',
     maturity: 'Finished product',
     scores: { cost: 2, deployment: 5, sensing: 2, marking: 3, maturity: 5 },
@@ -322,9 +325,9 @@ export const COMPETITORS = [
   {
     name: 'Tethered ROV',
     kind: 'e.g. Blueye, Deep Trekker',
-    cost: 'Tens of thousands of dollars',
+    cost: 'Often thousands of dollars or more (not sourced)',
     deployment: 'Minutes — setup + tether management',
-    sensing: 'Optical camera, fails in turbid water',
+    sensing: 'Uses a camera, which struggles in muddy water',
     marking: 'None — operator reads a screen',
     maturity: 'Finished product',
     scores: { cost: 1, deployment: 2, sensing: 2, marking: 1, maturity: 5 },
@@ -351,9 +354,9 @@ export const BUSINESS = {
   customers: [
     { who: '119 Fire & Rescue stations', why: 'A scout per truck: see what is under the water before anyone wades in.' },
     { who: 'Municipal flood-response units', why: 'Street-by-street sweeps of flooded underpasses and low-lying districts.' },
-    { who: 'Towns without rescue-robot budgets', why: 'At about 1/25 the price of EMILY, a basic scout becomes affordable.' },
+    { who: 'Towns without rescue-robot budgets', why: 'At about 1/26 the price of EMILY, a basic scout becomes affordable.' },
   ],
-  team: [{ name: 'Eddie Kim', role: 'Founder · Systems & Robotics', affiliation: 'Chadwick International' }],
+  team: [{ name: 'Eddie' }, { name: 'Minnie' }, { name: 'Luna' }],
   sources: [
     'EMILY robotic lifeguard price and speed, Military.com (2016)',
     'Part prices: the project shopping list (estimates, November 2026)',

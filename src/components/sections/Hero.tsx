@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { Radio, Cpu, ArrowDown } from 'lucide-react'
-import { IDENTITY, HULL, COST, won, usd } from '../../data/research'
+import { IDENTITY, HULL, COST } from '../../data/research'
 import { SectionShell, Stat } from '../ui/primitives'
 import { scrollToSection } from '../../hooks/useScrollSync'
 import { useSiteStore } from '../../store/useSiteStore'
@@ -31,7 +31,7 @@ export function Hero() {
 
   return (
     <SectionShell id="hero">
-      <div ref={root} className="pointer-events-auto w-full max-w-2xl">
+      <div ref={root} className="hero-scrim pointer-events-auto w-full max-w-2xl">
         <div className="hero-fade mb-6 flex flex-wrap items-center gap-2">
           {IDENTITY.competitions.map((c) => (
             <span key={c} className="chip">
@@ -44,13 +44,13 @@ export function Hero() {
         </div>
 
         <h1 className="font-display text-[11vw] font-700 leading-[0.98] text-[#f3ede1] sm:text-6xl lg:text-[4.8rem]">
-          <span className="block overflow-hidden">
+          <span className="block overflow-hidden pb-[0.16em] -mb-[0.16em]">
             <span className="hero-line block">Guardian of</span>
           </span>
-          <span className="block overflow-hidden">
+          <span className="block overflow-hidden pb-[0.16em] -mb-[0.16em]">
             <span className="hero-line block text-[#ff8a73]">zero-visibility</span>
           </span>
-          <span className="block overflow-hidden">
+          <span className="block overflow-hidden pb-[0.16em] -mb-[0.16em]">
             <span className="hero-line block">waters.</span>
           </span>
         </h1>
@@ -71,8 +71,8 @@ export function Hero() {
 
         <div className="hero-fade mt-10 grid max-w-lg grid-cols-3 gap-3">
           <Stat value={`${HULL.lengthMm / 10}`} unit="cm" label="Catamaran length" />
-          <Stat value={`~${Math.round(HULL.capacityKg)}`} unit="kg" label="Floating capacity" accent="pink" />
-          <Stat value={usd(COST.total)} label={`Build cost · ${won(COST.total)} est.`} accent="red" />
+          <Stat value={`${HULL.capacityKg}`} unit="kg" label="Floating capacity, about" accent="pink" />
+          <Stat value={`$${COST.usdApprox}`} label="Build cost, about (535,510 won, estimate)" accent="red" />
         </div>
 
         <button onClick={() => scrollToSection('crisis')} className="hero-fade mt-12 flex items-center gap-2 text-xs text-[#93a3ae]">

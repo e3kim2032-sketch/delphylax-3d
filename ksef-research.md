@@ -6,7 +6,7 @@
 
 ## Team & competition
 
-- **Eddie Kim** · Chadwick International · KSEF 2027 (also entered in the Conrad Challenge)
+- **Eddie** · KSEF 2027 (also entered in the Conrad Challenge)
 - Project rename: Floodscout → **Delphylax** (Latin: *Dolphin Guardian*)
 - One-liner: an insect-inspired amphibious robot that finds survivors in flooded underground spaces
 

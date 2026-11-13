@@ -49,6 +49,10 @@ export function Title({ children, className = '' }: { children: ReactNode; class
   return <h2 className={`font-display text-4xl font-700 leading-[1.02] text-[#f3ede1] sm:text-5xl lg:text-[3.6rem] ${className}`}>{children}</h2>
 }
 
+export function SimTag() {
+  return <span className="sim-tag">Simulated</span>
+}
+
 export function Stat({ value, unit, label, accent = 'blue' }: { value: string; unit?: string; label: string; accent?: 'blue' | 'pink' | 'red' }) {
   const color = accent === 'blue' ? '#7fb3d5' : accent === 'pink' ? '#ff8a73' : '#ff6b57'
   return (

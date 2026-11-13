@@ -4,6 +4,7 @@ import { Radio, Crosshair, Activity, Waves, ChevronUp, Menu, X } from 'lucide-re
 import { DelphylaxMark } from '../ui/DelphylaxLogo'
 import { Waveform } from './Waveform'
 import { ThermalGrid } from './ThermalGrid'
+import { SimTag } from '../ui/primitives'
 import { useSiteStore, MAX_MARKERS, type Section } from '../../store/useSiteStore'
 import { SECTIONS, MAX_DEPTH_M, IDENTITY } from '../../data/research'
 import { scrollToSection } from '../../hooks/useScrollSync'
@@ -65,7 +66,7 @@ function SensorMonitor() {
     <div className="glass hud-corner rounded-md p-3 font-mono" style={{ width: 248 }}>
       <div className="mb-2 flex items-center justify-between text-[8px] tracking-[0.08em] text-[#93a3ae]">
         <span className="flex items-center gap-1">
-          <Activity size={10} /> {IDENTITY.unit} · {IDENTITY.model}
+          <Activity size={10} /> {IDENTITY.model} <SimTag />
         </span>
         <span className={lock.active ? 'text-[#ff6b57]' : 'text-[#7fb3d5]'}>{lock.active ? '● LOCK' : '○ SCANNING'}</span>
       </div>

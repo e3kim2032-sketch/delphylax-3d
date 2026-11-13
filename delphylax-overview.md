@@ -1,6 +1,6 @@
 # Floodscout Delphylax: Project Overview
 
-Nov 13, 2026 · Eddie Kim. Source of truth for `src/data/research.ts`.
+Nov 13, 2026 · Eddie. Source of truth for `src/data/research.ts`.
 
 ## Summary
 

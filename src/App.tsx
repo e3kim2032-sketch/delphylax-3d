@@ -47,6 +47,7 @@ export default function App() {
 
   useEffect(() => {
     setSandbox(section === 'sandbox')
+    document.documentElement.dataset.section = section
     if (section !== 'engineering') toggleExploded(false)
   }, [section, setSandbox, toggleExploded])
 

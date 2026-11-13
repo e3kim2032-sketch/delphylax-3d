@@ -44,7 +44,7 @@ function BuoyancyChart({ payload }: { payload: number }) {
               </text>
               <rect x={padL} y={y - 6} width={Math.max(2, sx(r.value) - padL)} height={12} rx={4} fill={r.color} opacity={hover === null || hover === i ? 1 : 0.45} />
               <text x={sx(r.value) + 6} y={y + 4} fill="#fff" fontSize="10" fontFamily="JetBrains Mono">
-                {r.value.toFixed(1)} kg
+                {r.label === 'FLOAT' ? `about ${r.value}` : r.value.toFixed(1)} kg
               </text>
             </g>
           )
@@ -121,7 +121,7 @@ export function Engineering() {
 
   return (
     <SectionShell id="engineering" className="!items-start">
-      <div className="pointer-events-auto grid w-full max-w-7xl gap-8 lg:grid-cols-[minmax(0,340px)_1fr_minmax(0,380px)]">
+      <div className="pointer-events-auto grid w-full max-w-7xl grid-cols-1 gap-8 lg:grid-cols-[minmax(0,340px)_1fr_minmax(0,380px)] [&>*]:min-w-0">
         <div>
           <Reveal>
             <Kicker index="03">Biomimicry & engineering</Kicker>
@@ -190,7 +190,7 @@ export function Engineering() {
                   {SPECS.map((s) => (
                     <tr key={s.spec} className="border-t border-white/8">
                       <td className="py-1.5 pr-2 text-[#a9b4bd]">{s.spec}</td>
-                      <td className="py-1.5 pr-2 font-mono text-white whitespace-nowrap">{s.value}</td>
+                      <td className="py-1.5 pr-2 font-mono text-white">{s.value}</td>
                       <td className="py-1.5 text-[10px] text-white/45">
                         {s.estimate && <span className="mr-1 text-[#ffb4a6]">est.</span>}
                         {s.how}

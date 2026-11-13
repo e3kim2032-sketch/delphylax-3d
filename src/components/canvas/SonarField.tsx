@@ -269,7 +269,7 @@ function LockLabel({ labelRef }: { labelRef: RefObject<HTMLDivElement | null> })
           className="glass-strong hud-corner px-3 py-2 font-mono text-[11px] leading-tight whitespace-nowrap transition-opacity duration-300"
           style={{ opacity: 0, borderColor: 'rgba(255,42,85,0.7)', minWidth: 180 }}
         >
-          <div className="text-[9px] tracking-[0.25em] text-[#ff6b57]">● TARGET · SONAR + THERMAL</div>
+          <div className="text-[9px] tracking-[0.25em] text-[#ff6b57]">● TARGET · SIMULATED</div>
           <div className="mt-1 flex justify-between gap-4 text-white">
             <span>RANGE</span>
             <span className="text-[#ffb4a6]">{lock.distanceM.toFixed(1)}m</span>

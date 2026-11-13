@@ -1,10 +1,9 @@
 import { Users, CircleDot, Circle, CheckCircle2, AlertTriangle, BookOpen } from 'lucide-react'
-import { BUSINESS, ROADMAP, COST, LIMITS, IDENTITY, won, usd } from '../../data/research'
+import { BUSINESS, ROADMAP, COST, LIMITS, IDENTITY } from '../../data/research'
 import { SectionShell, Kicker, Title, Reveal, Stat } from '../ui/primitives'
 import { DelphylaxLockup } from '../ui/DelphylaxLogo'
 
 export function Business() {
-  const ratio = Math.round(COST.emilyUsd / (COST.total / COST.usdRate))
   return (
     <SectionShell id="business" className="!items-start pb-10">
       <div className="pointer-events-auto w-full max-w-7xl">
@@ -14,16 +13,16 @@ export function Business() {
             A scout on every <span className="text-gradient">rescue truck.</span>
           </Title>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[#d7dde3]">
-            One Delphylax costs about {won(COST.total)} (≈ {usd(COST.total)}) to build, roughly 1/{ratio} of EMILY, a proven robotic lifeguard used by navies and
+            One Delphylax costs {COST.line} to build, about 1/{COST.ratio} of EMILY, a proven robotic lifeguard used by navies and
             lifeguards. That is cheap enough for a basic flood scout to ride on every rescue vehicle in towns that can’t afford professional rescue robots.
           </p>
         </Reveal>
 
         <Reveal delay={1}>
           <div className="mt-8 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
-            <Stat value={usd(COST.total)} label={`Delphylax · ${won(COST.total)} est.`} accent="pink" />
+            <Stat value={`$${COST.usdApprox}`} label="Delphylax, about (535,510 won, estimate)" accent="pink" />
             <Stat value={`$${(COST.emilyUsd / 1000).toFixed(0)}k`} label="EMILY robotic lifeguard" accent="blue" />
-            <Stat value={`1/${ratio}`} label="of the price" accent="red" />
+            <Stat value={`1/${COST.ratio}`} label="About, of EMILY’s price" accent="red" />
             <Stat value={`${COST.emilySpeedMph}`} unit="mph" label="EMILY top speed" accent="blue" />
           </div>
           <p className="mt-2 max-w-3xl font-mono text-[11px] text-white/40 ">
@@ -88,22 +87,16 @@ export function Business() {
             <Reveal delay={3}>
               <div className="glass hud-corner rounded-lg p-5">
                 <div className="mb-3 font-mono text-[11px] text-[#93a3ae] ">Team</div>
+                <div className="space-y-3">
                 {BUSINESS.team.map((m) => (
                   <div key={m.name} className="flex items-center gap-4">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full font-display text-lg font-800 text-white" style={{ background: 'linear-gradient(135deg,#2f5f85,#e8654f)' }}>
-                      {m.name
-                        .split(' ')
-                        .map((n) => n[0])
-                        .join('')}
+                      {m.name[0]}
                     </div>
-                    <div>
-                      <div className="font-display text-base font-800 text-white">{m.name}</div>
-                      <div className="text-xs text-[#a9b4bd]">
-                        {m.role} · {m.affiliation}
-                      </div>
-                    </div>
+                    <div className="font-display text-base font-800 text-white">{m.name}</div>
                   </div>
                 ))}
+                </div>
               </div>
             </Reveal>
             <Reveal delay={4}>
@@ -126,7 +119,7 @@ export function Business() {
         <footer className="mt-14 flex flex-col items-start justify-between gap-6 border-t border-white/10 pt-8 sm:flex-row sm:items-center">
           <DelphylaxLockup height={40} />
           <div className="font-mono text-[11px] text-white/45 ">
-            {IDENTITY.founder} · {IDENTITY.school} · {IDENTITY.competitions.join(' · ')}
+            {BUSINESS.team.map((m) => m.name).join(', ')} · {IDENTITY.competitions.join(' · ')}
           </div>
         </footer>
       </div>

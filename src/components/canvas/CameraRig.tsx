@@ -13,14 +13,14 @@ interface Waypoint {
 
 const WAYPOINTS: Record<string, Waypoint> = {
   // above the surface
-  hero: { pos: new THREE.Vector3(2.6, 1.1, 4.3), look: new THREE.Vector3(-1.0, 0.1, 0), fov: 40 },
+  hero: { pos: new THREE.Vector3(2.6, 1.1, 4.3), look: new THREE.Vector3(-1.7, 0.1, 0), fov: 40 },
   // just under the surface, looking up at the hulls from the port quarter
   crisis: { pos: new THREE.Vector3(-3.4, -0.5, 3.8), look: new THREE.Vector3(0.6, -0.25, 0), fov: 44 },
   // surface level, exploded parts rise above
   engineering: { pos: new THREE.Vector3(3.4, 1.7, 5.6), look: new THREE.Vector3(0.6, 0.45, 0), fov: 40 },
   // diver's view: hulls overhead, sonar field on the riverbed ahead
   sandbox: { pos: new THREE.Vector3(-0.2, -0.8, 7.6), look: new THREE.Vector3(3.0, -1.9, -0.6), fov: 50 },
-  matrix: { pos: new THREE.Vector3(5.6, -0.6, -4.2), look: new THREE.Vector3(0.2, -0.5, 0.4), fov: 38 },
+  matrix: { pos: new THREE.Vector3(5.6, -0.6, -4.2), look: new THREE.Vector3(-1.6, -0.5, 0.4), fov: 38 },
   business: { pos: new THREE.Vector3(0.2, 1.5, 5.2), look: new THREE.Vector3(0.2, 0.2, 0), fov: 38 },
 }
 
@@ -50,6 +50,12 @@ export function CameraRig() {
     const b = WAYPOINTS[ORDER[i + 1]]
     tmpPos.lerpVectors(a.pos, b.pos, f)
     tmpLook.lerpVectors(a.look, b.look, f)
+    if (portrait) {
+      // the desktop side-offsets push the boat out of a narrow frame: recentre it, and sit it low behind the lower text
+      tmpLook.x *= 0.15
+      tmpPos.x *= 0.4
+      tmpLook.y += 0.7
+    }
     if (back !== 1) tmpPos.sub(tmpLook).multiplyScalar(back).add(tmpLook)
     const fov = THREE.MathUtils.lerp(a.fov, b.fov, f)
 

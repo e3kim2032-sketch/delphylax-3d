@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Radio, Shuffle, Filter, Boxes, MapPin, RotateCcw } from 'lucide-react'
 import { useSiteStore, MAX_MARKERS } from '../../store/useSiteStore'
 import { SONAR } from '../../data/research'
-import { SectionShell, Kicker, Title, Reveal } from '../ui/primitives'
+import { SectionShell, Kicker, Title, Reveal, SimTag } from '../ui/primitives'
 import { sceneRefs } from '../canvas/sceneRefs'
 
 function RevealMeter() {
@@ -121,7 +121,7 @@ export function Sandbox() {
           <Reveal delay={2}>
             <div className="glass-strong hud-corner space-y-3 rounded-lg p-4 font-mono" style={{ borderColor: lock.active ? 'rgba(255,107,87,0.7)' : undefined }}>
               <div className="flex items-center justify-between text-[11px] ">
-                <span className="text-[#93a3ae]">Target status</span>
+                <span className="flex items-center gap-2 text-[#93a3ae]">Target status <SimTag /></span>
                 <span className={lock.active ? 'text-[#ff6b57] blink' : 'text-white/50'}>{lock.active ? '● LOCKED' : '○ SEARCHING'}</span>
               </div>
               <RevealMeter />

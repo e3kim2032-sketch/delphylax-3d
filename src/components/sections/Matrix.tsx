@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Check, Minus, X } from 'lucide-react'
-import { COMPETITORS, MATRIX_COLUMNS, COST, usd } from '../../data/research'
+import { COMPETITORS, MATRIX_COLUMNS, COST } from '../../data/research'
 import { SectionShell, Kicker, Title, Reveal } from '../ui/primitives'
 
 function Score({ n }: { n: number }) {
@@ -20,17 +20,16 @@ function Score({ n }: { n: number }) {
 
 export function Matrix() {
   const [hover, setHover] = useState<string | null>(null)
-  const ratio = Math.round(COST.emilyUsd / (COST.total / COST.usdRate))
   return (
     <SectionShell id="matrix" align="center" className="!items-end lg:!items-center">
       <div className="pointer-events-auto w-full max-w-6xl lg:pt-20">
         <Reveal>
           <Kicker index="05">Competitive matrix</Kicker>
           <Title className="max-w-3xl">
-            About <span className="text-gradient">1/{ratio} the price</span> of a proven rescue robot.
+            About <span className="text-gradient">1/{COST.ratio} the price</span> of a proven rescue robot.
           </Title>
           <p className="mt-3 max-w-2xl text-sm text-[#d7dde3]">
-            EMILY, used by navies and lifeguards, sells for about ${COST.emilyUsd.toLocaleString()} ({COST.emilySource}). Delphylax costs about {usd(COST.total)}.
+            EMILY, used by navies and lifeguards, sells for about ${COST.emilyUsd.toLocaleString()} ({COST.emilySource}). Delphylax costs {COST.line}.
             EMILY is a finished product that reaches {COST.emilySpeedMph} mph, so this compares price, not ability. It shows that a basic flood scout could be
             cheap enough for towns that can’t afford professional rescue robots.
           </p>
