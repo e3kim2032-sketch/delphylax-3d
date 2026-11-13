@@ -5,7 +5,6 @@ import { HudOverlay } from './components/hud/HudOverlay'
 import { Hero } from './components/sections/Hero'
 import { Crisis } from './components/sections/Crisis'
 import { Engineering } from './components/sections/Engineering'
-import { BuildLog } from './components/sections/BuildLog'
 import { Sandbox } from './components/sections/Sandbox'
 import { Matrix } from './components/sections/Matrix'
 import { Business } from './components/sections/Business'
@@ -66,7 +65,6 @@ export default function App() {
         <Hero />
         <Crisis />
         <Engineering />
-        <BuildLog />
         <Sandbox />
         <Matrix />
         <Business />

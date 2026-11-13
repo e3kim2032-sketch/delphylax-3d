@@ -60,14 +60,6 @@ Values marked "estimate" are calculated, not yet measured.
 - 3D printing: **73,610 won** (57,000 estimate for plates 1–12 + 16,610 reprint incl. 3,700 shipping; PETG/PLA, 4 walls, 15–20% infill, supports off).
 - **Total ≈ 535,510 won ≈ $380** at 1,400 won/$. EMILY robotic lifeguard ≈ $10,000 (Military.com, 2016), ~25× more; EMILY reaches 25 mph, so this compares price, not ability.
 
-## Build status
-
-Hulls, deck, cabin box and power harness done; waiting on reprinted saddles, the second ESC and two sensors before the first water test.
-
-Done: leak sensor wired + tested · marker servo wired + fitted · pipes cut to 76 cm, cones test-fitted · 5 V converter, fuse holder, four Wago bars · deck drilled (16 holes, paper template) · electronics box bolted to the deck · thrusters (CW + CCW), battery, one ESC arrived.
-
-To do: pay for / receive reprinted saddles + thruster mounts · foam pipe ends, glue cones (epoxy + screws) · fit parts in the box, seal holes with silicone · second ESC, tilt sensor, compass (on the way) · wire thrusters, battery, fuse; write the brain code · first water test (float, drive, thrust on a scale) · add GPS, heat sensor, sonar.
-
 ## Limits and next steps
 
 Hull shape caps speed near 1.2 m/s: slow street floods, not fast rivers. We will state only what we measure.

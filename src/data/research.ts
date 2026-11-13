@@ -266,29 +266,6 @@ export const COST_BY_GROUP = Object.entries(
   .map(([group, won]) => ({ group, won }))
   .sort((a, b) => b.won - a.won)
 
-export const BUILD_STATUS = {
-  summary:
-    'The hulls, deck, cabin box and power harness are done; the boat is waiting on the reprinted saddles, the second speed controller and two sensors before its first water test.',
-  done: [
-    'Leak sensor wired to the ESP32 and tested',
-    'Marker servo wired and tested; servo fitted in the marker rack',
-    'Hull pipes cut to 76 cm; nose and tail cones test-fitted',
-    'Power wiring: 5 V converter, fuse holder and four Wago bars',
-    'Deck drilled with all 16 holes from a full-size paper template',
-    'Electronics box drilled and bolted to the deck',
-    'Thrusters (CW + CCW), battery and one speed controller arrived',
-  ],
-  todo: [
-    'Pay for and receive the reprinted saddles and thruster mounts',
-    'Foam in both ends of each pipe, then glue the cones with epoxy and screws',
-    'Fit the parts inside the box; seal every hole with silicone',
-    'Second speed controller, tilt sensor and compass (on the way)',
-    'Wire thrusters, battery and fuse; write the full brain code',
-    'First water test: float, drive, and measure thrust with a scale',
-    'Add GPS, heat sensor and sonar',
-  ],
-} as const
-
 export const WATER_TEST = [
   { test: 'Float', measure: 'Waterline and trim with the full payload', status: 'pending' },
   { test: 'Drive & steer', measure: 'Differential thrust turning, straight-line speed', status: 'pending' },
@@ -351,7 +328,7 @@ export const MATRIX_COLUMNS = [
 ] as const
 
 export const ROADMAP = [
-  { phase: 'Now', date: 'Nov 2026', title: 'Delphylax build', body: 'Hulls, deck, cabin box and power harness done. Waiting on reprinted saddles, second ESC, tilt sensor and compass.', state: 'active' as const },
+  { phase: 'Now', date: 'Nov 2026', title: 'Delphylax build', body: 'Building the first full-size Delphylax: hulls, deck, cabin, power and thrusters.', state: 'active' as const },
   { phase: 'Next', date: 'Nov–Dec 2026', title: 'First water test', body: 'Float, drive, measure thrust with a scale, and test the current the boat can hold against.', state: 'planned' as const },
   { phase: 'Then', date: 'KSEF 2027', title: 'Sonar + thermal search', body: 'Add GPS, heat sensor and sonar; measure detection in a muddy test tank; replace estimates with receipts and measurements.', state: 'planned' as const },
   { phase: 'Level 2', date: 'Conrad Challenge', title: 'Stronger push', body: 'Bigger thrusters (3 to 3.5 kgf each) on a 4-cell battery, if testing shows slow street floods are not enough.', state: 'planned' as const },
@@ -388,10 +365,9 @@ export const SECTIONS = [
   { id: 'hero', index: '01', label: 'Guardian', depth: 0 },
   { id: 'crisis', index: '02', label: 'The Crisis', depth: -0.6 },
   { id: 'engineering', index: '03', label: 'Engineering', depth: -1.4 },
-  { id: 'buildlog', index: '04', label: 'Build Log', depth: -1.6 },
-  { id: 'sandbox', index: '05', label: 'Field Test', depth: -2.2 },
-  { id: 'matrix', index: '06', label: 'Comparison', depth: -2.7 },
-  { id: 'business', index: '07', label: 'Business', depth: -3.0 },
+  { id: 'sandbox', index: '04', label: 'Field Test', depth: -2.2 },
+  { id: 'matrix', index: '05', label: 'Comparison', depth: -2.7 },
+  { id: 'business', index: '06', label: 'Business', depth: -3.0 },
 ] as const
 
 /** Street-flood depth for the HUD gauge (m). */

@@ -8,7 +8,7 @@ export function Business() {
     <SectionShell id="business" className="!items-start pb-10">
       <div className="pointer-events-auto w-full max-w-7xl">
         <Reveal>
-          <Kicker index="07">Commercial viability, roadmap & team</Kicker>
+          <Kicker index="06">Commercial viability, roadmap & team</Kicker>
           <Title>
             A scout on every <span className="text-gradient">rescue truck.</span>
           </Title>

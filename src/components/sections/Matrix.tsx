@@ -24,7 +24,7 @@ export function Matrix() {
     <SectionShell id="matrix" align="center" className="!items-end lg:!items-center">
       <div className="pointer-events-auto w-full max-w-6xl lg:pt-20">
         <Reveal>
-          <Kicker index="06">Competitive matrix</Kicker>
+          <Kicker index="05">Competitive matrix</Kicker>
           <Title className="max-w-3xl">
             About <span className="text-gradient">1/{COST.ratio} the price</span> of a proven rescue robot.
           </Title>

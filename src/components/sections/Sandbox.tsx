@@ -53,7 +53,7 @@ export function Sandbox() {
       <div className="pointer-events-none grid w-full max-w-7xl gap-6 lg:grid-cols-[minmax(0,360px)_1fr_minmax(0,300px)] lg:items-end">
         <div className="pointer-events-auto">
           <Reveal>
-            <Kicker index="05">Field test mode</Kicker>
+            <Kicker index="04">Field test mode</Kicker>
             <Title className="!text-3xl sm:!text-4xl">
               Live playable <span className="text-gradient">search sandbox.</span>
             </Title>
