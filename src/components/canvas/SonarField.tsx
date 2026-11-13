@@ -266,10 +266,10 @@ function LockLabel({ labelRef }: { labelRef: RefObject<HTMLDivElement | null> })
       <Html center distanceFactor={7.5} zIndexRange={[40, 0]} style={{ pointerEvents: 'none' }} portal={sceneRefs.htmlPortal as RefObject<HTMLElement>}>
         <div
           ref={labelRef}
-          className="glass-strong hud-corner px-3 py-2 font-mono text-[11px] leading-tight whitespace-nowrap transition-opacity duration-300"
+          className="glass-strong hud-corner px-3 py-2 font-mono text-xs leading-tight whitespace-nowrap transition-opacity duration-300"
           style={{ opacity: 0, borderColor: 'rgba(255,42,85,0.7)', minWidth: 180 }}
         >
-          <div className="text-[9px] tracking-[0.25em] text-[#ff6b57]">● TARGET · SIMULATED</div>
+          <div className="text-xs tracking-[0.25em] text-[#ff6b57]">● TARGET · SIMULATED</div>
           <div className="mt-1 flex justify-between gap-4 text-white">
             <span>RANGE</span>
             <span className="text-[#ffb4a6]">{lock.distanceM.toFixed(1)}m</span>

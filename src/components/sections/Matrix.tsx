@@ -24,7 +24,7 @@ export function Matrix() {
     <SectionShell id="matrix" align="center" className="!items-end lg:!items-center">
       <div className="pointer-events-auto w-full max-w-6xl lg:pt-20">
         <Reveal>
-          <Kicker index="05">Competitive matrix</Kicker>
+          <Kicker index="06">Competitive matrix</Kicker>
           <Title className="max-w-3xl">
             About <span className="text-gradient">1/{COST.ratio} the price</span> of a proven rescue robot.
           </Title>
@@ -38,7 +38,7 @@ export function Matrix() {
           <div className="glass-strong hud-corner mt-8 overflow-x-auto rounded-lg" style={{ background: 'rgba(19, 27, 33, 0.92)' }}>
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead>
-                <tr className="font-mono text-[11px] text-white/50 ">
+                <tr className="font-mono text-xs text-white/65 ">
                   <th className="px-4 py-4 font-medium">Criterion</th>
                   {COMPETITORS.map((c) => (
                     <th key={c.name} className="px-4 py-4 font-medium" style={c.highlight ? { color: '#ffb4a6', background: 'linear-gradient(180deg, rgba(232,101,79,0.12), transparent)' } : undefined}>
@@ -55,7 +55,7 @@ export function Matrix() {
                     {COMPETITORS.map((c) => (
                       <td key={c.name} className="px-4 py-3 align-top" style={c.highlight ? { background: 'rgba(232,101,79,0.06)' } : undefined}>
                         <Score n={c.scores[col.key]} />
-                        <div className="mt-1 text-xs leading-snug text-[#a9b4bd]">{c[col.key]}</div>
+                        <div className="mt-1 text-xs leading-snug text-[#b9c4cc]">{c[col.key]}</div>
                       </td>
                     ))}
                   </tr>
@@ -63,7 +63,7 @@ export function Matrix() {
               </tbody>
             </table>
           </div>
-          <p className="mt-3 text-center font-mono text-[11px] text-white/40 ">
+          <p className="mt-3 text-center font-mono text-xs text-white/60 ">
             Scores 1–5 · icons carry the rating alongside color · Delphylax cost is a planning estimate, not receipts
           </p>
         </Reveal>

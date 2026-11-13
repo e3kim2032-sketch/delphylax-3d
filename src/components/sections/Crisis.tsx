@@ -11,9 +11,9 @@ function VisibilityCompare() {
   const H = 360
   return (
     <div className="glass-strong hud-corner rounded-lg p-3">
-      <div className="mb-2 flex items-center justify-between font-mono text-[11px] ">
+      <div className="mb-2 flex items-center justify-between font-mono text-xs ">
         <span className="text-white/70">Camera in muddy flood water · 0.2 m</span>
-        <span className="text-[#ff8a73]">Delphylax sonar + 8×8 thermal <SimTag /></span>
+        <span className="text-[#ff8a73]">Delphylax sonar, under water <SimTag /></span>
       </div>
       <div className="relative overflow-hidden rounded-md" style={{ aspectRatio: `${W}/${H}` }}>
         <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 h-full w-full">
@@ -42,7 +42,7 @@ function VisibilityCompare() {
           <rect width={W} height={H} fill="url(#torch)" />
           {/* faint shape barely visible at 0.2 m */}
           <ellipse cx="86" cy="190" rx="22" ry="10" fill="#3a2f1c" opacity="0.5" />
-          <text x="18" y="340" fill="#9c8f6a" fontFamily="JetBrains Mono" fontSize="11" letterSpacing="2">
+          <text x="18" y="340" fill="#9c8f6a" fontFamily="JetBrains Mono" fontSize="13" letterSpacing="2">
             VISIBILITY 0.2 m · TARGET NOT FOUND
           </text>
 
@@ -54,8 +54,8 @@ function VisibilityCompare() {
             ))}
             {[1, 2, 3, 4, 5].map((m) => (
               <g key={m}>
-                <line x1={40 + m * 110} y1={H / 2 - 8} x2={40 + m * 110} y2={H / 2 + 8} stroke="#93a3ae" strokeOpacity="0.6" />
-                <text x={40 + m * 110} y={H / 2 + 24} fill="#93a3ae" fontFamily="JetBrains Mono" fontSize="10" textAnchor="middle">
+                <line x1={40 + m * 110} y1={H / 2 - 8} x2={40 + m * 110} y2={H / 2 + 8} stroke="#aab8c2" strokeOpacity="0.6" />
+                <text x={40 + m * 110} y={H / 2 + 24} fill="#aab8c2" fontFamily="JetBrains Mono" fontSize="13" textAnchor="middle">
                   {m}m
                 </text>
               </g>
@@ -74,12 +74,12 @@ function VisibilityCompare() {
               <path d="M-24 2 C-18 -8 -6 -10 2 -6 L14 -8 C20 -9 24 -4 22 0 C18 4 10 4 4 4 L-20 6 Z" fill="#ff2d55" />
               <circle cx="20" cy="-7" r="6" fill="#ff2d55" />
               <rect x="-40" y="-22" width="80" height="34" fill="none" stroke="#ff2d55" strokeWidth="1.2" strokeDasharray="6 4" />
-              <text x="0" y="-28" fill="#ffb4a6" fontFamily="JetBrains Mono" fontSize="10" textAnchor="middle" letterSpacing="1.5">
-                SIMULATED · HEAT + SONAR · 4.6 m · 98.4%
+              <text x="0" y="-28" fill="#ffb4a6" fontFamily="JetBrains Mono" fontSize="13" textAnchor="middle" letterSpacing="1.5">
+                SIMULATED · SONAR ECHO · 4.6 m · 98.4%
               </text>
             </g>
-            <text x={W - 18} y="340" fill="#93a3ae" fontFamily="JetBrains Mono" fontSize="11" letterSpacing="2" textAnchor="end">
-              ECHO FILTER ON · HEAT CONFIRMED · 1 TARGET
+            <text x={W - 18} y="340" fill="#aab8c2" fontFamily="JetBrains Mono" fontSize="13" letterSpacing="2" textAnchor="end">
+              ECHO FILTER ON · 1 OBJECT FOUND
             </text>
           </g>
 
@@ -124,7 +124,7 @@ export function Crisis() {
             </div>
             <div className="mt-5 border-l-2 border-[#e8654f] pl-4 text-sm text-[#f3ede1]/85">
               {CRISIS.summary}
-              <div className="mt-1 font-mono text-[11px] text-white/45">
+              <div className="mt-1 font-mono text-xs text-white/60">
                 {CRISIS.event} · {CRISIS.summaryNote}: {CRISIS.sources.slice(0, 2).join('; ')}
               </div>
             </div>
@@ -138,21 +138,21 @@ export function Crisis() {
                     <div className="flex items-center gap-2 font-display text-sm font-700 text-white">
                       <Icon size={14} className="text-[#ff8a73]" /> {w.title}
                     </div>
-                    <p className="mt-1 text-xs leading-relaxed text-[#a9b4bd]">{w.body}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-[#b9c4cc]">{w.body}</p>
                   </li>
                 )
               })}
             </ul>
-            <p className="mt-4 font-mono text-[10px] text-[#93a3ae] ">
+            <p className="mt-4 font-mono text-xs text-[#aab8c2] ">
               Monsoon window · {CRISIS.monsoonWindow} · every summer
             </p>
           </Reveal>
         </div>
         <Reveal delay={2}>
           <VisibilityCompare />
-          <p className="mt-3 text-xs text-[#a9b4bd]">
-            A rescuer wading in cannot see what is under the water. Tethered ROVs take minutes to rig, rely on cameras that struggle in turbid
-            water, and snag on debris. Delphylax floats in, listens with sonar, confirms with heat, and drops a glowing marker.
+          <p className="mt-3 text-xs text-[#b9c4cc]">
+            A rescuer wading in cannot see what is under the water, and tethered ROVs rely on cameras that struggle in muddy water. Delphylax floats
+            in: sonar finds objects under the water, the AMG8833 heat sensor spots people at the surface, and it drops a glowing marker where rescuers should look.
           </p>
         </Reveal>
       </div>

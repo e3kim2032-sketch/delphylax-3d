@@ -5,6 +5,7 @@ import { HudOverlay } from './components/hud/HudOverlay'
 import { Hero } from './components/sections/Hero'
 import { Crisis } from './components/sections/Crisis'
 import { Engineering } from './components/sections/Engineering'
+import { BuildLog } from './components/sections/BuildLog'
 import { Sandbox } from './components/sections/Sandbox'
 import { Matrix } from './components/sections/Matrix'
 import { Business } from './components/sections/Business'
@@ -29,7 +30,7 @@ function Loader() {
         <span className="sonar-ring absolute inset-0 rounded-full border border-[#e8654f]" style={{ animationDelay: '0.8s' }} />
         <DelphylaxMark size={72} animated={false} />
       </div>
-      <div className="mt-6 font-mono text-[10px] tracking-[0.35em] text-[#93a3ae]">INITIALISING ACOUSTIC ARRAY</div>
+      <div className="mt-6 font-mono text-xs tracking-[0.35em] text-[#aab8c2]">INITIALISING ACOUSTIC ARRAY</div>
     </div>
   )
 }
@@ -65,6 +66,7 @@ export default function App() {
         <Hero />
         <Crisis />
         <Engineering />
+        <BuildLog />
         <Sandbox />
         <Matrix />
         <Business />

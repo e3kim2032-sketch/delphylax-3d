@@ -272,23 +272,28 @@ function DeckAndCabin({ m }: { m: Mats }) {
         </mesh>
       </Part>
 
-      {/* electronics box + boards */}
+      {/* electronics box + boards: the airtight food box lies flat on the deck,
+          250 mm long (bow to stern) × 150 mm wide × 100 mm tall, under the shell.
+          boxGeometry args are [across, up, along]; the deck top is at z = 86. */}
       <Part explode={[0, 0.62, 0]}>
-        <mesh material={m.box} position={mm(0, 0, 136)}>
-          <boxGeometry args={[150 * S, 250 * S, 100 * S]} />
+        <mesh material={m.box} position={mm(0, 0, 86 + 50)}>
+          <boxGeometry args={[150 * S, 100 * S, 250 * S]} />
         </mesh>
-        <mesh material={m.pcb} position={mm(0, -70, 92)}>
-          <boxGeometry args={[56 * S, 75 * S, 6 * S]} />
+        {/* 5 V converter / power PCB, flat on the floor near the bow end */}
+        <mesh material={m.pcb} position={mm(0, -80, 86 + 3)}>
+          <boxGeometry args={[56 * S, 6 * S, 75 * S]} />
         </mesh>
-        <mesh material={m.esp} position={mm(0, 40, 100)}>
-          <boxGeometry args={[70 * S, 60 * S, 22 * S]} />
+        {/* ESP32 screw-terminal board, flat, starboard half */}
+        <mesh material={m.esp} position={mm(35, 30, 86 + 7.5)}>
+          <boxGeometry args={[70 * S, 15 * S, 55 * S]} />
         </mesh>
-        <mesh position={mm(-40, 60, 95)}>
-          <boxGeometry args={[50 * S, 70 * S, 18 * S]} />
+        {/* 3S 18650 battery pack, flat, port half */}
+        <mesh position={mm(-38, 50, 86 + 10)}>
+          <boxGeometry args={[60 * S, 20 * S, 75 * S]} />
           <meshStandardMaterial color="#1e293b" />
         </mesh>
-        {/* ESP32 status LED */}
-        <mesh position={mm(18, 10, 112)}>
+        {/* ESP32 status LED on top of the board */}
+        <mesh position={mm(48, 18, 86 + 15 + 3)}>
           <sphereGeometry args={[3 * S, 10, 10]} />
           <meshBasicMaterial color="#7fb3d5" toneMapped={false} />
         </mesh>
@@ -452,7 +457,7 @@ function Callouts() {
               e.stopPropagation()
               select(selected === s.id ? null : s.id)
             }}
-            className="glass-strong hud-corner flex items-center gap-2 px-3 py-2 text-left font-mono text-[10px] tracking-[0.15em] uppercase whitespace-nowrap transition-all"
+            className="glass-strong hud-corner flex items-center gap-2 px-3 py-2 text-left font-mono text-xs tracking-[0.15em] uppercase whitespace-nowrap transition-all"
             style={{
               opacity: 0,
               pointerEvents: 'auto',

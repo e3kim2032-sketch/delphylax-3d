@@ -21,8 +21,8 @@ function RevealMeter() {
   }, [])
   return (
     <div>
-      <div className="flex justify-between font-mono text-[11px] text-white/55 ">
-        <span>Echo + heat return</span>
+      <div className="flex justify-between font-mono text-xs text-white/70 ">
+        <span>Sonar echo return</span>
         <span ref={txt} className="text-white">
           0%
         </span>
@@ -53,7 +53,7 @@ export function Sandbox() {
       <div className="pointer-events-none grid w-full max-w-7xl gap-6 lg:grid-cols-[minmax(0,360px)_1fr_minmax(0,300px)] lg:items-end">
         <div className="pointer-events-auto">
           <Reveal>
-            <Kicker index="04">Field test mode</Kicker>
+            <Kicker index="05">Field test mode</Kicker>
             <Title className="!text-3xl sm:!text-4xl">
               Live playable <span className="text-gradient">search sandbox.</span>
             </Title>
@@ -65,7 +65,7 @@ export function Sandbox() {
           <Reveal delay={1}>
             <div className="glass-strong hud-corner mt-5 space-y-4 rounded-lg p-4">
               <div>
-                <div className="mb-2 flex items-center gap-2 font-mono text-[11px] text-[#93a3ae] ">
+                <div className="mb-2 flex items-center gap-2 font-mono text-xs text-[#aab8c2] ">
                   <Boxes size={11} /> Clutter density
                 </div>
                 <div className="flex gap-2">
@@ -78,7 +78,7 @@ export function Sandbox() {
                 </div>
               </div>
               <div>
-                <div className="mb-2 flex items-center gap-2 font-mono text-[11px] text-[#93a3ae] ">
+                <div className="mb-2 flex items-center gap-2 font-mono text-xs text-[#aab8c2] ">
                   <Filter size={11} /> Echo filter · k = {SONAR.sparsityK}
                 </div>
                 <div className="flex gap-2">
@@ -120,41 +120,44 @@ export function Sandbox() {
         <div className="pointer-events-auto">
           <Reveal delay={2}>
             <div className="glass-strong hud-corner space-y-3 rounded-lg p-4 font-mono" style={{ borderColor: lock.active ? 'rgba(255,107,87,0.7)' : undefined }}>
-              <div className="flex items-center justify-between text-[11px] ">
-                <span className="flex items-center gap-2 text-[#93a3ae]">Target status <SimTag /></span>
-                <span className={lock.active ? 'text-[#ff6b57] blink' : 'text-white/50'}>{lock.active ? '● LOCKED' : '○ SEARCHING'}</span>
+              <div className="flex items-center justify-between text-xs ">
+                <span className="flex items-center gap-2 text-[#aab8c2]">Target status <SimTag /></span>
+                <span className={lock.active ? 'text-[#ff6b57] blink' : 'text-white/65'}>{lock.active ? '● LOCKED' : '○ SEARCHING'}</span>
               </div>
               <RevealMeter />
-              <div className="grid grid-cols-2 gap-3 text-[10px]">
+              <div className="grid grid-cols-2 gap-3 text-xs">
                 <div>
-                  <div className="text-white/50">RANGE</div>
+                  <div className="text-white/65">RANGE</div>
                   <div className="text-xl text-white">
                     {lock.distanceM ? lock.distanceM.toFixed(1) : '--.-'}
-                    <span className="text-[11px] text-[#93a3ae]"> m</span>
+                    <span className="text-xs text-[#aab8c2]"> m</span>
                   </div>
                 </div>
                 <div>
-                  <div className="text-white/50">CONFIDENCE</div>
+                  <div className="text-white/65">CONFIDENCE</div>
                   <div className={`text-xl ${lock.active ? 'text-[#ff6b57]' : 'text-white'}`}>
                     {(lock.confidence * 100).toFixed(1)}
-                    <span className="text-[11px] text-[#93a3ae]"> %</span>
+                    <span className="text-xs text-[#aab8c2]"> %</span>
                   </div>
                 </div>
                 <div>
-                  <div className="text-white/50">LOCK THRESHOLD</div>
+                  <div className="text-white/65">LOCK THRESHOLD</div>
                   <div className="text-white">{(SONAR.lockThreshold * 100).toFixed(0)}%</div>
                 </div>
                 <div>
-                  <div className="text-white/50">SWEEPS · MARKERS</div>
+                  <div className="text-white/65">SWEEPS · MARKERS</div>
                   <div className="text-white">
                     {String(pingCount).padStart(4, '0')} · {markers.length}
                   </div>
                 </div>
               </div>
-              <p className="border-t border-white/10 pt-2 text-[11px] leading-relaxed text-white/45">
+              <p className="border-t border-white/10 pt-2 text-xs leading-relaxed text-white/60">
                 {sparsity
-                  ? `Filter keeps the ${SONAR.sparsityK} strongest returns per sweep; sediment echoes are energy-spread and dropped. Heat from the AMG8833 confirms a person.`
+                  ? `Filter keeps the ${SONAR.sparsityK} strongest returns per sweep; sediment echoes are energy-spread and dropped.`
                   : 'Filter off: every echo is kept. Sediment speckle floods the return and confidence collapses below the lock threshold.'}
+              </p>
+              <p className="text-xs leading-relaxed text-white/72">
+                {SONAR.roles} {SONAR.integration}
               </p>
             </div>
           </Reveal>

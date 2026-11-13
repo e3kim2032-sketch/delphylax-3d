@@ -17,7 +17,7 @@ export const IDENTITY = {
   former: 'Floodscout',
   tagline: 'Guardian of Zero-Visibility Waters',
   oneLiner:
-    'A 94 cm catamaran rescue scout for street floods. It searches muddy water with sonar and a heat sensor, then drops a glowing marker so rescuers know exactly where to look — without sending a person in.',
+    'A 94 cm catamaran rescue scout for street floods. Sonar finds objects under the water and a heat sensor spots people at the surface, then it drops a glowing marker so rescuers know exactly where to look — without sending a person in.',
   competitions: ['Conrad Challenge', 'KSEF 2027'],
   inspiration:
     'Inspired by the Amazon river dolphin, which finds its way through muddy river water without being able to see.',
@@ -56,7 +56,7 @@ export const BIOACOUSTICS = {
   centroidFrequencyKHz: 95,
   reference: 'Ladegaard et al. (2015), J. Exp. Biol. 218: 3091–3101',
   principle:
-    'River dolphins trade range for resolution: short, quiet, high-frequency clicks fired at a high rate let them navigate root-choked, sediment-filled water with no visibility at all. Delphylax borrows the idea — listen, don’t look — with a fish-finder sonar and an 8×8 heat camera.',
+    'River dolphins trade range for resolution: short, quiet, high-frequency clicks fired at a high rate let them navigate root-choked, sediment-filled water with no visibility at all. Delphylax borrows the idea — listen, don’t look — with a fish-finder sonar under the water and an AMG8833 heat sensor for people at the surface.',
 } as const
 
 export const SONAR = {
@@ -64,7 +64,14 @@ export const SONAR = {
   sparsityK: 8,
   sonarUnit: 'LUCKY FF718LiC-W wireless fish finder',
   thermalUnit: 'AMG8833 8×8 thermal camera',
+  /** what each sensor can and cannot do — used wherever sensing is described */
+  roles: 'Sonar finds objects under the water; the AMG8833 heat sensor spots people at the surface.',
+  integration: 'Sonar readings are shown on the fish finder’s screen for now; linking them to the ESP32 is planned.',
 } as const
+
+/** How the boat is steered. One sentence, shown in the Engineering section. */
+export const CONTROL_MODE =
+  'A rescuer steers Delphylax by remote control from the bank; the ESP32 on board only takes over to cut the motors if the boat tips or leaks. Self-driving search is planned, not built.'
 
 export const SPECS = [
   { spec: 'Length, nose tip to tail', value: 'about 940 mm', how: 'From the design (760 mm pipes + cones)', estimate: false },
@@ -134,15 +141,15 @@ export const HOW_IT_WORKS = [
   {
     id: 'senses',
     name: 'Sonar + thermal senses',
-    short: 'Fish-finder sonar · AMG8833 · GPS · compass',
-    body: 'Sonar sees under muddy water, an 8×8 heat sensor finds body warmth, and GPS and a compass know where the boat is. A tilt sensor and a leak sensor watch for danger.',
+    short: 'Fish-finder sonar · AMG8833 · compass · GPS (planned)',
+    body: 'Sonar finds objects under the water; the AMG8833 heat sensor spots people at the surface. A compass knows which way the boat points, and GPS is planned. A tilt sensor and a leak sensor watch for danger. Sonar readings are shown on the fish finder’s screen for now; linking them to the ESP32 is planned.',
     color: '#ec4899',
   },
   {
     id: 'markers',
     name: 'Glow-marker dropper',
     short: 'Servo disc, 4 tubes',
-    body: 'A servo turns a disc under a rack of four tubes and drops one glowing marker at a time where something is found.',
+    body: 'A servo turns a disc under a rack of four tubes and drops one glowing marker at a time where something is found. Tagging each drop with a GPS position is planned.',
     color: '#e11d48',
   },
   {
@@ -305,8 +312,8 @@ export const COMPETITORS = [
     kind: 'Flood-rescue scout catamaran',
     cost: 'About $380 (535,510 won, estimate)',
     deployment: 'Carried by one person, placed in the water',
-    sensing: 'Fish-finder sonar + 8×8 thermal camera',
-    marking: 'Drops a glowing marker, GPS-tagged',
+    sensing: 'Sonar finds objects under the water; heat sensor spots people at the surface',
+    marking: 'Drops a glowing marker (GPS tag planned)',
     maturity: 'Prototype — first water test pending',
     scores: { cost: 5, deployment: 4, sensing: 4, marking: 5, maturity: 2 },
     highlight: true,
@@ -325,12 +332,12 @@ export const COMPETITORS = [
   {
     name: 'Tethered ROV',
     kind: 'e.g. Blueye, Deep Trekker',
-    cost: 'Often thousands of dollars or more (not sourced)',
-    deployment: 'Minutes — setup + tether management',
+    cost: 'Varies by model; price not sourced here',
+    deployment: 'Needs a tether and an operator',
     sensing: 'Uses a camera, which struggles in muddy water',
     marking: 'None — operator reads a screen',
     maturity: 'Finished product',
-    scores: { cost: 1, deployment: 2, sensing: 2, marking: 1, maturity: 5 },
+    scores: { cost: 2, deployment: 3, sensing: 2, marking: 1, maturity: 5 },
     highlight: false,
   },
 ] as const
@@ -358,19 +365,44 @@ export const BUSINESS = {
   ],
   team: [{ name: 'Eddie' }, { name: 'Minnie' }, { name: 'Luna' }],
   sources: [
-    'EMILY robotic lifeguard price and speed, Military.com (2016)',
-    'Part prices: the project shopping list (estimates, November 2026)',
-    'Reprint price: print shop checkout total (November 2026)',
+    {
+      label: 'EMILY robotic lifeguard price and speed, Military.com (2016)',
+      href: 'https://www.military.com/daily-news/2016/05/18/meet-the-us-navys-robotic-lifeguard-named-emily.html',
+    },
+    {
+      label: 'Part prices: the project shopping list (estimates, November 2026)',
+      href: 'https://github.com/e3kim2032-sketch/delphylax-3d/blob/main/delphylax-overview.md#costs',
+    },
+    {
+      label: 'Reprint price: print shop checkout total (November 2026)',
+      href: 'https://github.com/e3kim2032-sketch/delphylax-3d/blob/main/delphylax-overview.md#costs',
+    },
   ],
 } as const
+
+/**
+ * Build log photos. Drop a JPG into `public/build/` named `<id>.jpg` and it
+ * replaces the placeholder slot; until then the slot shows the caption only.
+ */
+export const BUILD_LOG = [
+  { id: '01-hull-pipes', date: 'Nov 5', caption: 'Hull pipes cut to 76 cm, nose and tail cones test-fitted' },
+  { id: '02-deck-template', date: 'Nov 6', caption: 'Deck drilled from a full-size paper template, 16 holes' },
+  { id: '03-cabin-box', date: 'Nov 7', caption: 'Electronics box drilled and bolted to the deck' },
+  { id: '04-power-harness', date: 'Nov 8', caption: 'Power wiring: 5 V converter, fuse holder and four Wago bars' },
+  { id: '05-leak-sensor', date: 'Nov 9', caption: 'Leak sensor wired to the ESP32 and tested' },
+  { id: '06-marker-servo', date: 'Nov 10', caption: 'Marker servo wired, tested and fitted in the rack' },
+  { id: '07-thrusters', date: 'Nov 11', caption: 'Thrusters (CW + CCW), battery and the first speed controller' },
+  { id: '08-first-float', date: 'Soon', caption: 'First water test: float, drive, thrust on a scale' },
+] as const
 
 export const SECTIONS = [
   { id: 'hero', index: '01', label: 'Guardian', depth: 0 },
   { id: 'crisis', index: '02', label: 'The Crisis', depth: -0.6 },
   { id: 'engineering', index: '03', label: 'Engineering', depth: -1.4 },
-  { id: 'sandbox', index: '04', label: 'Field Test', depth: -2.2 },
-  { id: 'matrix', index: '05', label: 'Comparison', depth: -2.7 },
-  { id: 'business', index: '06', label: 'Business', depth: -3.0 },
+  { id: 'buildlog', index: '04', label: 'Build Log', depth: -1.6 },
+  { id: 'sandbox', index: '05', label: 'Field Test', depth: -2.2 },
+  { id: 'matrix', index: '06', label: 'Comparison', depth: -2.7 },
+  { id: 'business', index: '07', label: 'Business', depth: -3.0 },
 ] as const
 
 /** Street-flood depth for the HUD gauge (m). */

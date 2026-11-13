@@ -158,7 +158,7 @@ export function DelphylaxLockup({ height = 44, className = '', subtitle = true }
       <svg height={height} width={w - height - 12} viewBox="0 0 300 44" role="img" aria-label="DELPHYLAX wordmark">
         <defs>
           <linearGradient id={grad} x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#93a3ae" />
+            <stop offset="0%" stopColor="#aab8c2" />
             <stop offset="60%" stopColor="#f3ede1" />
             <stop offset="100%" stopColor="#ffb4a6" />
           </linearGradient>

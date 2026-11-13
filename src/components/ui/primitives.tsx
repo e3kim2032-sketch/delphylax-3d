@@ -37,7 +37,7 @@ export function SectionShell({ id, children, className = '', align = 'left' }: {
 
 export function Kicker({ index, children }: { index: string; children: ReactNode }) {
   return (
-    <div className="mb-4 flex items-center gap-3 font-mono text-[11px] text-[#93a3ae]">
+    <div className="mb-4 flex items-center gap-3 font-mono text-xs text-[#aab8c2]">
       <span className="text-[#ff8a73]">{index}</span>
       <span className="h-px w-6 bg-[#e8654f]" />
       <span>{children}</span>
@@ -65,7 +65,7 @@ export function Stat({ value, unit, label, accent = 'blue' }: { value: string; u
           </span>
         )}
       </div>
-      <div className="mt-1 text-[11px] text-white/55">{label}</div>
+      <div className="mt-1 text-xs text-white/70">{label}</div>
     </div>
   )
 }

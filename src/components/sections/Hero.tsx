@@ -56,7 +56,7 @@ export function Hero() {
         </h1>
 
         <p className="hero-fade mt-6 max-w-xl text-base leading-relaxed text-[#d7dde3] sm:text-lg">{IDENTITY.oneLiner}</p>
-        <p className="hero-fade mt-3 max-w-xl text-xs text-[#93a3ae]">
+        <p className="hero-fade mt-3 max-w-xl text-xs text-[#aab8c2]">
           {IDENTITY.greek}. {IDENTITY.inspiration}
         </p>
 
@@ -72,10 +72,10 @@ export function Hero() {
         <div className="hero-fade mt-10 grid max-w-lg grid-cols-3 gap-3">
           <Stat value={`${HULL.lengthMm / 10}`} unit="cm" label="Catamaran length" />
           <Stat value={`${HULL.capacityKg}`} unit="kg" label="Floating capacity, about" accent="pink" />
-          <Stat value={`$${COST.usdApprox}`} label="Build cost, about (535,510 won, estimate)" accent="red" />
+          <Stat value={`$${COST.usdApprox}`} label={`Build cost, est. ${COST.total.toLocaleString('en-US')} won (about $${COST.usdApprox})`} accent="red" />
         </div>
 
-        <button onClick={() => scrollToSection('crisis')} className="hero-fade mt-12 flex items-center gap-2 text-xs text-[#93a3ae]">
+        <button onClick={() => scrollToSection('crisis')} className="hero-fade mt-12 flex items-center gap-2 text-xs text-[#aab8c2]">
           <ArrowDown size={12} className="animate-bounce" /> Scroll down. Click anywhere in the water to ping.
         </button>
       </div>
