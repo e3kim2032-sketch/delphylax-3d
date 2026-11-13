@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import type { SubsystemId } from '../data/research'
 
 export type Clutter = 'low' | 'extreme'
-export type Section = 'hero' | 'crisis' | 'engineering' | 'buildlog' | 'sandbox' | 'matrix' | 'business'
+export type Section = 'hero' | 'problem' | 'how' | 'progress' | 'cost' | 'team'
 
 export interface Ping {
   id: number
@@ -39,6 +39,8 @@ interface SiteState {
   clutter: Clutter
   sparsity: boolean
   sandboxActive: boolean
+  /** the Try-the-sonar overlay is open: camera dives, page scroll is locked */
+  sandboxOpen: boolean
   pings: Ping[]
   pingCount: number
   lock: TargetLock
@@ -54,6 +56,8 @@ interface SiteState {
   setClutter: (c: Clutter) => void
   toggleSparsity: (v?: boolean) => void
   setSandbox: (v: boolean) => void
+  openSandbox: () => void
+  closeSandbox: () => void
   emitPing: (x: number, y: number, z: number) => void
   prunePings: (now: number, ttl: number) => void
   setLock: (l: Partial<TargetLock>) => void
@@ -78,6 +82,7 @@ export const useSiteStore = create<SiteState>((set, get) => ({
   clutter: 'low',
   sparsity: true,
   sandboxActive: false,
+  sandboxOpen: false,
   pings: [],
   pingCount: 0,
   lock: { active: false, distanceM: 0, confidence: 0, sx: 0.5, sy: 0.5, lockedAt: 0 },
@@ -97,6 +102,8 @@ export const useSiteStore = create<SiteState>((set, get) => ({
   setClutter: (clutter) => set({ clutter }),
   toggleSparsity: (v) => set((s) => ({ sparsity: v ?? !s.sparsity })),
   setSandbox: (sandboxActive) => set({ sandboxActive }),
+  openSandbox: () => set({ sandboxOpen: true, sandboxActive: true, explodedOn: false }),
+  closeSandbox: () => set({ sandboxOpen: false, sandboxActive: false, lock: { active: false, distanceM: 0, confidence: 0, sx: 0.5, sy: 0.5, lockedAt: 0 } }),
   emitPing: (x, y, z) =>
     set((s) => ({
       pings: [...s.pings.slice(-5), { id: ++pingId, x, y, z, t: performance.now() / 1000 }],

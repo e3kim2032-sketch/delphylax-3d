@@ -55,8 +55,8 @@ export function Waveform({ width = 220, height = 54 }: { width?: number; height?
       ctx.stroke()
 
       const grad = ctx.createLinearGradient(0, 0, width, 0)
-      grad.addColorStop(0, '#5b8fb8')
-      grad.addColorStop(1, st.lock.active ? '#ff2d55' : '#e8654f')
+      grad.addColorStop(0, '#2a8f85')
+      grad.addColorStop(1, st.lock.active ? '#eafffc' : '#4dd4c6')
       ctx.strokeStyle = grad
       ctx.lineWidth = 1.5
       ctx.shadowColor = st.lock.active ? 'rgba(255,107,87,0.8)' : 'rgba(232,101,79,0.6)'

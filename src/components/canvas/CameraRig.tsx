@@ -2,7 +2,7 @@ import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useSiteStore } from '../../store/useSiteStore'
-import { SECTIONS, MAX_DEPTH_M } from '../../data/research'
+import { SECTIONS, MAX_DEPTH_M, SANDBOX_DEPTH_M } from '../../data/research'
 import { sceneRefs } from './sceneRefs'
 
 interface Waypoint {
@@ -15,15 +15,15 @@ const WAYPOINTS: Record<string, Waypoint> = {
   // above the surface
   hero: { pos: new THREE.Vector3(2.6, 1.1, 4.3), look: new THREE.Vector3(-1.7, 0.1, 0), fov: 40 },
   // just under the surface, looking up at the hulls from the port quarter
-  crisis: { pos: new THREE.Vector3(-3.4, -0.5, 3.8), look: new THREE.Vector3(0.6, -0.25, 0), fov: 44 },
-  // surface level, exploded parts rise above
-  engineering: { pos: new THREE.Vector3(3.4, 1.7, 5.6), look: new THREE.Vector3(0.6, 0.45, 0), fov: 40 },
+  problem: { pos: new THREE.Vector3(-3.4, -0.5, 3.8), look: new THREE.Vector3(0.6, -0.25, 0), fov: 44 },
+  // surface level, exploded parts rise above: the labelled diagram
+  how: { pos: new THREE.Vector3(3.0, 1.7, 5.8), look: new THREE.Vector3(-0.5, 0.45, 0), fov: 40 },
   // low three-quarter view from the bow while the photo grid scrolls past
-  buildlog: { pos: new THREE.Vector3(-3.0, 0.9, 5.4), look: new THREE.Vector3(1.2, 0.2, 0), fov: 40 },
-  // diver's view: hulls overhead, sonar field on the riverbed ahead
+  progress: { pos: new THREE.Vector3(-3.0, 0.9, 5.4), look: new THREE.Vector3(1.2, 0.2, 0), fov: 40 },
+  cost: { pos: new THREE.Vector3(5.6, -0.6, -4.2), look: new THREE.Vector3(-1.6, -0.5, 0.4), fov: 38 },
+  team: { pos: new THREE.Vector3(0.2, 1.5, 5.2), look: new THREE.Vector3(0.2, 0.2, 0), fov: 38 },
+  // diver's view for the Try-the-sonar overlay: hulls overhead, sonar field on the riverbed ahead
   sandbox: { pos: new THREE.Vector3(-0.2, -0.8, 7.6), look: new THREE.Vector3(3.0, -1.9, -0.6), fov: 50 },
-  matrix: { pos: new THREE.Vector3(5.6, -0.6, -4.2), look: new THREE.Vector3(-1.6, -0.5, 0.4), fov: 38 },
-  business: { pos: new THREE.Vector3(0.2, 1.5, 5.2), look: new THREE.Vector3(0.2, 0.2, 0), fov: 38 },
 }
 
 const ORDER = SECTIONS.map((s) => s.id)
@@ -48,8 +48,9 @@ export function CameraRig() {
     const p = st.scrollProgress * (ORDER.length - 1) // 0..5 continuous
     const i = Math.min(ORDER.length - 2, Math.max(0, Math.floor(p)))
     const f = THREE.MathUtils.smoothstep(p - i, 0, 1)
-    const a = WAYPOINTS[ORDER[i]]
-    const b = WAYPOINTS[ORDER[i + 1]]
+    const dive = st.sandboxOpen
+    const a = dive ? WAYPOINTS.sandbox : WAYPOINTS[ORDER[i]]
+    const b = dive ? WAYPOINTS.sandbox : WAYPOINTS[ORDER[i + 1]]
     tmpPos.lerpVectors(a.pos, b.pos, f)
     tmpLook.lerpVectors(a.look, b.look, f)
     if (portrait) {
@@ -88,7 +89,7 @@ export function CameraRig() {
     if (dt > 0) sceneRefs.fps = THREE.MathUtils.lerp(sceneRefs.fps, 1 / dt, 0.05)
 
     // depth factor for environment
-    const d01 = Math.min(1, Math.max(0, -st.depthM / MAX_DEPTH_M))
+    const d01 = Math.min(1, Math.max(0, -(dive ? SANDBOX_DEPTH_M : st.depthM) / MAX_DEPTH_M))
     sceneRefs.depth01 = THREE.MathUtils.lerp(sceneRefs.depth01, d01, 1 - Math.exp(-dt * 3))
   })
   return null

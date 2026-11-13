@@ -1,16 +1,12 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
-import { Radio, Cpu, ArrowDown } from 'lucide-react'
-import { IDENTITY, HULL, COST } from '../../data/research'
-import { SectionShell, Stat } from '../ui/primitives'
+import { ArrowDown } from 'lucide-react'
+import { IDENTITY } from '../../data/research'
+import { SectionShell, Accent } from '../ui/primitives'
 import { scrollToSection } from '../../hooks/useScrollSync'
-import { useSiteStore } from '../../store/useSiteStore'
-import { sceneRefs } from '../canvas/sceneRefs'
 
 export function Hero() {
   const root = useRef<HTMLDivElement>(null)
-  const emitPing = useSiteStore((s) => s.emitPing)
-  const toggleExploded = useSiteStore((s) => s.toggleExploded)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -20,64 +16,32 @@ export function Hero() {
     return () => ctx.revert()
   }, [])
 
-  const launch = () => {
-    scrollToSection('sandbox')
-    setTimeout(() => emitPing(sceneRefs.nose.x, sceneRefs.nose.y, sceneRefs.nose.z), 1400)
-  }
-  const inspect = () => {
-    scrollToSection('engineering')
-    setTimeout(() => toggleExploded(true), 900)
-  }
-
   return (
     <SectionShell id="hero">
       <div ref={root} className="hero-scrim pointer-events-auto w-full max-w-2xl">
-        <div className="hero-fade mb-6 flex flex-wrap items-center gap-2">
-          {IDENTITY.competitions.map((c) => (
-            <span key={c} className="chip">
-              {c}
-            </span>
-          ))}
-          <span className="chip" style={{ color: '#ffb4a6', borderColor: 'rgba(232,101,79,0.45)', background: 'rgba(232,101,79,0.1)' }}>
-            {IDENTITY.model} · {IDENTITY.unit}
-          </span>
-        </div>
+        <p className="hero-fade mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-[#b7c3cc]">{IDENTITY.competitions.join(' · ')}</p>
 
-        <h1 className="font-display text-[11vw] font-700 leading-[0.98] text-[#f3ede1] sm:text-6xl lg:text-[4.8rem]">
+        <h1 className="font-display text-[11vw] font-700 leading-[0.98] text-[#eef3f6] sm:text-6xl lg:text-[4.8rem]">
           <span className="block overflow-hidden pb-[0.16em] -mb-[0.16em]">
             <span className="hero-line block">Guardian of</span>
           </span>
           <span className="block overflow-hidden pb-[0.16em] -mb-[0.16em]">
-            <span className="hero-line block text-[#ff8a73]">zero-visibility</span>
+            <span className="hero-line block">
+              <Accent>zero-visibility</Accent>
+            </span>
           </span>
           <span className="block overflow-hidden pb-[0.16em] -mb-[0.16em]">
             <span className="hero-line block">waters.</span>
           </span>
         </h1>
 
-        <p className="hero-fade mt-6 max-w-xl text-base leading-relaxed text-[#d7dde3] sm:text-lg">{IDENTITY.oneLiner}</p>
-        <p className="hero-fade mt-3 max-w-xl text-xs text-[#aab8c2]">
-          {IDENTITY.greek}. {IDENTITY.inspiration}
-        </p>
+        <p className="hero-fade mt-7 max-w-xl text-lg leading-relaxed text-[#eef3f6]/90 sm:text-xl">{IDENTITY.oneLiner}</p>
 
-        <div className="hero-fade mt-8 flex flex-wrap gap-3">
-          <button className="btn-primary" onClick={launch}>
-            <Radio size={16} /> Launch Sonar Simulation
-          </button>
-          <button className="btn-secondary" onClick={inspect}>
-            <Cpu size={16} /> Inspect Hardware
+        <div className="hero-fade mt-10">
+          <button className="btn-primary" onClick={() => scrollToSection('how')}>
+            See how it works <ArrowDown size={16} />
           </button>
         </div>
-
-        <div className="hero-fade mt-10 grid max-w-lg grid-cols-3 gap-3">
-          <Stat value={`${HULL.lengthMm / 10}`} unit="cm" label="Catamaran length" />
-          <Stat value={`${HULL.capacityKg}`} unit="kg" label="Floating capacity, about" accent="pink" />
-          <Stat value={`$${COST.usdApprox}`} label={`Build cost, est. ${COST.total.toLocaleString('en-US')} won (about $${COST.usdApprox})`} accent="red" />
-        </div>
-
-        <button onClick={() => scrollToSection('crisis')} className="hero-fade mt-12 flex items-center gap-2 text-xs text-[#aab8c2]">
-          <ArrowDown size={12} className="animate-bounce" /> Scroll down. Click anywhere in the water to ping.
-        </button>
       </div>
     </SectionShell>
   )

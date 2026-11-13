@@ -430,12 +430,14 @@ function SonarFloat({ m }: { m: Mats }) {
 /* ------------------------------------------------------------------ */
 const PIN_POS: Record<SubsystemId, [number, number, number]> = {
   hulls: mm(-HX - 60, -120, -120),
-  cabin: mm(0, -40, 420),
   thrusters: mm(HX + 60, 320, -220),
-  senses: mm(0, -330, 150),
+  sonar: mm(-80, -330, -40),
+  thermal: mm(60, -300, 200),
   markers: mm(0, 420, 240),
-  brain: mm(-120, 60, 300),
+  brain: mm(-120, 60, 330),
 }
+const PIN_NEUTRAL = '#eef3f6'
+const PIN_DATA = '#4dd4c6'
 
 function Callouts() {
   const select = useSiteStore((s) => s.selectSubsystem)
@@ -457,16 +459,15 @@ function Callouts() {
               e.stopPropagation()
               select(selected === s.id ? null : s.id)
             }}
-            className="glass-strong hud-corner flex items-center gap-2 px-3 py-2 text-left font-mono text-xs tracking-[0.15em] uppercase whitespace-nowrap transition-all"
+            className="card flex items-center gap-2 !rounded-md px-3 py-1.5 text-left text-[13px] font-medium whitespace-nowrap transition-colors"
             style={{
               opacity: 0,
               pointerEvents: 'auto',
-              borderColor: selected === s.id ? s.color : undefined,
-              boxShadow: selected === s.id ? `0 0 24px ${s.color}66` : undefined,
+              borderColor: selected === s.id ? (s.data ? PIN_DATA : PIN_NEUTRAL) : undefined,
             }}
           >
-            <span className="block h-2 w-2 rounded-full" style={{ background: s.color, boxShadow: `0 0 10px ${s.color}` }} />
-            <span className="text-white/90">{s.name}</span>
+            <span className="block h-2 w-2 rounded-full" style={{ background: s.data ? PIN_DATA : PIN_NEUTRAL }} />
+            <span className="text-[#eef3f6]">{s.name}</span>
           </button>
         </Html>
       ))}
@@ -512,7 +513,7 @@ export function DelphylaxModel() {
 
     // autonomous sonar sweep
     const now = performance.now() / 1000
-    const interval = st.section === 'hero' ? 3.4 : st.section === 'sandbox' ? 6.5 : 4.8
+    const interval = st.sandboxOpen ? 6.5 : st.section === 'hero' ? 3.4 : 4.8
     if (now - sceneRefs.lastPing > interval) emitPing(sceneRefs.nose.x, sceneRefs.nose.y, sceneRefs.nose.z)
     const last = st.pings[st.pings.length - 1]
     if (last && last.t > sceneRefs.lastPing) {

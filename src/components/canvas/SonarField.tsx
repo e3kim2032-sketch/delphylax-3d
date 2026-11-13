@@ -61,12 +61,12 @@ function GlowMarker({ x, y, z, t }: { x: number; y: number; z: number; t: number
     <group ref={g}>
       <mesh>
         <sphereGeometry args={[0.035, 14, 14]} />
-        <meshBasicMaterial color="#ff2d55" toneMapped={false} />
+        <meshBasicMaterial color="#4dd4c6" toneMapped={false} />
       </mesh>
-      <pointLight color="#ff2d55" intensity={2.5} distance={2.5} decay={2} />
+      <pointLight color="#4dd4c6" intensity={2.5} distance={2.5} decay={2} />
       <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
         <ringGeometry args={[0.18, 0.21, 48]} />
-        <meshBasicMaterial color="#ff6b57" transparent opacity={0.6} toneMapped={false} side={THREE.DoubleSide} depthWrite={false} />
+        <meshBasicMaterial color="#4dd4c6" transparent opacity={0.6} toneMapped={false} side={THREE.DoubleSide} depthWrite={false} />
       </mesh>
       <lineSegments geometry={line}>
         <lineBasicMaterial color="#ffffff" transparent opacity={0.25} />
@@ -80,7 +80,7 @@ export function SonarField() {
   const rockMat = useMemo(() => createSonarMaterial({ rock: true, instanced: true }), [])
   const rocksRef = useRef<THREE.InstancedMesh>(null)
   const victimRef = useRef<THREE.Group>(null)
-  const victimMaterial = useMemo(() => new THREE.MeshBasicMaterial({ color: '#ff2a55', transparent: true, opacity: 0, toneMapped: false }), [])
+  const victimMaterial = useMemo(() => new THREE.MeshBasicMaterial({ color: '#eafffc', transparent: true, opacity: 0, toneMapped: false }), [])
   const boxRef = useRef<THREE.LineSegments>(null)
   const labelRef = useRef<HTMLDivElement>(null)
   const emitPing = useSiteStore((s) => s.emitPing)
@@ -207,7 +207,8 @@ export function SonarField() {
       boxRef.current.rotation.y = t * 0.6
       boxRef.current.visible = s > 0.02
     }
-    if (labelRef.current) labelRef.current.style.opacity = active ? '1' : '0'
+    // the lock label is part of the Try-the-sonar mode only; never over the page
+    if (labelRef.current) labelRef.current.style.opacity = active && st.sandboxOpen ? '1' : '0'
   })
 
   const boxGeo = useMemo(() => new THREE.EdgesGeometry(new THREE.BoxGeometry(1.5, 0.6, 1.0)), [])
@@ -243,7 +244,7 @@ export function SonarField() {
       </group>
 
       <lineSegments ref={boxRef} geometry={boxGeo} visible={false}>
-        <lineBasicMaterial color="#ff2a55" toneMapped={false} transparent opacity={0.95} />
+        <lineBasicMaterial color="#4dd4c6" toneMapped={false} transparent opacity={0.95} />
       </lineSegments>
 
       <LockLabel labelRef={labelRef} />
@@ -266,17 +267,17 @@ function LockLabel({ labelRef }: { labelRef: RefObject<HTMLDivElement | null> })
       <Html center distanceFactor={7.5} zIndexRange={[40, 0]} style={{ pointerEvents: 'none' }} portal={sceneRefs.htmlPortal as RefObject<HTMLElement>}>
         <div
           ref={labelRef}
-          className="glass-strong hud-corner px-3 py-2 font-mono text-xs leading-tight whitespace-nowrap transition-opacity duration-300"
-          style={{ opacity: 0, borderColor: 'rgba(255,42,85,0.7)', minWidth: 180 }}
+          className="hud-panel px-3 py-2 font-mono text-xs leading-tight whitespace-nowrap transition-opacity duration-300"
+          style={{ opacity: 0, minWidth: 180 }}
         >
-          <div className="text-xs tracking-[0.25em] text-[#ff6b57]">● TARGET · SIMULATED</div>
-          <div className="mt-1 flex justify-between gap-4 text-white">
+          <div className="text-xs tracking-[0.2em] text-[#4dd4c6]">● TARGET · SIMULATED</div>
+          <div className="mt-1 flex justify-between gap-4 text-[#eef3f6]">
             <span>RANGE</span>
-            <span className="text-[#ffb4a6]">{lock.distanceM.toFixed(1)}m</span>
+            <span className="text-[#4dd4c6]">{lock.distanceM.toFixed(1)} m</span>
           </div>
-          <div className="flex justify-between gap-4 text-white">
+          <div className="flex justify-between gap-4 text-[#eef3f6]">
             <span>CONFIDENCE</span>
-            <span className="text-[#ffb4a6]">{(lock.confidence * 100).toFixed(1)}%</span>
+            <span className="text-[#4dd4c6]">{(lock.confidence * 100).toFixed(0)}%</span>
           </div>
         </div>
       </Html>
