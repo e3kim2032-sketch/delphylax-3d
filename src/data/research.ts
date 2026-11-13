@@ -384,21 +384,6 @@ export const BUSINESS = {
   ],
 } as const
 
-/**
- * Build log photos. Drop a JPG into `public/build/` named `<id>.jpg` and it
- * replaces the placeholder slot; until then the slot shows the caption only.
- */
-export const BUILD_LOG = [
-  { id: '01-hull-pipes', date: 'Nov 5', caption: 'Hull pipes cut to 76 cm, nose and tail cones test-fitted' },
-  { id: '02-deck-template', date: 'Nov 6', caption: 'Deck drilled from a full-size paper template, 16 holes' },
-  { id: '03-cabin-box', date: 'Nov 7', caption: 'Electronics box drilled and bolted to the deck' },
-  { id: '04-power-harness', date: 'Nov 8', caption: 'Power wiring: 5 V converter, fuse holder and four Wago bars' },
-  { id: '05-leak-sensor', date: 'Nov 9', caption: 'Leak sensor wired to the ESP32 and tested' },
-  { id: '06-marker-servo', date: 'Nov 10', caption: 'Marker servo wired, tested and fitted in the rack' },
-  { id: '07-thrusters', date: 'Nov 11', caption: 'Thrusters (CW + CCW), battery and the first speed controller' },
-  { id: '08-first-float', date: 'Soon', caption: 'First water test: float, drive, thrust on a scale' },
-] as const
-
 export const SECTIONS = [
   { id: 'hero', index: '01', label: 'Guardian', depth: 0 },
   { id: 'crisis', index: '02', label: 'The Crisis', depth: -0.6 },
