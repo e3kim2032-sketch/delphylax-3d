@@ -58,7 +58,7 @@ Values marked "estimate" are calculated, not yet measured.
 
 - 32 bought parts: **461,900 won** (thrusters + sonar = 43%). Planning estimates, not receipts. Owned parts (ESP32, camera, speaker, mic) not counted. Full list in `src/data/research.ts` (`PARTS`).
 - 3D printing: **73,610 won** (57,000 estimate for plates 1–12 + 16,610 reprint incl. 3,700 shipping; PETG/PLA, 4 walls, 15–20% infill, supports off).
-- **Total ≈ 535,510 won ≈ $380** at 1,400 won/$. EMILY robotic lifeguard ≈ $10,000 (Military.com, 2016), ~25× more; EMILY reaches 25 mph, so this compares price, not ability.
+- **Total ≈ 535,510 won ≈ $380** at 1,400 won/$. EMILY robotic lifeguard ≈ $10,000 (Military.com, 2016), about 26× more; EMILY reaches 25 mph, so this compares price, not ability.
 
 ## Limits and next steps
 

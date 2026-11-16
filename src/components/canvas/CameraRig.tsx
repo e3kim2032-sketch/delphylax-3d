@@ -17,11 +17,11 @@ const WAYPOINTS: Record<string, Waypoint> = {
   // just under the surface, looking up at the hulls from the port quarter
   crisis: { pos: new THREE.Vector3(-3.4, -0.5, 3.8), look: new THREE.Vector3(0.6, -0.25, 0), fov: 44 },
   // surface level, exploded parts rise above
-  engineering: { pos: new THREE.Vector3(3.4, 1.7, 5.6), look: new THREE.Vector3(0.6, 0.45, 0), fov: 40 },
+  engineering: { pos: new THREE.Vector3(3.4, 2.1, 7.2), look: new THREE.Vector3(0.1, 0.74, 0), fov: 40 },
   // diver's view: hulls overhead, sonar field on the riverbed ahead
   sandbox: { pos: new THREE.Vector3(-0.2, -0.8, 7.6), look: new THREE.Vector3(3.0, -1.9, -0.6), fov: 50 },
-  matrix: { pos: new THREE.Vector3(5.6, -0.6, -4.2), look: new THREE.Vector3(-1.6, -0.5, 0.4), fov: 38 },
-  business: { pos: new THREE.Vector3(0.2, 1.5, 5.2), look: new THREE.Vector3(0.2, 0.2, 0), fov: 38 },
+  matrix: { pos: new THREE.Vector3(5.6, -0.6, -4.2), look: new THREE.Vector3(0.7, -1.0, 1.3), fov: 38 },
+  business: { pos: new THREE.Vector3(0.2, 1.5, 5.6), look: new THREE.Vector3(-1.9, -0.25, 0), fov: 38 },
 }
 
 const ORDER = SECTIONS.map((s) => s.id)

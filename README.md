@@ -39,9 +39,9 @@ src/
       AbyssalEnvironment.tsx  water surface, sky/abyss dome, sediment particles, fog
       CameraRig.tsx           scroll waypoints + mouse parallax
       Effects.tsx             post-processing
-    hud/HudOverlay.tsx        tactical HUD: depth gauge, sensor monitor (sonar trace + 8×8 thermal), waypoints
+    hud/HudOverlay.tsx        header (nav, Read mode toggle) + HUD instruments, shown only in the hero and Field Test
     ui/DelphylaxLogo.tsx      vector mark + lockup (vectorised from the hand-drawn sketch)
-    sections/                 Hero · Crisis · Engineering · Sandbox · Matrix · Business
+    sections/                 Hero · Crisis (incident timeline, FVI) · Engineering (parts legend, RescueConcept) · Sandbox · Matrix · Business (revenue, SDGs, policy, Faq)
 ```
 
 ## Data provenance
@@ -58,3 +58,14 @@ the inspiration, not as Delphylax measurements.
 - Click anywhere on the water/debris field, press **Emit Sonar Ping**, or wait — Delphylax pings autonomously.
 - Section 03: **X-Ray / Exploded View**, **Searchlights**, six subsystem callouts, buoyancy / hull-speed lab.
 - Section 04: **Clutter density**, **Echo filter on/off**, re-hide target, and **Drop glow marker** once locked (4 per rack).
+
+## Read mode and loading
+
+- **Read mode** (nav toggle, remembered in `localStorage`) turns the 3D canvas and post-processing off and
+  shows the same content on a static backdrop. It starts on by itself when WebGL is missing, the visitor
+  prefers reduced motion, or the device reports 4 or fewer CPU cores or 4 GB or less memory.
+- three.js loads lazily: the entry page needs only the `vendor`, `motion` and `index` chunks; `Scene` and
+  `r3f` are fetched after the text has painted (see `codeSplitting` in `vite.config.ts`).
+  Keep `sceneRefs.ts` and anything the text sections import free of `three` imports, or the 3D bundle
+  becomes part of the first load again.
+- `index.html` has a `<noscript>` summary; `public/cost-notes.html` is the linked source page for the cost estimate.

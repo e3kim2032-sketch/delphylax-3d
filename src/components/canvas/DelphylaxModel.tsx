@@ -3,7 +3,7 @@ import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { useSiteStore } from '../../store/useSiteStore'
-import { HOW_IT_WORKS, type SubsystemId } from '../../data/research'
+import { PARTS_LEGEND, type PartId } from '../../data/research'
 import { sceneRefs, MM } from './sceneRefs'
 
 /**
@@ -65,8 +65,63 @@ function Part({ base = [0, 0, 0], explode, children }: PartProps) {
     if (!g) return
     const k = sceneRefs.exploded
     g.position.set(b.x + e.x * k, b.y + e.y * k, b.z + e.z * k)
-  })
+    // priority -1: runs ahead of the default frame callbacks (the pins), without taking over rendering
+  }, -1)
   return <group ref={ref}>{children}</group>
+}
+
+/* ------------------------------------------------------------------ */
+/* Numbered pin: matches the parts legend in the Engineering section    */
+/* ------------------------------------------------------------------ */
+function Pin({ id, at }: { id: PartId; at: [number, number, number] }) {
+  const select = useSiteStore((s) => s.selectPart)
+  const selected = useSiteStore((s) => s.selectedPart)
+  const ref = useRef<HTMLButtonElement>(null)
+  const n = PARTS_LEGEND.findIndex((p) => p.id === id) + 1
+  const part = PARTS_LEGEND[n - 1]
+  const on = selected === id
+  useFrame(() => {
+    const el = ref.current
+    if (!el) return
+    // pins belong to the exploded view; when one part is picked the others step back
+    const o = Math.max(0, (sceneRefs.exploded - 0.55) / 0.45)
+    el.style.opacity = String(o * (selected && !on ? 0.35 : 1))
+    el.style.pointerEvents = o > 0.2 ? 'auto' : 'none'
+  })
+  // The button's bottom-centre is the anchor: a short leader line runs down to the
+  // part, the number sits above it, and the name (when picked) sits above the number.
+  return (
+    <Html position={at} zIndexRange={on ? [40, 31] : [30, 0]} portal={sceneRefs.htmlPortal as RefObject<HTMLElement>}>
+      <button
+        ref={ref}
+        tabIndex={-1}
+        aria-label={`${n}: ${part.name}`}
+        onClick={(e) => {
+          e.stopPropagation()
+          select(on ? null : id)
+        }}
+        className="flex flex-col items-center whitespace-nowrap"
+        style={{ opacity: 0, transform: 'translate(-50%, -100%)' }}
+      >
+        {on && <span className="glass-strong mb-1 rounded-md px-2 py-1 font-mono text-xs text-white">{part.name}</span>}
+        <span className="relative flex h-6 w-6 items-center justify-center">
+          {on && <span className="sonar-ring absolute inset-0 rounded-full border-2" style={{ borderColor: part.color }} />}
+          <span
+            className="relative flex h-6 w-6 items-center justify-center rounded-full font-mono text-xs font-semibold transition-colors"
+            style={
+              on
+                ? { background: part.color, color: '#0f1519', boxShadow: `0 0 16px ${part.color}` }
+                : { background: 'rgba(15,21,25,0.92)', color: '#fff', border: `1.5px solid ${part.color}` }
+            }
+          >
+            {n}
+          </span>
+        </span>
+        <span className="h-4 w-px" style={{ background: part.color, opacity: 0.9 }} />
+        <span className="h-1 w-1 rounded-full" style={{ background: part.color }} />
+      </button>
+    </Html>
+  )
 }
 
 /* ------------------------------------------------------------------ */
@@ -151,6 +206,49 @@ function finGeometry() {
 /* ------------------------------------------------------------------ */
 /* Sub-assemblies                                                      */
 /* ------------------------------------------------------------------ */
+/**
+ * Grab line: a bright orange rope along the outer side of a hull, hanging in three
+ * shallow loops between four attachment points, for a person in the water to hold.
+ */
+const GRAB_Y = [-270, -90, 90, 270] // attachment points along the hull (mm)
+const GRAB_Z = 14 // height of the attachment points above the pipe centre (mm)
+const GRAB_SAG = 46 // how far each loop hangs (mm)
+function grabLineGeometry(side: 1 | -1) {
+  const xo = side * (HX + PR + 4)
+  const pts: THREE.Vector3[] = []
+  GRAB_Y.forEach((y, i) => {
+    pts.push(new THREE.Vector3(...mm(xo, y, GRAB_Z)))
+    if (i < GRAB_Y.length - 1) {
+      const next = GRAB_Y[i + 1]
+      const span = next - y
+      // three points per loop give a soft, even sag
+      pts.push(new THREE.Vector3(...mm(xo + side * 5, y + span * 0.25, GRAB_Z - GRAB_SAG * 0.75)))
+      pts.push(new THREE.Vector3(...mm(xo + side * 7, y + span * 0.5, GRAB_Z - GRAB_SAG)))
+      pts.push(new THREE.Vector3(...mm(xo + side * 5, y + span * 0.75, GRAB_Z - GRAB_SAG * 0.75)))
+    }
+  })
+  const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal')
+  return new THREE.TubeGeometry(curve, 96, 3.2 * S, 8, false) // about 6 mm rope
+}
+
+function GrabLine({ side, m }: { side: 1 | -1; m: Mats }) {
+  const rope = useMemo(() => grabLineGeometry(side), [side])
+  const xo = side * (HX + PR)
+  return (
+    <>
+      <mesh geometry={rope}>
+        <meshStandardMaterial color="#ff8a1f" roughness={0.75} emissive="#ff6a00" emissiveIntensity={0.25} />
+      </mesh>
+      {/* attachment points: small cleats on the outer side of the pipe */}
+      {GRAB_Y.map((y) => (
+        <mesh key={y} material={m.grey} position={mm(xo + side * 2, y, GRAB_Z)}>
+          <boxGeometry args={[12 * S, 12 * S, 16 * S]} />
+        </mesh>
+      ))}
+    </>
+  )
+}
+
 function Hull({ side, m }: { side: 1 | -1; m: Mats }) {
   const nose = useMemo(noseGeometry, [])
   const tail = useMemo(tailGeometry, [])
@@ -184,6 +282,9 @@ function Hull({ side, m }: { side: 1 | -1; m: Mats }) {
           <boxGeometry args={[60 * S, 28 * S, 50 * S]} />
         </mesh>
       ))}
+      <GrabLine side={side} m={m} />
+      {side === 1 && <Pin id="hulls" at={mm(x, -60, PR)} />}
+      {side === 1 && <Pin id="grablines" at={mm(x + PR, 180, GRAB_Z)} />}
     </Part>
   )
 }
@@ -204,7 +305,7 @@ function Thruster({ side, m }: { side: 1 | -1; m: Mats }) {
   const can = useMemo(() => alongZ(new THREE.CylinderGeometry(25 * S, 25 * S, 110 * S, 32)), [])
   const shaft = useMemo(() => alongZ(new THREE.CylinderGeometry(6 * S, 6 * S, 24 * S, 16)), [])
   return (
-    <Part explode={[side * 0.18, -0.42, 0.28]}>
+    <Part explode={[side * 0.18, 0.32, 0.7]}>
       {/* mount */}
       <mesh material={m.grey} position={mm(x, ty, -76)}>
         <boxGeometry args={[72 * S, 60 * S, 62 * S]} />
@@ -231,9 +332,13 @@ function Thruster({ side, m }: { side: 1 | -1; m: Mats }) {
           </mesh>
         ))}
       </group>
+      {side === 1 && <Pin id="thrusters" at={mm(x, ty, -45)} />}
     </Part>
   )
 }
+
+/** how far the electronics lift out of the box in the exploded view (scene units) */
+const LIFT = 0.93
 
 function DeckAndCabin({ m }: { m: Mats }) {
   const deck = useMemo(deckGeometry, [])
@@ -270,37 +375,73 @@ function DeckAndCabin({ m }: { m: Mats }) {
           <torusGeometry args={[95 * S, 22 * S, 12, 40]} />
           <meshStandardMaterial color="#ff7f66" roughness={0.6} />
         </mesh>
+        <Pin id="deck" at={mm(225, -170, 86)} />
       </Part>
 
-      {/* electronics box + boards: the airtight food box lies flat on the deck,
+      {/* electronics box: the airtight food box lies flat on the deck,
           250 mm long (bow to stern) × 150 mm wide × 100 mm tall, under the shell.
           boxGeometry args are [across, up, along]; the deck top is at z = 86. */}
       <Part explode={[0, 0.62, 0]}>
         <mesh material={m.box} position={mm(0, 0, 86 + 50)}>
           <boxGeometry args={[150 * S, 100 * S, 250 * S]} />
         </mesh>
-        {/* 5 V converter / power PCB, flat on the floor near the bow end */}
+        <Pin id="box" at={mm(75, 60, 186)} />
+      </Part>
+
+      {/* what sits on the box floor. In the exploded view each item lifts out of the
+          box and they fan out bow-to-stern in one row, so every pin is easy to read. */}
+      {/* 12 V-to-5 V converter, near the bow end */}
+      <Part explode={[0, LIFT, -0.444]}>
         <mesh material={m.pcb} position={mm(0, -80, 86 + 3)}>
           <boxGeometry args={[56 * S, 6 * S, 75 * S]} />
         </mesh>
-        {/* ESP32 screw-terminal board, flat, starboard half */}
-        <mesh material={m.esp} position={mm(35, 30, 86 + 7.5)}>
-          <boxGeometry args={[70 * S, 15 * S, 55 * S]} />
+        <Pin id="converter" at={mm(0, -80, 86 + 6)} />
+      </Part>
+      {/* 20 A fuse in its holder, on the battery lead */}
+      <Part explode={[0, LIFT, -0.276]}>
+        <mesh position={mm(-38, -20, 86 + 7)}>
+          <boxGeometry args={[14 * S, 14 * S, 40 * S]} />
+          <meshStandardMaterial color="#111418" roughness={0.5} />
         </mesh>
-        {/* 3S 18650 battery pack, flat, port half */}
+        <mesh position={mm(-38, -20, 86 + 15)}>
+          <boxGeometry args={[8 * S, 3 * S, 14 * S]} />
+          <meshBasicMaterial color="#facc15" toneMapped={false} />
+        </mesh>
+        <Pin id="fuse" at={mm(-38, -20, 86 + 17)} />
+      </Part>
+      {/* 3-cell battery pack, flat, port half */}
+      <Part explode={[0, LIFT, -0.13]}>
         <mesh position={mm(-38, 50, 86 + 10)}>
           <boxGeometry args={[60 * S, 20 * S, 75 * S]} />
           <meshStandardMaterial color="#1e293b" />
         </mesh>
-        {/* ESP32 status LED on top of the board */}
+        <Pin id="battery" at={mm(-38, 50, 86 + 20)} />
+      </Part>
+      {/* ESP32 screw-terminal board, flat, starboard half */}
+      <Part explode={[0, LIFT, 0.214]}>
+        <mesh material={m.esp} position={mm(35, 30, 86 + 7.5)}>
+          <boxGeometry args={[70 * S, 15 * S, 55 * S]} />
+        </mesh>
+        {/* status LED on top of the board */}
         <mesh position={mm(48, 18, 86 + 15 + 3)}>
           <sphereGeometry args={[3 * S, 10, 10]} />
           <meshBasicMaterial color="#7fb3d5" toneMapped={false} />
         </mesh>
+        <Pin id="esp32" at={mm(35, 30, 86 + 15)} />
+      </Part>
+      {/* two speed controllers (ESCs), one per thruster, at the stern end */}
+      <Part explode={[0, LIFT, 0.36]}>
+        {[20, 52].map((x) => (
+          <mesh key={x} position={mm(x, 100, 86 + 5)}>
+            <boxGeometry args={[25 * S, 10 * S, 45 * S]} />
+            <meshStandardMaterial color="#7c3aed" roughness={0.5} />
+          </mesh>
+        ))}
+        <Pin id="escs" at={mm(36, 100, 86 + 10)} />
       </Part>
 
       {/* coral shell + sensor visor */}
-      <Part explode={[0, 1.05, 0]}>
+      <Part explode={[0, 1.38, 0]}>
         <mesh geometry={shell} material={m.coral} />
         <mesh material={m.glass} position={mm(0, -187, 141)}>
           <boxGeometry args={[130 * S, 3 * S, 56 * S]} />
@@ -336,10 +477,12 @@ function DeckAndCabin({ m }: { m: Mats }) {
           <circleGeometry args={[5 * S, 16]} />
           <meshBasicMaterial color="#ff2d55" toneMapped={false} />
         </mesh>
+        {/* the heat sensor in the bow bezel: same number as the sonar float */}
+        <Pin id="sensors" at={mm(17, -193, 152)} />
       </Part>
 
       {/* dorsal fin (GPS lives under it) */}
-      <Part explode={[0, 1.45, 0]}>
+      <Part explode={[0, 1.8, 0]}>
         <mesh geometry={fin} material={m.coral} position={mm(0, -70, 204)} />
         <mesh position={mm(0, 10, 215)}>
           <boxGeometry args={[25 * S, 25 * S, 6 * S]} />
@@ -397,6 +540,7 @@ function MarkerRack({ m }: { m: Mats }) {
         <boxGeometry args={[150 * S, 28 * S, 110 * S]} />
         <meshStandardMaterial color="#5b636b" transparent opacity={0.35} roughness={0.6} />
       </mesh>
+      <Pin id="markers" at={mm(0, RY, 152)} />
     </Part>
   )
 }
@@ -421,56 +565,8 @@ function SonarFloat({ m }: { m: Mats }) {
         <meshBasicMaterial ref={glow} color="#7fb3d5" toneMapped={false} />
       </mesh>
       <pointLight position={mm(0, -277, -30)} color="#7fb3d5" intensity={1.2} distance={1.5} />
+      <Pin id="sensors" at={mm(0, -277, 32)} />
     </Part>
-  )
-}
-
-/* ------------------------------------------------------------------ */
-/* Callouts                                                            */
-/* ------------------------------------------------------------------ */
-const PIN_POS: Record<SubsystemId, [number, number, number]> = {
-  hulls: mm(-HX - 60, -120, -120),
-  cabin: mm(0, -40, 420),
-  thrusters: mm(HX + 60, 320, -220),
-  senses: mm(0, -330, 150),
-  markers: mm(0, 420, 240),
-  brain: mm(-120, 60, 300),
-}
-
-function Callouts() {
-  const select = useSiteStore((s) => s.selectSubsystem)
-  const selected = useSiteStore((s) => s.selectedSubsystem)
-  const ref = useRef<HTMLButtonElement[]>([])
-  useFrame(() => {
-    const o = Math.max(0, (sceneRefs.exploded - 0.55) / 0.45)
-    for (const el of ref.current) if (el) el.style.opacity = String(o)
-  })
-  return (
-    <>
-      {HOW_IT_WORKS.map((s, i) => (
-        <Html key={s.id} position={PIN_POS[s.id]} center distanceFactor={3.6} zIndexRange={[30, 0]} portal={sceneRefs.htmlPortal as RefObject<HTMLElement>}>
-          <button
-            ref={(el) => {
-              if (el) ref.current[i] = el
-            }}
-            onClick={(e) => {
-              e.stopPropagation()
-              select(selected === s.id ? null : s.id)
-            }}
-            className="glass-strong hud-corner flex items-center gap-2 px-3 py-2 text-left font-mono text-xs tracking-[0.15em] uppercase whitespace-nowrap transition-all"
-            style={{
-              opacity: 0,
-              pointerEvents: 'auto',
-              borderColor: selected === s.id ? s.color : undefined,
-              boxShadow: selected === s.id ? `0 0 24px ${s.color}66` : undefined,
-            }}
-          >
-            <span className="block h-2 w-2 rounded-full" style={{ background: s.color, boxShadow: `0 0 10px ${s.color}` }} />
-            <span className="text-white/90">{s.name}</span>
-          </button>
-        </Html>
-      ))}
-    </>
   )
 }
 
@@ -536,7 +632,6 @@ export function DelphylaxModel() {
       <DeckAndCabin m={m} />
       <MarkerRack m={m} />
       <SonarFloat m={m} />
-      <Callouts />
     </group>
   )
 }

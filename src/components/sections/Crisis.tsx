@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Droplets, Moon, AlertTriangle, EyeOff } from 'lucide-react'
-import { CRISIS } from '../../data/research'
-import { SectionShell, Kicker, Title, Reveal, SimTag } from '../ui/primitives'
+import { Droplets, Moon, AlertTriangle, EyeOff, MapPinned } from 'lucide-react'
+import { CRISIS, INCIDENTS, INCIDENTS_NOTE, FVI, BUSINESS } from '../../data/research'
+import { SectionShell, Kicker, Title, Reveal, SimTag, SourceLink } from '../ui/primitives'
 
 const ICONS = [Droplets, Moon, AlertTriangle, EyeOff]
 
@@ -10,13 +10,20 @@ function VisibilityCompare() {
   const W = 640
   const H = 360
   return (
-    <div className="glass-strong hud-corner rounded-lg p-3">
-      <div className="mb-2 flex items-center justify-between font-mono text-xs ">
-        <span className="text-white/70">Camera in muddy flood water · 0.2 m</span>
-        <span className="text-[#ff8a73]">Delphylax sonar, under water <SimTag /></span>
+    <div className="card card-pad">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
+        <span className="label">Camera in muddy water · 0.2 m</span>
+        <span className="label flex items-center gap-2 !text-[#ff8a73]">
+          Sonar, under water <SimTag />
+        </span>
       </div>
       <div className="relative overflow-hidden rounded-md" style={{ aspectRatio: `${W}/${H}` }}>
-        <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 h-full w-full">
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          className="absolute inset-0 h-full w-full"
+          role="img"
+          aria-label="Simulated comparison. Left: a camera in muddy flood water sees about 0.2 metres and finds nothing. Right: sonar shows one object 4.6 metres away."
+        >
           <defs>
             <filter id="mud">
               <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="4" />
@@ -100,32 +107,106 @@ function VisibilityCompare() {
   )
 }
 
+/** Real past floods, oldest first, each with linked sources. */
+function IncidentTimeline() {
+  return (
+    <div className="mt-14">
+      <h3 className="font-display text-2xl font-700 leading-tight text-[#f3ede1] sm:text-3xl">Three floods where rescuers could not see or reach people</h3>
+      <ol className="relative mt-6 grid gap-4 md:grid-cols-3">
+        <span className="absolute left-0 right-0 top-[9px] hidden h-px bg-white/15 md:block" aria-hidden />
+        {INCIDENTS.map((inc) => (
+          <li key={inc.date} className="relative md:pt-7">
+            <span className="absolute left-0 top-0.5 hidden h-4 w-4 rounded-full border-2 border-[#e8654f] bg-[#0f1519] md:block" aria-hidden />
+            <article className="card h-full card-pad">
+              <div className="font-mono text-xs text-[#ff8a73]">{inc.date}</div>
+              <h4 className="mt-1 font-display text-base font-700 text-white">{inc.place}</h4>
+              <p className="mt-2 text-base leading-relaxed text-[#eef3f6]/90">{inc.what}</p>
+              <p className="mt-3 text-sm leading-relaxed text-[#c3ced6]">
+                <span className="font-semibold text-[#eef3f6]">Why rescuers could not see or reach them: </span>
+                {inc.why}
+              </p>
+              <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-sm text-[#aab8c2]">
+                <span>Sources:</span>
+                {inc.sources.map((src) => (
+                  <SourceLink key={src.href} href={src.href}>
+                    {src.label}
+                  </SourceLink>
+                ))}
+              </p>
+            </article>
+          </li>
+        ))}
+      </ol>
+      <p className="card mt-4 px-4 py-3 text-sm leading-relaxed text-[#d7dde3]">{INCIDENTS_NOTE}</p>
+    </div>
+  )
+}
+
+/** Luna's Flood Vulnerability Index: which neighbourhoods to search first. */
+function FviCard() {
+  const luna = BUSINESS.team.find((m) => m.name === 'Luna')
+  return (
+    <div className="card mt-8 card-pad">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="flex items-center gap-2 font-display text-xl font-700 text-[#f3ede1]">
+          <MapPinned size={18} className="text-[#ff8a73]" aria-hidden /> Flood Vulnerability Index: where to search first
+        </h3>
+        {luna && <span className="chip">{luna.name} · FVI program developer</span>}
+      </div>
+      <div className="mt-4 grid gap-5 md:grid-cols-3">
+        <div>
+          <div className="font-mono text-xs text-[#ff8a73]">What it is</div>
+          <p className="mt-1 text-base leading-relaxed text-[#eef3f6]/90">{FVI.what}</p>
+        </div>
+        <div>
+          <div className="font-mono text-xs text-[#ff8a73]">What goes into it</div>
+          <p className="mt-1 text-base leading-relaxed text-[#eef3f6]/90">{FVI.inputs}</p>
+          <SourceLink href={FVI.source.href} className="mt-2 text-sm text-[#aab8c2]">
+            {FVI.source.label}
+          </SourceLink>
+        </div>
+        <div>
+          <div className="font-mono text-xs text-[#ff8a73]">How it guides Delphylax</div>
+          <p className="mt-1 text-base leading-relaxed text-[#eef3f6]/90">{FVI.use}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function Crisis() {
   return (
     <SectionShell id="crisis" align="right">
-      <div className="pointer-events-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+      <div className="pointer-events-auto w-full max-w-6xl">
+      <div className="grid w-full gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-center">
         <div>
-          <Reveal>
+          <Reveal className="text-scrim">
             <Kicker index="02">The crisis & the muddy-water gap</Kicker>
             <Title>
-              The first <span className="text-gradient">10 minutes</span> are lost to blind water.
+              The first <span className="text-gradient">minutes</span> are lost to blind water.
             </Title>
           </Reveal>
           <Reveal delay={1}>
             <div className="mt-8 grid grid-cols-2 gap-4">
-              <div className="glass hud-corner rounded-md p-4">
+              <div className="card card-pad">
                 <div className="font-mono text-4xl font-semibold text-white">{CRISIS.recordYears}</div>
-                <div className="mt-1 text-xs text-[#d7dde3]">years — {CRISIS.recordLabel.toLowerCase()}</div>
+                <div className="mt-2 text-sm leading-snug text-[#dbe2e8]">years: {CRISIS.recordLabel}</div>
               </div>
-              <div className="glass hud-corner rounded-md p-4" style={{ borderColor: 'rgba(255,107,87,0.4)' }}>
+              <div className="card card-pad" style={{ borderColor: 'rgba(255,107,87,0.4)' }}>
                 <div className="font-mono text-4xl font-semibold text-[#ff6b57]">{CRISIS.livesLost}</div>
-                <div className="mt-1 text-xs text-[#d7dde3]">lives — {CRISIS.livesLabel.toLowerCase()}</div>
+                <div className="mt-2 text-sm leading-snug text-[#dbe2e8]">lives {CRISIS.livesLabel}</div>
               </div>
             </div>
-            <div className="mt-5 border-l-2 border-[#e8654f] pl-4 text-sm text-[#f3ede1]/85">
+            <div className="mt-6 border-l-2 border-[#e8654f] pl-4 text-base leading-relaxed text-[#eef3f6]">
               {CRISIS.summary}
-              <div className="mt-1 font-mono text-xs text-white/60">
-                {CRISIS.event} · {CRISIS.summaryNote}: {CRISIS.sources.slice(0, 2).join('; ')}
+              <div className="mt-2 text-sm text-[#aab8c2]">
+                {CRISIS.event} · {CRISIS.summaryNote}:{' '}
+                {CRISIS.sources.map((src, i) => (
+                  <span key={src.href}>
+                    {i > 0 && '; '}
+                    <SourceLink href={src.href}>{src.label}</SourceLink>
+                  </span>
+                ))}
               </div>
             </div>
           </Reveal>
@@ -134,27 +215,34 @@ export function Crisis() {
               {CRISIS.whyDeadly.map((w, i) => {
                 const Icon = ICONS[i]
                 return (
-                  <li key={w.title} className="glass rounded-md p-3">
-                    <div className="flex items-center gap-2 font-display text-sm font-700 text-white">
+                  <li key={w.title} className="card card-pad">
+                    <div className="flex items-center gap-2 font-display text-base font-700 text-white">
                       <Icon size={14} className="text-[#ff8a73]" /> {w.title}
                     </div>
-                    <p className="mt-1 text-xs leading-relaxed text-[#b9c4cc]">{w.body}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-[#c3ced6]">{w.body}</p>
                   </li>
                 )
               })}
             </ul>
-            <p className="mt-4 font-mono text-xs text-[#aab8c2] ">
+            <p className="label mt-5">
               Monsoon window · {CRISIS.monsoonWindow} · every summer
             </p>
           </Reveal>
         </div>
         <Reveal delay={2}>
           <VisibilityCompare />
-          <p className="mt-3 text-xs text-[#b9c4cc]">
+          <p className="mt-3 text-sm text-[#c3ced6]">
             A rescuer wading in cannot see what is under the water, and tethered ROVs rely on cameras that struggle in muddy water. Delphylax floats
             in: sonar finds objects under the water, the AMG8833 heat sensor spots people at the surface, and it drops a glowing marker where rescuers should look.
           </p>
         </Reveal>
+      </div>
+      <Reveal>
+        <IncidentTimeline />
+      </Reveal>
+      <Reveal>
+        <FviCard />
+      </Reveal>
       </div>
     </SectionShell>
   )

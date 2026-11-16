@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useRef, type RefObject } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
-import { Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { createSonarMaterial, MAX_PINGS } from './SonarWaveShader'
 import { sceneRefs, FLOOR_Y, METERS_PER_UNIT, SONAR_SPEED, PING_TTL } from './sceneRefs'
@@ -82,7 +81,6 @@ export function SonarField() {
   const victimRef = useRef<THREE.Group>(null)
   const victimMaterial = useMemo(() => new THREE.MeshBasicMaterial({ color: '#ff2a55', transparent: true, opacity: 0, toneMapped: false }), [])
   const boxRef = useRef<THREE.LineSegments>(null)
-  const labelRef = useRef<HTMLDivElement>(null)
   const emitPing = useSiteStore((s) => s.emitPing)
   const victimSeed = useSiteStore((s) => s.victimSeed)
 
@@ -205,9 +203,9 @@ export function SonarField() {
       boxRef.current.scale.setScalar(Math.max(s, 0.0001))
       boxRef.current.position.copy(sceneRefs.victim).y += 0.25
       boxRef.current.rotation.y = t * 0.6
-      boxRef.current.visible = s > 0.02
+      // the lock box and label belong to the Field Test; elsewhere they would sit over the page
+      boxRef.current.visible = s > 0.02 && st.sandboxActive
     }
-    if (labelRef.current) labelRef.current.style.opacity = active ? '1' : '0'
   })
 
   const boxGeo = useMemo(() => new THREE.EdgesGeometry(new THREE.BoxGeometry(1.5, 0.6, 1.0)), [])
@@ -246,40 +244,7 @@ export function SonarField() {
         <lineBasicMaterial color="#ff2a55" toneMapped={false} transparent opacity={0.95} />
       </lineSegments>
 
-      <LockLabel labelRef={labelRef} />
       <GlowMarkers />
-    </group>
-  )
-}
-
-function LockLabel({ labelRef }: { labelRef: RefObject<HTMLDivElement | null> }) {
-  const groupRef = useRef<THREE.Group>(null)
-  const lock = useSiteStore((s) => s.lock)
-  useFrame(() => {
-    if (groupRef.current) {
-      groupRef.current.position.copy(sceneRefs.victim)
-      groupRef.current.position.y += 0.95
-    }
-  })
-  return (
-    <group ref={groupRef}>
-      <Html center distanceFactor={7.5} zIndexRange={[40, 0]} style={{ pointerEvents: 'none' }} portal={sceneRefs.htmlPortal as RefObject<HTMLElement>}>
-        <div
-          ref={labelRef}
-          className="glass-strong hud-corner px-3 py-2 font-mono text-xs leading-tight whitespace-nowrap transition-opacity duration-300"
-          style={{ opacity: 0, borderColor: 'rgba(255,42,85,0.7)', minWidth: 180 }}
-        >
-          <div className="text-xs tracking-[0.25em] text-[#ff6b57]">● TARGET · SIMULATED</div>
-          <div className="mt-1 flex justify-between gap-4 text-white">
-            <span>RANGE</span>
-            <span className="text-[#ffb4a6]">{lock.distanceM.toFixed(1)}m</span>
-          </div>
-          <div className="flex justify-between gap-4 text-white">
-            <span>CONFIDENCE</span>
-            <span className="text-[#ffb4a6]">{(lock.confidence * 100).toFixed(1)}%</span>
-          </div>
-        </div>
-      </Html>
     </group>
   )
 }

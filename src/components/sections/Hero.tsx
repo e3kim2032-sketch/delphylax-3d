@@ -1,18 +1,21 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { Radio, Cpu, ArrowDown } from 'lucide-react'
-import { IDENTITY, HULL, COST } from '../../data/research'
-import { SectionShell, Stat } from '../ui/primitives'
+import { IDENTITY, HERO_FACTS, IMPACT } from '../../data/research'
+import { SectionShell, Counter } from '../ui/primitives'
 import { scrollToSection } from '../../hooks/useScrollSync'
-import { useSiteStore } from '../../store/useSiteStore'
+import { useSiteStore, useLive3d } from '../../store/useSiteStore'
 import { sceneRefs } from '../canvas/sceneRefs'
 
 export function Hero() {
   const root = useRef<HTMLDivElement>(null)
   const emitPing = useSiteStore((s) => s.emitPing)
   const toggleExploded = useSiteStore((s) => s.toggleExploded)
+  const live3d = useLive3d()
 
   useEffect(() => {
+    // with reduced motion the hero is simply shown: no intro animation to wait for
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const ctx = gsap.context(() => {
       gsap.from('.hero-line', { yPercent: 110, opacity: 0, duration: 1.1, stagger: 0.12, ease: 'power4.out', delay: 0.25 })
       gsap.from('.hero-fade', { opacity: 0, y: 18, duration: 0.9, stagger: 0.1, ease: 'power3.out', delay: 0.8 })
@@ -22,16 +25,16 @@ export function Hero() {
 
   const launch = () => {
     scrollToSection('sandbox')
-    setTimeout(() => emitPing(sceneRefs.nose.x, sceneRefs.nose.y, sceneRefs.nose.z), 1400)
+    if (live3d) setTimeout(() => emitPing(sceneRefs.nose.x, sceneRefs.nose.y, sceneRefs.nose.z), 1400)
   }
   const inspect = () => {
     scrollToSection('engineering')
-    setTimeout(() => toggleExploded(true), 900)
+    if (live3d) setTimeout(() => toggleExploded(true), 900)
   }
 
   return (
     <SectionShell id="hero">
-      <div ref={root} className="hero-scrim pointer-events-auto w-full max-w-2xl">
+      <div ref={root} className="text-scrim pointer-events-auto w-full max-w-2xl">
         <div className="hero-fade mb-6 flex flex-wrap items-center gap-2">
           {IDENTITY.competitions.map((c) => (
             <span key={c} className="chip">
@@ -45,10 +48,10 @@ export function Hero() {
 
         <h1 className="font-display text-[11vw] font-700 leading-[0.98] text-[#f3ede1] sm:text-6xl lg:text-[4.8rem]">
           <span className="block overflow-hidden pb-[0.16em] -mb-[0.16em]">
-            <span className="hero-line block">Guardian of</span>
+            <span className="hero-line block">Guardian of </span>
           </span>
           <span className="block overflow-hidden pb-[0.16em] -mb-[0.16em]">
-            <span className="hero-line block text-[#ff8a73]">zero-visibility</span>
+            <span className="hero-line block text-[#ff8a73]">zero-visibility </span>
           </span>
           <span className="block overflow-hidden pb-[0.16em] -mb-[0.16em]">
             <span className="hero-line block">waters.</span>
@@ -56,27 +59,35 @@ export function Hero() {
         </h1>
 
         <p className="hero-fade mt-6 max-w-xl text-base leading-relaxed text-[#d7dde3] sm:text-lg">{IDENTITY.oneLiner}</p>
-        <p className="hero-fade mt-3 max-w-xl text-xs text-[#aab8c2]">
+        <dl className="hero-fade mt-5 max-w-xl space-y-2">
+          {HERO_FACTS.map((f) => (
+            <div key={f.label} className="flex flex-col gap-0.5 sm:flex-row sm:gap-3">
+              <dt className="shrink-0 pt-0.5 font-mono text-xs text-[#ff8a73] sm:w-28">{f.label}</dt>
+              <dd className="text-base leading-relaxed text-[#eef3f6]">{f.text}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="hero-fade mt-4 max-w-xl text-sm leading-relaxed text-[#aab8c2]">
           {IDENTITY.greek}. {IDENTITY.inspiration}
         </p>
 
         <div className="hero-fade mt-8 flex flex-wrap gap-3">
           <button className="btn-primary" onClick={launch}>
-            <Radio size={16} /> Launch Sonar Simulation
+            <Radio size={16} aria-hidden /> {live3d ? 'Launch Sonar Simulation' : 'See the Field Test'}
           </button>
           <button className="btn-secondary" onClick={inspect}>
-            <Cpu size={16} /> Inspect Hardware
+            <Cpu size={16} aria-hidden /> Inspect Hardware
           </button>
         </div>
 
-        <div className="hero-fade mt-10 grid max-w-lg grid-cols-3 gap-3">
-          <Stat value={`${HULL.lengthMm / 10}`} unit="cm" label="Catamaran length" />
-          <Stat value={`${HULL.capacityKg}`} unit="kg" label="Floating capacity, about" accent="pink" />
-          <Stat value={`$${COST.usdApprox}`} label={`Build cost, est. ${COST.total.toLocaleString('en-US')} won (about $${COST.usdApprox})`} accent="red" />
+        <div className="hero-fade mt-10 grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-3">
+          {IMPACT.map((c) => (
+            <Counter key={c.label} prefix={c.prefix} value={c.value} suffix={c.suffix} label={c.label} source={c.source} />
+          ))}
         </div>
 
-        <button onClick={() => scrollToSection('crisis')} className="hero-fade mt-12 flex items-center gap-2 text-xs text-[#aab8c2]">
-          <ArrowDown size={12} className="animate-bounce" /> Scroll down. Click anywhere in the water to ping.
+        <button onClick={() => scrollToSection('crisis')} className="hero-fade mt-10 flex items-center gap-2 rounded-md text-sm text-[#aab8c2] hover:text-white">
+          <ArrowDown size={12} className="animate-bounce motion-reduce:animate-none" aria-hidden /> Scroll down.{live3d ? ' Click anywhere in the water to ping.' : ''}
         </button>
       </div>
     </SectionShell>

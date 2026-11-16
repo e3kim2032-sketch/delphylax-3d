@@ -8,7 +8,7 @@
     <meta name="theme-color" content="#0f1519" />
     <meta
       name="description"
-      content="Delphylax — a 94 cm catamaran rescue scout for street floods. It searches muddy water with sonar and a thermal camera, then drops a glowing marker where rescuers should look. Conrad Challenge & KSEF 2027."
+      content="Delphylax is a small robot boat that searches flooded streets. Sonar finds objects under muddy water, a heat sensor spots people at the surface, and it drops a glowing marker where rescuers should look. Built by Eddie, Minnie and Luna for the Conrad Challenge."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,17 +17,73 @@
       rel="stylesheet"
     />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="DELPHYLAX — Guardian of Zero-Visibility Waters" />
+    <meta property="og:site_name" content="Delphylax" />
+    <meta property="og:title" content="Delphylax: a flood-rescue scout boat" />
     <meta
       property="og:description"
-      content="A 94 cm catamaran rescue scout for street floods. Sonar and thermal search in muddy water, then a glowing marker where rescuers should look."
+      content="A small robot boat that searches flooded streets, so rescuers can see where people are without wading into muddy water."
     />
     <meta property="og:image" content="./og.png" />
+    <meta property="og:image:alt" content="The Delphylax logo and the words: Delphylax, a flood-rescue scout boat." />
     <meta name="twitter:card" content="summary_large_image" />
-    <title>DELPHYLAX — Guardian of Zero-Visibility Waters</title>
+    <title>Delphylax: a flood-rescue scout boat</title>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <style>
+        .ns { max-width: 44rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; color: #eef3f6; font: 16px/1.65 Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; }
+        .ns h1 { font-size: 2rem; line-height: 1.15; margin: 1rem 0 0.5rem; }
+        .ns h2 { font-size: 1.15rem; margin: 2rem 0 0.4rem; color: #ff8a73; }
+        .ns p, .ns li { color: #d7dde3; }
+        .ns a { color: #ff8a73; }
+        .ns .note { font-size: 0.875rem; color: #b7c3cc; }
+      </style>
+      <main class="ns">
+        <img src="./logo.png" alt="Delphylax logo" width="72" height="69" />
+        <h1>Delphylax: a flood-rescue scout boat</h1>
+        <p class="note">This page works best with JavaScript on. Here is everything important in plain text.</p>
+
+        <h2>What it is</h2>
+        <p>
+          Delphylax is a small robot boat, about 94 cm long, that searches flooded streets. It helps people trapped in floods and the rescuers
+          looking for them: rescuers can see where people are without wading into dangerous, muddy water.
+        </p>
+
+        <h2>The problem</h2>
+        <p>
+          In August 2022 Seoul had its heaviest daily rain since records began 115 years earlier. Three people died when water trapped a family
+          inside their semi-basement home. In floods like this, muddy water hides what is underneath, and rescuers go in without being able to see.
+        </p>
+
+        <h2>How it works</h2>
+        <ul>
+          <li>Two sealed PVC-pipe hulls make a catamaran that is hard to flip; foam inside means a leak cannot sink it.</li>
+          <li>Two brushless underwater thrusters push and steer it. A rescuer steers by remote control from the bank.</li>
+          <li>Sonar finds objects under the water; the AMG8833 heat sensor spots people at the surface.</li>
+          <li>A servo drops one glowing marker at a time where something is found, so rescuers know where to look.</li>
+          <li>An ESP32 computer cuts the motors if the boat tips over or a leak is detected.</li>
+        </ul>
+        <p class="note">
+          Delphylax has not had its first water test. Speed (about 1.2 m/s), weight and thrust are estimates, and the sonar and heat readouts
+          shown on the site are simulated.
+        </p>
+
+        <h2>Cost</h2>
+        <p>
+          About $380 to build (535,510 won, a planning estimate). That is about 1/26 of the price of EMILY, a proven robotic lifeguard that sells
+          for about $10,000. This compares price, not ability. <a href="./cost-notes.html">Cost notes</a>
+        </p>
+
+        <h2>Team</h2>
+        <ul>
+          <li>Eddie: project lead; design, build and electronics</li>
+          <li>Minnie: communications director and policy researcher</li>
+          <li>Luna: researcher and FVI (Flood Vulnerability Index) program developer</li>
+        </ul>
+        <p class="note">Conrad Challenge · KSEF 2027</p>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

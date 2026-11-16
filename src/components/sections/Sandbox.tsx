@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { Radio, Shuffle, Filter, Boxes, MapPin, RotateCcw } from 'lucide-react'
-import { useSiteStore, MAX_MARKERS } from '../../store/useSiteStore'
+import { useSiteStore, useLive3d, MAX_MARKERS } from '../../store/useSiteStore'
 import { SONAR } from '../../data/research'
-import { SectionShell, Kicker, Title, Reveal, SimTag } from '../ui/primitives'
+import { SectionShell, Kicker, Title, Lead, Reveal, SimTag } from '../ui/primitives'
+import { SensorMonitor } from '../hud/SensorMonitor'
 import { sceneRefs } from '../canvas/sceneRefs'
 
 function RevealMeter() {
@@ -21,13 +22,13 @@ function RevealMeter() {
   }, [])
   return (
     <div>
-      <div className="flex justify-between font-mono text-xs text-white/70 ">
-        <span>Sonar echo return</span>
+      <div className="flex justify-between font-mono text-xs text-[#aab8c2]">
+        <span>SONAR ECHO RETURN</span>
         <span ref={txt} className="text-white">
           0%
         </span>
       </div>
-      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+      <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
         <div ref={bar} className="h-full rounded-full" style={{ width: '0%', background: 'linear-gradient(90deg,#3b9eff,#ff5fa2,#ff2d55)', transition: 'width 0.1s linear' }} />
       </div>
     </div>
@@ -42,126 +43,151 @@ export function Sandbox() {
   const emitPing = useSiteStore((s) => s.emitPing)
   const rehide = useSiteStore((s) => s.rehideVictim)
   const lock = useSiteStore((s) => s.lock)
-  const pingCount = useSiteStore((s) => s.pingCount)
   const markers = useSiteStore((s) => s.markers)
   const dropMarker = useSiteStore((s) => s.dropMarker)
   const reloadMarkers = useSiteStore((s) => s.reloadMarkers)
+  const lights = useSiteStore((s) => s.lights)
   const left = MAX_MARKERS - markers.length
+  const live3d = useLive3d()
+  const webglOk = useSiteStore((s) => s.webglOk)
+  const setReadMode = useSiteStore((s) => s.setReadMode)
 
   return (
-    <SectionShell id="sandbox" className="!items-end">
-      <div className="pointer-events-none grid w-full max-w-7xl gap-6 lg:grid-cols-[minmax(0,360px)_1fr_minmax(0,300px)] lg:items-end">
+    <SectionShell id="sandbox">
+      <div className="pointer-events-none grid w-full max-w-7xl gap-6 lg:grid-cols-[minmax(0,400px)_1fr_minmax(0,320px)] lg:items-center">
         <div className="pointer-events-auto">
-          <Reveal>
+          <Reveal className="text-scrim">
             <Kicker index="04">Field test mode</Kicker>
-            <Title className="!text-3xl sm:!text-4xl">
-              Live playable <span className="text-gradient">search sandbox.</span>
+            <Title className="!text-3xl sm:!text-4xl lg:!text-5xl">
+              Try the <span className="text-gradient">search</span> yourself.
             </Title>
-            <p className="mt-3 text-sm leading-relaxed text-[#d7dde3]">
-              Click anywhere in the water to sweep the sonar from the bow float. Raise the clutter, switch the echo filter off, and watch the noise swallow
-              the target. Lock it, then drop a glowing marker so rescuers know where to look.
-            </p>
+            <Lead>
+              Click anywhere in the water to sweep the sonar. Raise the clutter or switch the echo filter off, and watch the noise swallow the target. Lock it, then
+              drop a glowing marker.
+            </Lead>
           </Reveal>
-          <Reveal delay={1}>
-            <div className="glass-strong hud-corner mt-5 space-y-4 rounded-lg p-4">
-              <div>
-                <div className="mb-2 flex items-center gap-2 font-mono text-xs text-[#aab8c2] ">
-                  <Boxes size={11} /> Clutter density
+          {live3d ? (
+            <Reveal delay={1}>
+              <div className="card card-pad mt-6 space-y-5">
+                <div>
+                  <div className="label mb-2 flex items-center gap-2">
+                    <Boxes size={13} aria-hidden /> Clutter
+                  </div>
+                  <div className="flex gap-2">
+                    <button type="button" className="btn-secondary btn-sm flex-1" aria-pressed={clutter === 'low'} onClick={() => setClutter('low')}>
+                      Low
+                    </button>
+                    <button type="button" className="btn-secondary btn-sm flex-1" aria-pressed={clutter === 'extreme'} onClick={() => setClutter('extreme')}>
+                      Flood debris
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <div className="label mb-2 flex items-center gap-2">
+                    <Filter size={13} aria-hidden /> Echo filter
+                  </div>
+                  <div className="flex gap-2">
+                    <button type="button" className="btn-secondary btn-sm flex-1" aria-pressed={sparsity} onClick={() => toggleSparsity(true)}>
+                      On
+                    </button>
+                    <button type="button" className="btn-secondary btn-sm flex-1" aria-pressed={!sparsity} onClick={() => toggleSparsity(false)}>
+                      Off
+                    </button>
+                  </div>
                 </div>
                 <div className="flex gap-2">
-                  <button className="toggle flex-1 justify-center" data-active={clutter === 'low'} onClick={() => setClutter('low')}>
-                    Low
+                  <button type="button" className="btn-primary flex-1" onClick={() => emitPing(sceneRefs.nose.x, sceneRefs.nose.y, sceneRefs.nose.z)}>
+                    <Radio size={16} aria-hidden /> Sonar sweep
                   </button>
-                  <button className="toggle flex-1 justify-center" data-active={clutter === 'extreme'} onClick={() => setClutter('extreme')}>
-                    Extreme flood debris
+                  <button type="button" className="btn-secondary !px-3.5" onClick={rehide} aria-label="Hide the target somewhere new">
+                    <Shuffle size={16} aria-hidden />
                   </button>
-                </div>
-              </div>
-              <div>
-                <div className="mb-2 flex items-center gap-2 font-mono text-xs text-[#aab8c2] ">
-                  <Filter size={11} /> Echo filter · k = {SONAR.sparsityK}
                 </div>
                 <div className="flex gap-2">
-                  <button className="toggle flex-1 justify-center" data-active={sparsity} onClick={() => toggleSparsity(true)}>
-                    On
+                  <button type="button" className="btn-secondary flex-1" disabled={!lock.active || left === 0} onClick={() => dropMarker(sceneRefs.stern.x, sceneRefs.stern.y, sceneRefs.stern.z)}>
+                    <MapPin size={16} aria-hidden /> Drop marker · {left} left
                   </button>
-                  <button className="toggle flex-1 justify-center" data-active={!sparsity} onClick={() => toggleSparsity(false)}>
-                    Off
+                  <button type="button" className="btn-secondary !px-3.5" onClick={reloadMarkers} aria-label="Reload markers">
+                    <RotateCcw size={16} aria-hidden />
                   </button>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <button className="btn-primary flex-1 justify-center !px-3" onClick={() => emitPing(sceneRefs.nose.x, sceneRefs.nose.y, sceneRefs.nose.z)}>
-                  <Radio size={14} /> Sonar Sweep
+            </Reveal>
+          ) : (
+            <div className="card card-pad mt-6">
+              <p className="text-base leading-relaxed text-[#eef3f6]">
+                The sandbox runs on the live 3D scene, which is off in Read mode.
+                {webglOk ? ' Turn Read mode off to try it.' : ' This device cannot run the 3D scene.'}
+              </p>
+              {webglOk && (
+                <button type="button" className="btn-primary btn-sm mt-4" onClick={() => setReadMode(false)}>
+                  <Radio size={15} aria-hidden /> Turn on 3D
                 </button>
-                <button className="btn-secondary !px-3" onClick={rehide} aria-label="Re-hide target">
-                  <Shuffle size={14} />
-                </button>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  className="btn-secondary flex-1 justify-center !px-3 disabled:opacity-40"
-                  disabled={!lock.active || left === 0}
-                  onClick={() => dropMarker(sceneRefs.stern.x, sceneRefs.stern.y, sceneRefs.stern.z)}
-                  style={lock.active && left > 0 ? { borderColor: 'rgba(255,107,87,0.8)', boxShadow: '0 0 20px rgba(255,107,87,0.35)' } : undefined}
-                >
-                  <MapPin size={14} /> Drop glow marker · {left}/{MAX_MARKERS}
-                </button>
-                <button className="btn-secondary !px-3" onClick={reloadMarkers} aria-label="Reload markers">
-                  <RotateCcw size={14} />
-                </button>
-              </div>
+              )}
+              <p className="mt-4 text-sm leading-relaxed text-[#c3ced6]">
+                {SONAR.roles} {SONAR.integration}
+              </p>
             </div>
-          </Reveal>
+          )}
         </div>
 
         <div className="hidden lg:block" />
 
-        <div className="pointer-events-auto">
-          <Reveal delay={2}>
-            <div className="glass-strong hud-corner space-y-3 rounded-lg p-4 font-mono" style={{ borderColor: lock.active ? 'rgba(255,107,87,0.7)' : undefined }}>
-              <div className="flex items-center justify-between text-xs ">
-                <span className="flex items-center gap-2 text-[#aab8c2]">Target status <SimTag /></span>
-                <span className={lock.active ? 'text-[#ff6b57] blink' : 'text-white/65'}>{lock.active ? '● LOCKED' : '○ SEARCHING'}</span>
+        {live3d && (
+          <div className="pointer-events-auto space-y-4">
+            <Reveal delay={1} className="hidden lg:block">
+              <SensorMonitor />
+            </Reveal>
+            <Reveal delay={2}>
+              <div className="card card-pad space-y-4" style={{ borderColor: lock.active ? 'rgba(255,107,87,0.7)' : undefined }}>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="label flex items-center gap-2">
+                    Target status <SimTag />
+                  </span>
+                  <span className={`font-mono text-xs ${lock.active ? 'blink text-[#ff6b57]' : 'text-[#aab8c2]'}`}>{lock.active ? '● LOCKED' : '○ SEARCHING'}</span>
+                </div>
+                <RevealMeter />
+                <div className="grid grid-cols-2 gap-4 font-mono text-xs text-[#aab8c2]">
+                  <div>
+                    RANGE
+                    <div className="text-2xl text-white">
+                      {lock.distanceM ? lock.distanceM.toFixed(1) : '--.-'}
+                      <span className="text-sm text-[#aab8c2]"> m</span>
+                    </div>
+                  </div>
+                  <div>
+                    CONFIDENCE
+                    <div className={`text-2xl ${lock.active ? 'text-[#ff6b57]' : 'text-white'}`}>
+                      {(lock.confidence * 100).toFixed(0)}
+                      <span className="text-sm text-[#aab8c2]"> %</span>
+                    </div>
+                  </div>
+                  <div>
+                    LOCK AT
+                    <div className="text-sm text-white">{(SONAR.lockThreshold * 100).toFixed(0)}%</div>
+                  </div>
+                  <div>
+                    MARKERS DROPPED
+                    <div className="text-sm text-white">
+                      {markers.length}/{MAX_MARKERS}
+                    </div>
+                  </div>
+                </div>
+                <p className="border-t border-white/10 pt-3 text-sm leading-relaxed text-[#c3ced6]">
+                  {sparsity
+                    ? `The filter keeps the ${SONAR.sparsityK} strongest returns per sweep and drops the scattered echoes from sediment.`
+                    : 'Filter off: every echo is kept. Sediment speckle floods the return, and confidence falls below the lock threshold.'}
+                </p>
+                <p className="text-sm leading-relaxed text-[#c3ced6]">
+                  {SONAR.roles} {SONAR.integration}
+                </p>
+                <p className="font-mono text-xs text-[#aab8c2]">
+                  LIGHTS {lights ? 'ON' : 'OFF'} · CLUTTER {clutter === 'extreme' ? 'DEBRIS' : 'LOW'} · FILTER {sparsity ? 'ON' : 'OFF'}
+                </p>
               </div>
-              <RevealMeter />
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div>
-                  <div className="text-white/65">RANGE</div>
-                  <div className="text-xl text-white">
-                    {lock.distanceM ? lock.distanceM.toFixed(1) : '--.-'}
-                    <span className="text-xs text-[#aab8c2]"> m</span>
-                  </div>
-                </div>
-                <div>
-                  <div className="text-white/65">CONFIDENCE</div>
-                  <div className={`text-xl ${lock.active ? 'text-[#ff6b57]' : 'text-white'}`}>
-                    {(lock.confidence * 100).toFixed(1)}
-                    <span className="text-xs text-[#aab8c2]"> %</span>
-                  </div>
-                </div>
-                <div>
-                  <div className="text-white/65">LOCK THRESHOLD</div>
-                  <div className="text-white">{(SONAR.lockThreshold * 100).toFixed(0)}%</div>
-                </div>
-                <div>
-                  <div className="text-white/65">SWEEPS · MARKERS</div>
-                  <div className="text-white">
-                    {String(pingCount).padStart(4, '0')} · {markers.length}
-                  </div>
-                </div>
-              </div>
-              <p className="border-t border-white/10 pt-2 text-xs leading-relaxed text-white/60">
-                {sparsity
-                  ? `Filter keeps the ${SONAR.sparsityK} strongest returns per sweep; sediment echoes are energy-spread and dropped.`
-                  : 'Filter off: every echo is kept. Sediment speckle floods the return and confidence collapses below the lock threshold.'}
-              </p>
-              <p className="text-xs leading-relaxed text-white/72">
-                {SONAR.roles} {SONAR.integration}
-              </p>
-            </div>
-          </Reveal>
-        </div>
+            </Reveal>
+          </div>
+        )}
       </div>
     </SectionShell>
   )

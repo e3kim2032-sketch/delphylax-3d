@@ -23,21 +23,34 @@ export const IDENTITY = {
     'Inspired by the Amazon river dolphin, which finds its way through muddy river water without being able to see.',
 } as const
 
+/** A site-relative path (e.g. cost-notes.html) or an absolute URL, resolved for links. */
+export const resolveHref = (href: string) => (/^https?:/.test(href) ? href : `${import.meta.env.BASE_URL}${href}`)
+
+/** The 10-second test: three plain-language lines under the hero one-liner. */
+export const HERO_FACTS = [
+  { label: 'What it is', text: 'A small robot boat that searches flooded streets.' },
+  { label: 'Who it helps', text: 'People trapped in floods, and the rescuers looking for them.' },
+  { label: 'Why it matters', text: 'Rescuers can see where people are without wading into dangerous, muddy water.' },
+] as const
+
 export const CRISIS = {
   event: 'Seoul, August 2022',
   recordYears: 115,
-  recordLabel: 'Heaviest rainfall since Seoul began keeping weather records',
+  recordLabel: 'the heaviest daily rain since Seoul began keeping weather records',
   livesLost: 3,
-  livesLabel: 'Lost when water trapped a family inside their semi-basement home',
+  livesLabel: 'lost when water trapped a family inside their semi-basement home',
   summary: 'The water rose faster than the family could escape, and no one outside could see what was happening inside.',
   summaryNote: 'Paraphrased from news reports',
   monsoonWindow: 'Late June – early August',
   sources: [
-    'AFP / The Journal (2023)',
-    'Al Jazeera (2023), citing the Korean government',
-    'Korea JoongAng Daily (2024)',
-    'Korea Herald (2023)',
+    { label: 'NPR (9 Aug 2022)', href: 'https://www.npr.org/2022/08/09/1116455746/historic-rainfall-turns-seouls-roads-into-rivers-and-leaves-8-dead' },
+    { label: 'The Kyunghyang Shinmun (10 Aug 2022)', href: 'https://www.khan.co.kr/en/article/202208101342347' },
   ],
+  /** the 115-year record: daily rain at the Dongjak station, highest since modern records began in 1907 */
+  recordSource: {
+    label: 'The Watchers (9 Aug 2022)',
+    href: 'https://watchers.news/2022/08/09/heaviest-rainfall-in-115-years-hits-seoul-leaving-8-people-dead-and-7-others-missing-south-korea/',
+  },
   whyDeadly: [
     { title: 'Water rises in minutes', body: 'Streets and underpasses fill faster than people can get out.' },
     { title: 'Total darkness', body: 'Power is usually cut, so there is no light.' },
@@ -45,6 +58,63 @@ export const CRISIS = {
     { title: 'Rescuers go in blind', body: 'No one can tell what, or who, is under the water.' },
   ],
   question: 'How can rescuers see what is under muddy flood water, quickly, without sending a person in?',
+} as const
+
+/**
+ * Real Korean urban floods where the water itself hid or blocked the people inside.
+ * Every entry is checked against the linked reports; nothing here is estimated.
+ */
+export const INCIDENTS = [
+  {
+    date: '8 August 2022',
+    place: 'Seoul · semi-basement home, Sillim-dong',
+    what: 'Record rain flooded a semi-basement home in Gwanak District. A family of three could not get out, and died.',
+    why: 'Water came in through the window and the stairs. The family called for help, but rescuers could not reach them in time.',
+    sources: [
+      { label: 'NPR', href: 'https://www.npr.org/2022/08/09/1116455746/historic-rainfall-turns-seouls-roads-into-rivers-and-leaves-8-dead' },
+      { label: 'Kyunghyang Shinmun', href: 'https://www.khan.co.kr/en/article/202208101342347' },
+    ],
+  },
+  {
+    date: '6 September 2022',
+    place: 'Pohang · apartment underground car park',
+    what: 'As Typhoon Hinnamnor flooded the city, residents went down to move their cars and were trapped. Seven people died; two were rescued alive.',
+    why: 'The car park was under water, and rescuers had to drain it before they could search for the people inside.',
+    sources: [{ label: 'Al Jazeera', href: 'https://www.aljazeera.com/news/2022/9/7/death-toll-rises-to-10-after-typhoon-hinnamnor-hits-south-korea' }],
+  },
+  {
+    date: '15 July 2023',
+    place: 'Cheongju · Osong road underpass',
+    what: 'A river bank gave way and the underpass filled in as little as two or three minutes, trapping vehicles including a bus. Fourteen people died.',
+    why: 'Divers searched from rubber boats while crews pumped the brown water out, and water mixed with mud slowed the search for the missing.',
+    sources: [
+      { label: 'Al Jazeera', href: 'https://www.aljazeera.com/news/2023/7/16/many-dead-in-s-korea-as-flash-floods-trap-15-vehicles-in-tunnel' },
+      { label: 'The Korea Times', href: 'https://www.koreatimes.co.kr/southkorea/society/20230717/49-dead-or-missing-in-downpours-after-4-more-bodies-recovered-from-underground-road' },
+      { label: 'Asia Economy', href: 'https://www.asiae.co.kr/en/article/2024071515472983456' },
+    ],
+  },
+] as const
+
+export const INCIDENTS_NOTE =
+  'In each flood, people outside could not see into the water or get through it in time. Delphylax is built for flooded streets, so it would not have fitted every one of these spaces, but the problem it works on is the same one.'
+
+/**
+ * Flood Vulnerability Index (FVI): Luna's program for choosing where to search first.
+ *
+ * Only the general, published idea of an FVI is described on the page for now.
+ * TODO (Luna): add the real details here, then show them in the FVI card:
+ *   - the exact inputs (indicators) the index uses, and the public dataset each one comes from
+ *   - the formula or weights that turn the inputs into one score, and the score's scale
+ *   - the map unit it scores (for example dong, district, or grid cell) and the area covered
+ *   - one worked example: a real neighbourhood, its inputs, and its score
+ *   - how the ranking was checked against past floods, if it has been
+ */
+export const FVI = {
+  what: 'A Flood Vulnerability Index is a score that ranks places by how badly a flood would hurt the people who live there. Luna is developing the team’s FVI program.',
+  inputs:
+    'Published indexes combine three kinds of information: exposure (how likely water is to reach a place), susceptibility (how easily the people and buildings there are harmed), and resilience (how well the place can cope and recover).',
+  use: 'The program ranks neighbourhoods by score. In a flood, the highest-scoring neighbourhoods are searched first, so a single Delphylax goes where people are most at risk.',
+  source: { label: 'Balica, Wright & van der Meulen (2012), Natural Hazards 64: 73–105', href: 'https://doi.org/10.1007/s11069-012-0234-1' },
 } as const
 
 /** Inia geoffrensis echolocation — the biomimetic inspiration (not a Delphylax measurement). */
@@ -116,52 +186,125 @@ export function buoyancy(payloadKg: number) {
   return { mass, used, reserveKg: HULL.capacityKg - mass }
 }
 
-export const HOW_IT_WORKS = [
+/**
+ * Numbered parts legend. The numbers match the pins on the exploded 3D model.
+ * Everything here comes from the parts list, the specs and delphylax-overview.md.
+ */
+export const PARTS_LEGEND = [
   {
     id: 'hulls',
-    name: 'Catamaran hulls',
-    short: 'Two 76 cm PVC pipes',
-    body: 'Two 76 cm PVC pipes (114 mm wide), 42 cm apart. 3D-printed nose and tail cones are glued on, and foam inside means a leak can’t sink it.',
+    name: 'Hulls',
+    does: 'Two sealed pipes keep the boat afloat and hard to flip.',
+    material: 'KS 100A PVC pipe, 114 mm wide, cut to 76 cm; 3D-printed nose and tail cones; urethane foam inside',
+    more: 'The pipes sit 42 cm apart. Foam inside means a leak can’t sink the boat, and together the two pipes float about 15 kg.',
     color: '#f8fafc',
   },
   {
-    id: 'cabin',
-    name: 'Deck & cabin',
-    short: 'Airtight box, coral shell, fin',
-    body: 'An 8 mm foam PVC deck sits on four printed saddles strapped to the pipes. An airtight box on the deck holds the electronics, under a coral 3D-printed shell with a dolphin fin.',
+    id: 'deck',
+    name: 'Deck',
+    does: 'A flat platform that joins the hulls and carries everything else.',
+    material: '8 mm black foam PVC sheet on four 3D-printed saddles strapped to the pipes',
+    more: '',
+    color: '#aab8c2',
+  },
+  {
+    id: 'box',
+    name: 'Electronics box',
+    does: 'Keeps the electronics dry, under the coral shell with the dolphin fin.',
+    material: 'Airtight food box, 250 × 150 × 100 mm, with PG7 cable glands and silicone sealant; 3D-printed shell held on with Velcro',
+    more: '',
     color: '#ff7f66',
   },
   {
+    id: 'esp32',
+    name: 'ESP32',
+    does: 'The brain: reads the sensors, drives the thrusters, and cuts the motors if the boat tips or leaks.',
+    material: 'ESP32 on a 30-pin screw-terminal board',
+    more: 'A rescuer steers by remote control from the bank. Self-driving search is planned, not built.',
+    color: '#38bdf8',
+  },
+  {
+    id: 'battery',
+    name: 'Battery',
+    does: 'Powers the thrusters, and the electronics through the converter.',
+    material: '3-cell lithium pack, 11.1 V, about 5000 mAh',
+    more: 'Run time has not been measured yet.',
+    color: '#94a3b8',
+  },
+  {
+    id: 'fuse',
+    name: 'Fuse',
+    does: 'Sits right after the battery and cuts the power if a wire shorts.',
+    material: '20 A fuse in a holder, on 14 AWG silicone wire',
+    more: '',
+    color: '#facc15',
+  },
+  {
+    id: 'converter',
+    name: '12 V-to-5 V converter',
+    does: 'Steps battery power down to 5 V for the ESP32 and the servo.',
+    material: '12 V to 5 V, 3 A converter; Wago 221 lever connectors join the wires',
+    more: '',
+    color: '#4ade80',
+  },
+  {
+    id: 'escs',
+    name: 'ESCs (speed controllers)',
+    does: 'One per thruster: each sets how fast its thruster spins, forward or reverse.',
+    material: 'Two 30 A brushless speed controllers',
+    more: '',
+    color: '#c084fc',
+  },
+  {
     id: 'thrusters',
-    name: 'Brushless thrusters',
-    short: '2 × QC2221, CW + CCW',
-    body: 'Two brushless underwater thrusters, one spinning each way, sit under the back of the hulls. Running one faster than the other steers the boat.',
+    name: 'Thrusters',
+    does: 'Push the boat. Running one faster than the other steers it.',
+    material: 'Two QX-MOTOR QC2221 380KV brushless underwater thrusters, one spinning each way, on 3D-printed mounts with stainless hose clamps',
+    more: 'Thrust is estimated at 0.4 to 1.0 kgf per thruster. The maker lists no number, so it is not measured yet.',
     color: '#3b82f6',
   },
   {
-    id: 'senses',
-    name: 'Sonar + thermal senses',
-    short: 'Fish-finder sonar · AMG8833 · compass · GPS (planned)',
-    body: 'Sonar finds objects under the water; the AMG8833 heat sensor spots people at the surface. A compass knows which way the boat points, and GPS is planned. A tilt sensor and a leak sensor watch for danger. Sonar readings are shown on the fish finder’s screen for now; linking them to the ESP32 is planned.',
+    id: 'markers',
+    name: 'Marker dropper',
+    does: 'Drops one glowing marker at a time where something is found.',
+    material: 'SG90 micro servo turning a 3D-printed disc under a rack of four tubes; mini glow lights with sinkers and 3 m lines',
+    more: 'Tagging each drop with a GPS position is planned.',
+    color: '#ff6b57',
+  },
+  {
+    id: 'sensors',
+    name: 'Sensors',
+    does: 'Sonar finds objects under the water; the AMG8833 heat sensor spots people at the surface.',
+    material: 'LUCKY FF718LiC-W fish-finder sonar on a bow float; AMG8833 8×8 heat sensor in the bow bezel; MPU6050 tilt sensor; leak sensor; GY-271 compass',
+    more: 'Sonar readings are shown on the fish finder’s screen for now; linking them to the ESP32 is planned. A NEO-M8N GPS is also planned.',
     color: '#ec4899',
   },
   {
-    id: 'markers',
-    name: 'Glow-marker dropper',
-    short: 'Servo disc, 4 tubes',
-    body: 'A servo turns a disc under a rack of four tubes and drops one glowing marker at a time where something is found. Tagging each drop with a GPS position is planned.',
-    color: '#e11d48',
-  },
-  {
-    id: 'brain',
-    name: 'ESP32 safety brain',
-    short: 'Tilt + leak cut-off',
-    body: 'The ESP32 reads every sensor and drives the thrusters, and it cuts the motors if the boat tips past a safe angle or the leak sensor gets wet. A 3-cell 11.1 V battery feeds a 20 A fuse, then the thrusters; a converter makes 5 V for the computer and the servo.',
-    color: '#38bdf8',
+    id: 'grablines',
+    name: 'Grab lines',
+    does: 'Orange rope loops along both hulls so a person in the water can hold on until rescuers arrive.',
+    material: 'About 6 mm orange rope in three shallow loops between four attachment points on each hull',
+    more: '',
+    color: '#ff9a3c',
   },
 ] as const
 
-export type SubsystemId = (typeof HOW_IT_WORKS)[number]['id']
+export type PartId = (typeof PARTS_LEGEND)[number]['id']
+
+/**
+ * "How a rescue would work": the labelled steps under the concept animation.
+ * It is a concept: today the boat is steered by remote control, and the automatic sweep is planned.
+ */
+export const RESCUE_STEPS = [
+  { title: 'Truck stops', body: 'The rescue truck stops at the edge of the flood.' },
+  { title: 'Delphylax launches', body: 'One person carries Delphylax to the water and sets it down.' },
+  { title: 'It sweeps the street', body: 'It crosses the flooded street back and forth, like mowing a lawn, while sonar looks for objects under the water.' },
+  { title: 'It marks the spot', body: 'The heat sensor spots a person at the surface beside a semi-basement window, and Delphylax drops a glowing marker there.' },
+  { title: 'Rescuers go straight there', body: 'The crew heads directly to the marker instead of searching every street.' },
+] as const
+
+export const RESCUE_NOTE =
+  'This shows the idea, not a real mission. Today a rescuer steers Delphylax by remote control; the automatic sweep is planned, not built.'
 
 export const TIMELINE = [
   { date: 'Nov 5', version: 'Delphylax build', change: 'Building started, one small step at a time', state: 'active' },
@@ -253,9 +396,34 @@ export const COST = {
   ratio: 26,
   line: 'about $380 (535,510 won, estimate)',
   emilyUsd: 10000,
-  emilySource: 'Military.com (2016)',
+  emilySource: 'Military.com, 2016',
   emilySpeedMph: 25,
 } as const
+
+/** Hero impact counters. Every value comes from this file and carries its own source link. */
+export const IMPACT = [
+  {
+    prefix: '$',
+    value: COST.usdApprox,
+    suffix: '',
+    label: `Build cost, estimate (${(PARTS_TOTAL + PRINTING.total).toLocaleString('en-US')} won)`,
+    source: { label: 'Cost notes', href: 'cost-notes.html' },
+  },
+  {
+    prefix: '1/',
+    value: COST.ratio,
+    suffix: '',
+    label: 'of the price of EMILY, a proven rescue robot (about)',
+    source: { label: 'Military.com, 2016', href: 'https://www.military.com/daily-news/2016/05/18/meet-the-us-navys-robotic-lifeguard-named-emily.html' },
+  },
+  {
+    prefix: '',
+    value: CRISIS.recordYears,
+    suffix: ' yrs',
+    label: 'Seoul, August 2022: heaviest daily rain since records began',
+    source: CRISIS.recordSource,
+  },
+] as const
 
 export const COST_BY_GROUP = Object.entries(
   PARTS.reduce<Record<string, number>>((acc, p) => {
@@ -327,12 +495,79 @@ export const MATRIX_COLUMNS = [
   { key: 'maturity', label: 'Maturity' },
 ] as const
 
-export const ROADMAP = [
-  { phase: 'Now', date: 'Nov 2026', title: 'Delphylax build', body: 'Building the first full-size Delphylax: hulls, deck, cabin, power and thrusters.', state: 'active' as const },
-  { phase: 'Next', date: 'Nov–Dec 2026', title: 'First water test', body: 'Float, drive, measure thrust with a scale, and test the current the boat can hold against.', state: 'planned' as const },
-  { phase: 'Then', date: 'KSEF 2027', title: 'Sonar + thermal search', body: 'Add GPS, heat sensor and sonar; measure detection in a muddy test tank; replace estimates with receipts and measurements.', state: 'planned' as const },
-  { phase: 'Level 2', date: 'Conrad Challenge', title: 'Stronger push', body: 'Bigger thrusters (3 to 3.5 kgf each) on a 4-cell battery, if testing shows slow street floods are not enough.', state: 'planned' as const },
+export const MISSION = 'Let rescuers see what is under flood water before anyone wades in.'
+export const VISION = 'A flood scout on every rescue truck, in every town that floods.'
+
+/**
+ * How we make money. Every price is an estimate worked out from the build cost above
+ * with the planning assumptions below. They are not quotes.
+ * TODO (team): confirm or replace these three assumptions.
+ */
+const PRICING = { saleMultiple: 2, serviceShare: 0.2, trainingShare: 0.5 } as const
+const roundTo5 = (n: number) => Math.round(n / 5) * 5
+
+export const REVENUE = [
+  {
+    title: 'Sell boats to fire stations',
+    price: `about $${roundTo5(COST.usdApprox * PRICING.saleMultiple)} per boat`,
+    basis: `Estimate: ${PRICING.saleMultiple} × the $${COST.usdApprox} build cost, to cover assembly, testing and spares.`,
+    body: 'One boat per rescue truck, bought by the fire headquarters that equips the station.',
+  },
+  {
+    title: 'Yearly parts and service plan',
+    price: `about $${roundTo5(COST.usdApprox * PRICING.serviceShare)} a year per boat`,
+    basis: `Estimate: ${PRICING.serviceShare * 100}% of the build cost each year.`,
+    body: 'Replacement glow markers and wear parts, and a check before each monsoon season.',
+  },
+  {
+    title: 'Operator training',
+    price: `about $${roundTo5(COST.usdApprox * PRICING.trainingShare)} per station`,
+    basis: `Estimate: ${PRICING.trainingShare * 100}% of the build cost for one session.`,
+    body: 'A hands-on session so a crew can launch, steer and recover the boat.',
+  },
 ] as const
+
+/** UN Sustainable Development Goal targets. Wording checked against sdgs.un.org (linked). */
+export const SDGS = [
+  {
+    goal: 'SDG 11',
+    name: 'Sustainable cities and communities',
+    target: 'Target 11.5',
+    text: 'By 2030, significantly reduce deaths, the number of people affected and economic losses caused by disasters, including water-related disasters.',
+    help: 'Delphylax helps rescuers find people in a flooded street sooner, without sending another person into the water.',
+    href: 'https://sdgs.un.org/goals/goal11#targets_and_indicators',
+  },
+  {
+    goal: 'SDG 13',
+    name: 'Climate action',
+    target: 'Target 13.1',
+    text: 'Strengthen resilience and adaptive capacity to climate-related hazards and natural disasters in all countries.',
+    help: 'A scout cheap enough to ride on every rescue truck makes a city better prepared for the next flood.',
+    href: 'https://sdgs.un.org/goals/goal13#targets_and_indicators',
+  },
+  {
+    goal: 'SDG 9',
+    name: 'Industry, innovation and infrastructure',
+    target: 'Target 9.1',
+    text: 'Develop quality, reliable, sustainable and resilient infrastructure, with affordable and equitable access for all.',
+    help: `Built from PVC pipe and off-the-shelf parts for about $${COST.usdApprox} (estimate), it puts rescue equipment within reach of towns with small budgets.`,
+    href: 'https://sdgs.un.org/goals/goal9#targets_and_indicators',
+  },
+] as const
+
+/** Policy & adoption (Minnie). Sourced facts only; the pilot is a proposal and has no numbers. */
+export const POLICY = {
+  buyers:
+    'In Korea, rescue equipment is bought by the metropolitan and provincial fire headquarters that run the 119 fire and rescue stations. They buy through the Public Procurement Service’s online shopping mall or by competitive bidding.',
+  source: { label: 'The Kyunghyang Shinmun (7 Oct 2026)', href: 'https://www.khan.co.kr/en/article/202610071558017' },
+  pilotTitle: 'What a pilot would look like',
+  pilot: [
+    'Lend one Delphylax to a single fire station for a monsoon season.',
+    'Train the crew to launch, steer and recover it.',
+    'Log every launch: where it went, what it found, and what went wrong.',
+    'Review the log with the station and decide together whether it has earned a place on the truck.',
+  ],
+} as const
 
 export const BUSINESS = {
   customers: [
@@ -352,14 +587,53 @@ export const BUSINESS = {
     },
     {
       label: 'Part prices: the project shopping list (estimates, November 2026)',
-      href: 'https://github.com/e3kim2032-sketch/delphylax-3d/blob/main/delphylax-overview.md#costs',
+      href: 'cost-notes.html',
     },
     {
       label: 'Reprint price: print shop checkout total (November 2026)',
-      href: 'https://github.com/e3kim2032-sketch/delphylax-3d/blob/main/delphylax-overview.md#costs',
+      href: 'cost-notes.html',
     },
   ],
 } as const
+
+/**
+ * Judge FAQ. Every answer is built from the values in this file. Where something
+ * is unknown or untested, the answer says so.
+ */
+export const FAQ = [
+  {
+    q: 'How fast is it?',
+    a: `About ${HULL.topSpeedMs} m/s at most. That is an estimate from the hull-speed limit for a ${HULL.waterlineLengthM} m hull, not a measurement. The first water test will give the real number.`,
+  },
+  {
+    q: 'How long does the battery last?',
+    a: `We don’t know yet. The battery is a 3-cell lithium pack (${HULL.batteryV} V, about 5000 mAh). Run time depends on how much current the thrusters draw, and that has not been measured.`,
+  },
+  {
+    q: 'What if the water is too fast?',
+    a: `Then Delphylax is the wrong tool. It is built for slow street floods: with a top speed near ${HULL.topSpeedMs} m/s (estimate) it cannot work against a fast river current, and the fastest current it can hold against is untested. If the boat tips past a safe angle or the leak sensor gets wet, the ESP32 cuts the motors, and foam in the hulls keeps it afloat.`,
+  },
+  {
+    q: 'How does it find a person in muddy water?',
+    a: `${SONAR.roles} It then drops a glowing marker so rescuers know where to look. The heat sensor cannot see under the water. ${SONAR.integration} The sonar and heat readouts on this site are simulated.`,
+  },
+  {
+    q: 'What does it cost?',
+    a: `About $${COST.usdApprox} to build (${COST.total.toLocaleString('en-US')} won): ${COST.parts.toLocaleString('en-US')} won of parts and ${COST.printing.toLocaleString('en-US')} won of 3D printing. These are planning estimates, not receipts. That is about 1/${COST.ratio} of the price of EMILY (about $${COST.emilyUsd.toLocaleString('en-US')}), a finished rescue robot, so it compares price, not ability.`,
+  },
+  {
+    q: 'What has been tested so far?',
+    a: 'On the bench: the ESP32 control board. In the water: nothing yet. Delphylax has not had its first water test, so floating, speed, thrust and holding against a current are all unmeasured. The sonar and heat readouts on this site are simulated, not test data.',
+  },
+  {
+    q: 'Does it drive itself?',
+    a: CONTROL_MODE,
+  },
+  {
+    q: 'What are its limits?',
+    a: `${LIMITS.headline} The heat sensor only sees people at the surface. Tagging each marker with a GPS position is planned, not built. Every cost and performance figure marked “estimate” still has to be measured.`,
+  },
+] as const
 
 export const SECTIONS = [
   { id: 'hero', index: '01', label: 'Guardian', depth: 0 },

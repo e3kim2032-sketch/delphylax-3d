@@ -1,4 +1,26 @@
-import * as THREE from 'three'
+/**
+ * A minimal 3D point. The HUD and the text sections read scene state from this
+ * file, so it must not import three.js: that keeps the 3D engine out of the first load.
+ */
+export class Vec3 {
+  x: number
+  y: number
+  z: number
+  constructor(x = 0, y = 0, z = 0) {
+    this.x = x
+    this.y = y
+    this.z = z
+  }
+  copy(v: { x: number; y: number; z: number }) {
+    this.x = v.x
+    this.y = v.y
+    this.z = v.z
+    return this
+  }
+  distanceTo(v: { x: number; y: number; z: number }) {
+    return Math.hypot(this.x - v.x, this.y - v.y, this.z - v.z)
+  }
+}
 
 /**
  * Mutable, frame-rate scene state shared between canvas components and the HUD
@@ -6,11 +28,11 @@ import * as THREE from 'three'
  */
 export const sceneRefs = {
   /** world position of the sonar float (ping origin) */
-  nose: new THREE.Vector3(1.1, 0, 0),
+  nose: new Vec3(1.1, 0, 0),
   /** world position of the marker rack drop point (stern) */
-  stern: new THREE.Vector3(-0.9, 0.1, 0),
-  robot: new THREE.Vector3(0, 0, 0),
-  victim: new THREE.Vector3(6.5, -2.05, -1.9),
+  stern: new Vec3(-0.9, 0.1, 0),
+  robot: new Vec3(0, 0, 0),
+  victim: new Vec3(6.5, -2.05, -1.9),
   /** 0..1 — how strongly the victim is currently illuminated by sonar */
   reveal: 0,
   /** last ping emission time (s) */

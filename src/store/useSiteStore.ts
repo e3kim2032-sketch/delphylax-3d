@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { SubsystemId } from '../data/research'
+import type { PartId } from '../data/research'
 
 export type Clutter = 'low' | 'extreme'
 export type Section = 'hero' | 'crisis' | 'engineering' | 'sandbox' | 'matrix' | 'business'
@@ -43,9 +43,12 @@ interface SiteState {
   pingCount: number
   lock: TargetLock
   markers: Marker[]
-  selectedSubsystem: SubsystemId | null
+  /** the legend part highlighted on the 3D model */
+  selectedPart: PartId | null
   pointer: { x: number; y: number }
   webglOk: boolean
+  /** fast text-first page: the 3D canvas and post-processing are off */
+  readMode: boolean
   victimSeed: number
 
   setScroll: (p: number, depth: number, section: Section) => void
@@ -59,10 +62,37 @@ interface SiteState {
   setLock: (l: Partial<TargetLock>) => void
   dropMarker: (x: number, y: number, z: number) => void
   reloadMarkers: () => void
-  selectSubsystem: (id: SubsystemId | null) => void
+  selectPart: (id: PartId | null) => void
   setPointer: (x: number, y: number) => void
   setWebglOk: (v: boolean) => void
+  setReadMode: (v: boolean) => void
   rehideVictim: () => void
+}
+
+const READ_KEY = 'dlx-read-mode'
+
+/**
+ * Read mode starts on when the visitor chose it before, prefers reduced motion,
+ * or is on a low-power device. A saved choice always wins.
+ */
+function initialReadMode(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    const saved = window.localStorage.getItem(READ_KEY)
+    if (saved === '1') return true
+    if (saved === '0') return false
+  } catch {
+    /* storage blocked: fall through to detection */
+  }
+  try {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return true
+  } catch {
+    /* no matchMedia */
+  }
+  const nav = navigator as Navigator & { deviceMemory?: number }
+  if (typeof nav.hardwareConcurrency === 'number' && nav.hardwareConcurrency <= 4) return true
+  if (typeof nav.deviceMemory === 'number' && nav.deviceMemory <= 4) return true
+  return false
 }
 
 let pingId = 0
@@ -82,9 +112,10 @@ export const useSiteStore = create<SiteState>((set, get) => ({
   pingCount: 0,
   lock: { active: false, distanceM: 0, confidence: 0, sx: 0.5, sy: 0.5, lockedAt: 0 },
   markers: [],
-  selectedSubsystem: null,
+  selectedPart: null,
   pointer: { x: 0, y: 0 },
   webglOk: true,
+  readMode: initialReadMode(),
   victimSeed: 3,
 
   setScroll: (scrollProgress, depthM, section) => {
@@ -113,8 +144,19 @@ export const useSiteStore = create<SiteState>((set, get) => ({
       s.markers.length >= MAX_MARKERS ? {} : { markers: [...s.markers, { id: ++markerId, x, y, z, t: performance.now() / 1000 }] },
     ),
   reloadMarkers: () => set({ markers: [] }),
-  selectSubsystem: (selectedSubsystem) => set({ selectedSubsystem }),
+  selectPart: (selectedPart) => set({ selectedPart }),
   setPointer: (x, y) => set({ pointer: { x, y } }),
   setWebglOk: (webglOk) => set({ webglOk }),
+  setReadMode: (readMode) => {
+    try {
+      window.localStorage.setItem(READ_KEY, readMode ? '1' : '0')
+    } catch {
+      /* storage blocked: the choice just lasts for this visit */
+    }
+    set(readMode ? { readMode, explodedOn: false, selectedPart: null } : { readMode })
+  },
   rehideVictim: () => set((s) => ({ victimSeed: s.victimSeed + 1, pings: [] })),
 }))
+
+/** True when the live 3D scene is on screen (WebGL works and Read mode is off). */
+export const useLive3d = () => useSiteStore((s) => s.webglOk && !s.readMode)

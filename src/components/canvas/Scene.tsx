@@ -45,7 +45,10 @@ export function Scene() {
         dpr={[1, 1.5]}
         gl={{ antialias: false, powerPreference: 'high-performance', alpha: false, stencil: false }}
         camera={{ fov: 40, near: 0.1, far: 140, position: [3.4, 1.0, 4.0] }}
-        onCreated={({ gl }) => {
+        onCreated={(state) => {
+          const { gl } = state
+          // dev only: lets tests step frames by hand when the tab is in the background
+          if (import.meta.env.DEV) (window as unknown as { __dlx: { r3f?: unknown } }).__dlx.r3f = state
           gl.toneMapping = THREE.ACESFilmicToneMapping
           gl.toneMappingExposure = 1.1
           gl.setClearColor('#0f1519')
