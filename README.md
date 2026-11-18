@@ -2,8 +2,9 @@
 
 Interactive 3D scrollytelling site for **Delphylax** (Greek: dolphin + guardian), a 94 cm PVC
 catamaran rescue scout for street floods built for the **Conrad Challenge** and **KSEF 2027**.
-It searches muddy water with a fish-finder sonar and an AMG8833 thermal camera, then drops a
-glowing marker where rescuers should look.
+It searches muddy water with a sonar sensor (DFRobot SEN0599, with a fish finder as backup), maps
+obstacles above the water with an RPLIDAR C1, spots people at the surface with an AMG8833 thermal
+camera, then drops a glowing marker where rescuers should look.
 
 ## Run
 

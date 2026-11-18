@@ -346,6 +346,9 @@ function Thruster({ side, m }: { side: 1 | -1; m: Mats }) {
   )
 }
 
+/** where the LiDAR scanner stands on top of the shell, ahead of the fin (boat mm) */
+export const LIDAR_AT: [number, number, number] = [0, -98, 198]
+
 /** how far the electronics lift out of the box in the exploded view (scene units) */
 const LIFT = 0.93
 
@@ -488,6 +491,19 @@ function DeckAndCabin({ m }: { m: Mats }) {
         </mesh>
         {/* the heat sensor in the bow bezel: same number as the sonar float */}
         <Pin id="sensors" at={mm(17, -193, 152)} />
+        {/* LiDAR scanner (RPLIDAR C1): a 360-degree puck on top of the shell */}
+        <mesh position={mm(LIDAR_AT[0], LIDAR_AT[1], LIDAR_AT[2] + 10)}>
+          <cylinderGeometry args={[28 * S, 30 * S, 20 * S, 32]} />
+          <meshStandardMaterial color="#20262b" roughness={0.55} metalness={0.2} />
+        </mesh>
+        <mesh material={m.glass} position={mm(LIDAR_AT[0], LIDAR_AT[1], LIDAR_AT[2] + 30)}>
+          <cylinderGeometry args={[26 * S, 26 * S, 20 * S, 32]} />
+        </mesh>
+        <mesh position={mm(LIDAR_AT[0], LIDAR_AT[1] - 26.5, LIDAR_AT[2] + 30)}>
+          <boxGeometry args={[18 * S, 8 * S, 2 * S]} />
+          <meshBasicMaterial color="#ff8a73" toneMapped={false} />
+        </mesh>
+        <Pin id="sensors" at={mm(LIDAR_AT[0], LIDAR_AT[1], LIDAR_AT[2] + 40)} />
       </Part>
 
       {/* dorsal fin (GPS lives under it) */}

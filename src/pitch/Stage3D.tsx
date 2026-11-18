@@ -4,7 +4,7 @@ import { Environment, Lightformer } from '@react-three/drei'
 import * as THREE from 'three'
 import { AbyssalEnvironment } from '../components/canvas/AbyssalEnvironment'
 import { Effects } from '../components/canvas/Effects'
-import { BoatParts, PinsContext, mm, BOAT_S as S } from '../components/canvas/DelphylaxModel'
+import { BoatParts, LIDAR_AT, PinsContext, mm, BOAT_S as S } from '../components/canvas/DelphylaxModel'
 import { sceneRefs } from '../components/canvas/sceneRefs'
 import { useSiteStore } from '../store/useSiteStore'
 import { live, sinceStep, SLIDE } from './live'
@@ -12,7 +12,7 @@ import { live, sinceStep, SLIDE } from './live'
 /**
  * The 3D stage behind the pitch deck. It reuses the site's boat model and water,
  * and adds what the pitch talks about: a camera that flies to each part, halo
- * rings on the highlighted part, the LiDAR on top, and the Delphylax Pod.
+ * rings on the highlighted part, the LiDAR sweep, and the Delphylax Pod.
  *
  * World frame: the boat sits at the origin with its bow toward +X; boat-local
  * millimetres (x across, y along with the bow at -y, z up) map to world as
@@ -126,11 +126,9 @@ function Director() {
 }
 
 /* ------------------------------------------------------------------ */
-/* LiDAR puck on top of the shell (the pitch describes it)              */
+/* LiDAR sweep: the puck is part of the boat model; this is its laser   */
 /* ------------------------------------------------------------------ */
-const LIDAR_AT: V3 = [0, -98, 198]
-
-function Lidar() {
+function LidarSweep() {
   const head = useRef<THREE.Group>(null)
   const beam = useRef<THREE.MeshBasicMaterial>(null)
   const disc = useRef<THREE.MeshBasicMaterial>(null)
@@ -138,7 +136,7 @@ function Lidar() {
   const [x, y, z] = LIDAR_AT
   useFrame((_, dt) => {
     const on = live.slide === SLIDE.how && live.step === 2
-    if (head.current && !live.reduce) head.current.rotation.y += dt * (on ? 6 : 1.5)
+    if (head.current && !live.reduce) head.current.rotation.y += dt * 6
     const k = live.reduce ? 1 : 1 - Math.exp(-dt * 5)
     if (beam.current) beam.current.opacity = THREE.MathUtils.lerp(beam.current.opacity, on ? 0.9 : 0, k)
     if (disc.current) disc.current.opacity = THREE.MathUtils.lerp(disc.current.opacity, on ? 0.12 : 0, k)
@@ -147,21 +145,7 @@ function Lidar() {
   const reach = 560 * S
   return (
     <group>
-      {/* base */}
-      <mesh position={mm(x, y, z + 10)}>
-        <cylinderGeometry args={[28 * S, 30 * S, 20 * S, 32]} />
-        <meshStandardMaterial color="#20262b" roughness={0.55} metalness={0.2} />
-      </mesh>
-      {/* spinning head */}
       <group ref={head} position={mm(x, y, z + 30)}>
-        <mesh>
-          <cylinderGeometry args={[26 * S, 26 * S, 20 * S, 32]} />
-          <meshPhysicalMaterial color="#0b1015" roughness={0.15} metalness={0.4} clearcoat={1} />
-        </mesh>
-        <mesh position={[0, 0, 26.5 * S]}>
-          <boxGeometry args={[18 * S, 8 * S, 2 * S]} />
-          <meshBasicMaterial color="#ff8a73" toneMapped={false} />
-        </mesh>
         {/* the laser: one thin line sweeping all the way round */}
         <mesh position={[0, 0, reach / 2 + 27 * S]}>
           <boxGeometry args={[5 * S, 5 * S, reach]} />
@@ -229,7 +213,7 @@ function PitchBoat({ boat }: { boat: RefObject<THREE.Group | null> }) {
       <PinsContext.Provider value={false}>
         <BoatParts />
       </PinsContext.Provider>
-      <Lidar />
+      <LidarSweep />
     </group>
   )
 }

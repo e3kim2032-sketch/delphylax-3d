@@ -126,17 +126,21 @@ export const BIOACOUSTICS = {
   centroidFrequencyKHz: 95,
   reference: 'Ladegaard et al. (2015), J. Exp. Biol. 218: 3091–3101',
   principle:
-    'River dolphins trade range for resolution: short, quiet, high-frequency clicks fired at a high rate let them navigate root-choked, sediment-filled water with no visibility at all. Delphylax borrows the idea — listen, don’t look — with a fish-finder sonar under the water and an AMG8833 heat sensor for people at the surface.',
+    'River dolphins trade range for resolution: short, quiet, high-frequency clicks fired at a high rate let them navigate root-choked, sediment-filled water with no visibility at all. Delphylax borrows the idea — listen, don’t look — with a sonar sensor under the water, a LiDAR scanner above it, and an AMG8833 heat sensor for people at the surface.',
 } as const
 
 export const SONAR = {
   lockThreshold: 0.85,
   sparsityK: 8,
-  sonarUnit: 'LUCKY FF718LiC-W wireless fish finder',
+  sonarUnit: 'DFRobot SEN0599 underwater sonar sensor',
+  backupSonarUnit: 'LUCKY FF718LiC-W wireless fish finder',
+  lidarUnit: 'RPLIDAR C1 360-degree laser scanner',
   thermalUnit: 'AMG8833 8×8 thermal camera',
   /** what each sensor can and cannot do — used wherever sensing is described */
   roles: 'Sonar finds objects under the water; the AMG8833 heat sensor spots people at the surface.',
-  integration: 'Sonar readings are shown on the fish finder’s screen for now; linking them to the ESP32 is planned.',
+  /** what the LiDAR adds: it works above the water only */
+  lidar: 'A 360-degree LiDAR scanner on top maps obstacles above the water.',
+  integration: 'The sonar sensor sends its distance readings straight to the ESP32. A fish-finder sonar is carried as a backup.',
 } as const
 
 /** How the boat is steered. One sentence, shown in the Engineering section. */
@@ -274,9 +278,9 @@ export const PARTS_LEGEND = [
   {
     id: 'sensors',
     name: 'Sensors',
-    does: 'Sonar finds objects under the water; the AMG8833 heat sensor spots people at the surface.',
-    material: 'LUCKY FF718LiC-W fish-finder sonar on a bow float; AMG8833 8×8 heat sensor in the bow bezel; MPU6050 tilt sensor; leak sensor; GY-271 compass',
-    more: 'Sonar readings are shown on the fish finder’s screen for now; linking them to the ESP32 is planned. A NEO-M8N GPS is also planned.',
+    does: 'Sonar finds objects under the water; the AMG8833 heat sensor spots people at the surface; LiDAR maps obstacles above the water.',
+    material: 'DFRobot SEN0599 underwater sonar sensor on a bow float; RPLIDAR C1 360-degree laser scanner on top; AMG8833 8×8 heat sensor in the bow bezel; MPU6050 tilt sensor; leak sensor; GY-271 compass',
+    more: 'The sonar sensor sends its distance readings straight to the ESP32. A fish-finder sonar (LUCKY FF718LiC-W) is carried as a backup. A NEO-M8N GPS is also planned.',
     color: '#ec4899',
   },
   {
@@ -615,7 +619,7 @@ export const FAQ = [
   },
   {
     q: 'How does it find a person in muddy water?',
-    a: `${SONAR.roles} It then drops a glowing marker so rescuers know where to look. The heat sensor cannot see under the water. ${SONAR.integration} The sonar and heat readouts on this site are simulated.`,
+    a: `${SONAR.roles} ${SONAR.lidar} It then drops a glowing marker so rescuers know where to look. The heat sensor cannot see under the water. ${SONAR.integration} The sonar and heat readouts on this site are simulated.`,
   },
   {
     q: 'What does it cost?',
