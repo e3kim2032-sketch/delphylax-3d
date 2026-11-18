@@ -1,0 +1,276 @@
+/*
+  Funding pitch deck. Same palette, fonts and card as the main site.
+  Slides are designed on a fixed 1920 x 1080 frame and scaled as one piece to fit
+  any window, so sizes here are in frame pixels.
+*/
+@layer components {
+  .pitch-root {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: #0f1519;
+    color: var(--text);
+    --k: 1;
+    --fx: 0px;
+    --fw: 1920px;
+  }
+  .pitch-backdrop,
+  .pitch-canvas,
+  .pitch-scrim {
+    position: absolute;
+    inset: 0;
+  }
+  .pitch-backdrop {
+    background: radial-gradient(110% 90% at 72% 62%, #1d2e3b 0%, #0f1519 62%);
+  }
+  .pitch-scrim {
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+  }
+  .pitch-scrim[data-on='true'] {
+    opacity: 1;
+  }
+  /* text slides: the water stays visible but quiet */
+  .pitch-scrim-full {
+    background: rgba(15, 21, 25, 0.87);
+  }
+  /* model slides: dark on the text side, clear on the model side */
+  .pitch-scrim-side {
+    background: linear-gradient(
+      90deg,
+      rgba(15, 21, 25, 0.95) 0,
+      rgba(15, 21, 25, 0.92) calc(var(--fx) + var(--fw) * 0.4),
+      rgba(15, 21, 25, 0) calc(var(--fx) + var(--fw) * 0.64)
+    );
+  }
+
+  .pitch-stage {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1920px;
+    height: 1080px;
+    transform: translate(-50%, -50%) scale(var(--k));
+    transform-origin: center;
+  }
+  .pitch-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 84px 120px 104px;
+  }
+
+  /* ---- type, in frame pixels ---- */
+  .p-kicker {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-family: var(--font-mono);
+    font-size: 24px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .p-kicker b {
+    font-weight: 500;
+    color: #ff8a73;
+  }
+  .p-kicker i {
+    width: 44px;
+    height: 2px;
+    background: #e8654f;
+  }
+  .p-title {
+    margin-top: 22px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 80px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: #f3ede1;
+  }
+  .p-title em {
+    font-style: normal;
+    color: #ff8a73;
+  }
+  .p-body {
+    font-size: 34px;
+    line-height: 1.45;
+    color: #dbe2e8;
+  }
+  .p-small {
+    font-size: 26px;
+    line-height: 1.45;
+    color: var(--text-3);
+  }
+  .p-label {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .p-num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: #fff;
+  }
+  .p-card {
+    background: rgba(20, 28, 34, 0.86);
+    border: 1.5px solid #2a3740;
+    border-radius: 24px;
+    padding: 36px 40px;
+  }
+  .p-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    border: 1.5px solid #e8654f;
+    background: rgba(232, 101, 79, 0.14);
+    font-family: var(--font-mono);
+    font-size: 24px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ffb4a6;
+  }
+  .p-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    padding: 22px 38px;
+    border-radius: 16px;
+    background: #e8654f;
+    color: #0f1519;
+    font-weight: 600;
+    font-size: 30px;
+    box-shadow: 0 0 36px rgba(232, 101, 79, 0.4);
+    transition:
+      background 0.18s,
+      transform 0.18s;
+  }
+  .p-btn:hover {
+    background: #ff8a73;
+    transform: translateY(-2px);
+  }
+
+  /* ---- presenter controls: real pixels, not scaled with the frame ---- */
+  .pitch-controls {
+    position: absolute;
+    right: max(14px, calc(22px * var(--k)));
+    bottom: max(12px, calc(26px * var(--k)));
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 20;
+  }
+  .pitch-controls button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* a little smaller on very small windows so they stay clear of the slide */
+    width: clamp(26px, calc(56px * var(--k)), 36px);
+    height: clamp(26px, calc(56px * var(--k)), 36px);
+    border-radius: 10px;
+    border: 1px solid #3a4852;
+    background: rgba(20, 28, 34, 0.85);
+    color: var(--text);
+    transition:
+      border-color 0.18s,
+      background 0.18s;
+  }
+  .pitch-controls button:hover:not(:disabled) {
+    border-color: #ff8a73;
+  }
+  .pitch-controls button:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .pitch-count {
+    min-width: 64px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+    color: var(--text-2);
+  }
+  .pitch-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    z-index: 20;
+  }
+  .pitch-progress > div {
+    height: 100%;
+    background: linear-gradient(90deg, #e8654f, #ff8a73);
+    transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* ---- design cycle loop ---- */
+  .cycle-orbit {
+    transform-origin: 0 0;
+    animation: cycle-orbit 10s linear infinite;
+  }
+  .cycle-node {
+    animation: cycle-node 10s linear infinite;
+  }
+  .cycle-arc {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: cycle-draw 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+  .lit-line {
+    transition:
+      color 0.4s,
+      border-color 0.4s,
+      background 0.4s;
+  }
+}
+
+@keyframes cycle-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes cycle-node {
+  0%,
+  16%,
+  100% {
+    stroke: #3a4852;
+    fill: rgba(20, 28, 34, 0.92);
+  }
+  3%,
+  10% {
+    stroke: #ff8a73;
+    fill: rgba(232, 101, 79, 0.28);
+  }
+}
+@keyframes cycle-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pitch-scrim,
+  .pitch-progress > div,
+  .lit-line,
+  .p-btn {
+    transition: none;
+  }
+  .cycle-orbit,
+  .cycle-node {
+    animation: none;
+  }
+  .cycle-arc {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

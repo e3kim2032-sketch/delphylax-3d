@@ -1,4 +1,4 @@
-import { useMemo, useRef, type ReactNode, type RefObject } from 'react'
+import { createContext, useContext, useMemo, useRef, type ReactNode, type RefObject } from 'react'
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import * as THREE from 'three'
@@ -13,12 +13,14 @@ import { sceneRefs, MM } from './sceneRefs'
  * The whole group is yawed so the bow points at +X in the scene.
  */
 const S = MM
+/** scene units per millimetre, for parts added by other scenes */
+export const BOAT_S = S
 const HX = 210 // pipe centre offset (mm) — pipes 420 mm apart
 const PR = 57 // pipe radius (114 mm diameter)
 const PL = 760 // pipe length
 const SLEEVE_R = 60.6
 
-const mm = (x: number, y: number, z: number): [number, number, number] => [x * S, z * S, y * S]
+export const mm = (x: number, y: number, z: number): [number, number, number] => [x * S, z * S, y * S]
 
 /* ------------------------------------------------------------------ */
 /* Materials                                                            */
@@ -56,7 +58,7 @@ interface PartProps {
   explode: [number, number, number]
   children: ReactNode
 }
-function Part({ base = [0, 0, 0], explode, children }: PartProps) {
+export function Part({ base = [0, 0, 0], explode, children }: PartProps) {
   const ref = useRef<THREE.Group>(null)
   const b = useMemo(() => new THREE.Vector3(...base), [base])
   const e = useMemo(() => new THREE.Vector3(...explode), [explode])
@@ -73,7 +75,14 @@ function Part({ base = [0, 0, 0], explode, children }: PartProps) {
 /* ------------------------------------------------------------------ */
 /* Numbered pin: matches the parts legend in the Engineering section    */
 /* ------------------------------------------------------------------ */
-function Pin({ id, at }: { id: PartId; at: [number, number, number] }) {
+/** The numbered pins belong to the main site's exploded view; other scenes can turn them off. */
+export const PinsContext = createContext(true)
+
+function Pin(props: { id: PartId; at: [number, number, number] }) {
+  return useContext(PinsContext) ? <PinInner {...props} /> : null
+}
+
+function PinInner({ id, at }: { id: PartId; at: [number, number, number] }) {
   const select = useSiteStore((s) => s.selectPart)
   const selected = useSiteStore((s) => s.selectedPart)
   const ref = useRef<HTMLButtonElement>(null)
@@ -573,9 +582,24 @@ function SonarFloat({ m }: { m: Mats }) {
 /* ------------------------------------------------------------------ */
 /* Boat                                                                */
 /* ------------------------------------------------------------------ */
+/** Every sub-assembly of the boat, in boat-local coordinates (bow at -z). */
+export function BoatParts() {
+  const m = useMaterials()
+  return (
+    <>
+      <Hull side={-1} m={m} />
+      <Hull side={1} m={m} />
+      <Thruster side={-1} m={m} />
+      <Thruster side={1} m={m} />
+      <DeckAndCabin m={m} />
+      <MarkerRack m={m} />
+      <SonarFloat m={m} />
+    </>
+  )
+}
+
 export function DelphylaxModel() {
   const root = useRef<THREE.Group>(null)
-  const m = useMaterials()
   const emitPing = useSiteStore((s) => s.emitPing)
   const noseLocal = useMemo(() => new THREE.Vector3(...mm(0, -277, -20)), [])
   const sternLocal = useMemo(() => new THREE.Vector3(...mm(0, 330, 60)), [])
@@ -625,13 +649,7 @@ export function DelphylaxModel() {
 
   return (
     <group ref={root} rotation={[0, -Math.PI / 2, 0]} onClick={onClick}>
-      <Hull side={-1} m={m} />
-      <Hull side={1} m={m} />
-      <Thruster side={-1} m={m} />
-      <Thruster side={1} m={m} />
-      <DeckAndCabin m={m} />
-      <MarkerRack m={m} />
-      <SonarFloat m={m} />
+      <BoatParts />
     </group>
   )
 }
