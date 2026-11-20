@@ -36,6 +36,9 @@ const BACK_OFF = 112
 // where the flood begins (everything to the right is under water)
 const SHORE = 'M760,0 C742,90 700,210 716,330 C728,420 708,500 696,600 C686,690 740,790 722,900'
 
+/** the real Pod model seen from above (made with tools/render.html) */
+const POD_TOP_SRC = `${import.meta.env.BASE_URL}pod-top.webp`
+
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
 const easeOut = (k: number) => 1 - Math.pow(1 - k, 3)
 const easeInOut = (k: number) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2)
@@ -623,13 +626,11 @@ export function RescueConcept() {
             <circle r="6.5" fill="#ff2d55" stroke="#fff" strokeWidth="2" />
           </g>
 
-          {/* the Delphylax Pod: a small dolphin-shaped float that glows in the water */}
+          {/* the Delphylax Pod, seen from above: a render of the real model, with its glow */}
           <g ref={pod} transform={`translate(${POD_AT.x} ${POD_AT.y}) rotate(-24)`}>
             <circle ref={podGlow} r="34" fill="url(#rc-pod)" />
             <circle ref={podRing} r="16" fill="none" stroke="#ffc9b8" strokeWidth="2" />
-            <path d="M-15,0 C-10,-7 6,-8 15,-1 L20,0 L15,1 C6,8 -10,7 -15,0 Z" fill="#fff6ee" stroke="#ff8a73" strokeWidth="1.2" />
-            <path d="M-15,0 L-23,-6 L-20,0 L-23,6 Z" fill="#ff8a73" />
-            <path d="M-1,-6 L-6,-12 L4,-7 Z" fill="#ff8a73" />
+            <image href={POD_TOP_SRC} x="-19" y="-9" width="38" height="18" preserveAspectRatio="xMidYMid meet" />
           </g>
 
           {/* sonar pings */}

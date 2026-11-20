@@ -75,8 +75,8 @@ function Reticle() {
 }
 
 /**
- * Fixed chrome. The header is a solid bar with two rows: the three pages of the site
- * (Robot, Team, Pitch) and, smaller, the sections of this page.
+ * Fixed chrome. The header is a solid bar with two rows: the two pages of the site
+ * (Robot, Team) and, smaller, the sections of this page.
  * The only other fixed pieces are instruments that live in the page gutters:
  * the depth gauge (hero and Field Test, wide screens) and the sensor monitor
  * (hero only, extra-wide screens). Neither ever sits over a card.
@@ -106,7 +106,7 @@ export function HudOverlay() {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-30 border-b border-white/10 bg-[#0f1519]/92 backdrop-blur-md">
-        {/* row 1: logo, the three pages, and the scene controls */}
+        {/* row 1: logo, the two pages, and the scene controls */}
         <div className="flex h-[56px] items-center justify-between gap-2 px-3 sm:gap-3 sm:px-6">
           <div className="flex min-w-0 items-center gap-2.5 sm:gap-5">
             <button type="button" onClick={() => jump('hero')} className="flex shrink-0 items-center gap-3 rounded-md" aria-label="Delphylax, top of page">

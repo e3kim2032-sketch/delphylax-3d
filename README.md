@@ -90,7 +90,7 @@ A second page built from the same project: `pitch/index.html` → `src/pitch/`. 
 - **Offline**: the logo and every font file are fetched while slide 1 is showing
   (`src/pitch/offline.ts`), so once the page has loaded it needs no network.
 - `prefers-reduced-motion` shows every slide in its final state with a still camera.
-- The page is `noindex`. The Robot / Team / Pitch tabs link to it; they hide while the deck is full screen.
+- The page is `noindex` and nothing on the Robot or Team pages links to it: open it by its address.
 
 The build has two inputs (`vite.config.ts`). The `r3f` chunk group must catch every
 3D-side package: a helper left in an app chunk makes `r3f` import it back, and that
@@ -98,19 +98,22 @@ circular load breaks the production build (it does not show up in `npm run dev`)
 
 ## Pages and tabs
 
-Three pages share one header control (`src/components/ui/SiteTabs.tsx`): **Robot** (`/`),
-**Team** (`/team/`) and **Pitch** (`/pitch/`). Each is its own Vite input in
-`vite.config.ts`, and every link between them is relative, so the site works under
-`/delphylax-3d/` on GitHub Pages. On the Robot page a second, smaller header row lists
-the sections of that page.
+Two pages share one header control (`src/components/ui/SiteTabs.tsx`): **Robot** (`/`)
+and **Team** (`/team/`). Each page, and the unlinked pitch deck, is its own Vite input in
+`vite.config.ts`, and every link is relative, so the site works under `/delphylax-3d/`
+on GitHub Pages. On the Robot page a second, smaller header row lists the sections of
+that page.
 
 - **Team page** (`team/index.html` → `src/team/`, content in `src/data/team.ts`): first
   names only. No last names, school, ages, emails or photos of people.
 - **Tabbed cards** (`src/components/ui/Tabs.tsx`) keep the Robot page to about 8 screens
   at 1440 × 900: Parts / Specs / Water tests / Hull lab in Engineering, and the business
   details in Business. Only one panel is rendered at a time.
-- **The Delphylax Pod** is one shared 3D component (`src/components/canvas/Pod.tsx`) used
-  by the Robot page, the pitch and the still render. Its wording lives in `POD` in
+- **The Delphylax Pod** is the team's own CAD model, `public/models/delphylax_pod.glb`
+  (millimetres, centred, up along +Z; in the mesh the head is at -X and the tail at +X).
+  One component, `src/components/canvas/Pod.tsx`, loads it for the Robot page, the pitch
+  and the still renders, colours it coral and adds the glow. Replace the file to update
+  the Pod everywhere, then refresh the stills (below). Its wording lives in `POD` in
   `src/data/research.ts`.
 
 ## Build photos
@@ -121,9 +124,12 @@ Drop image files (JPG, PNG, WebP, AVIF; export iPhone HEIC as JPG first) into
 stays hidden while the folder is empty. Captions and alt text go in `src/data/photos.ts`.
 No faces, name tags or school logos in the photos.
 
-## Still image of the boat
+## Still images of the models
 
-`public/boat.webp` (the hero in Read mode, and the Team page) is a render of the real
-3D model. To refresh it after changing the model: run `npm run dev`, open
-`/tools/render.html` (the boat on a transparent background, not part of the built site),
-screenshot it with a transparent background, crop, and save it over `public/boat.webp`.
+Three images in `public/` are renders of the real 3D models, for places with no live
+scene: `boat.webp` (the hero in Read mode, and the Team page), `pod.webp` (the Pod
+section in Read mode) and `pod-top.webp` (the Pod in the rescue animation). To refresh
+them after changing a model: run `npm run dev`, open `/tools/render.html`,
+`/tools/render.html?shot=pod` and `/tools/render.html?shot=top` (models on a transparent
+background, not part of the built site), screenshot each with a transparent background,
+crop, and save over the matching file.

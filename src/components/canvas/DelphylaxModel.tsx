@@ -5,7 +5,7 @@ import * as THREE from 'three'
 import { useSiteStore } from '../../store/useSiteStore'
 import { PARTS_LEGEND, type PartId } from '../../data/research'
 import { sceneRefs, MM } from './sceneRefs'
-import { Pod, POD_DOCK_MM, POD_EXPLODE, type PodControl } from './Pod'
+import { Pod, POD_TOP_MM, POD_EXPLODE, type PodControl } from './Pod'
 
 /**
  * DELPHYLAX — procedural model of the real boat, ported from the design
@@ -613,7 +613,7 @@ export function BoatParts() {
       <SonarFloat m={m} />
       {/* the Pod itself is drawn by <Pod/> in world space; this is its numbered pin */}
       <Part explode={POD_EXPLODE}>
-        <Pin id="pod" at={mm(POD_DOCK_MM[0], POD_DOCK_MM[1], POD_DOCK_MM[2] + 52)} />
+        <Pin id="pod" at={mm(POD_TOP_MM[0], POD_TOP_MM[1], POD_TOP_MM[2] + 8)} />
       </Part>
     </>
   )
@@ -622,9 +622,12 @@ export function BoatParts() {
 const REDUCED = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 /** seconds since the Pod was dropped on the main site (a huge number with reduced motion: final state at once) */
 const podSince = (at: number) => (REDUCED ? 1e6 : (performance.now() - at) / 1000)
+const POD_MODEL = `${import.meta.env.BASE_URL}models/delphylax_pod.glb`
 const podControl = (): PodControl => {
-  const at = useSiteStore.getState().podDropAt
-  return { show: true, dropped: at !== null, since: at === null ? 0 : podSince(at), reduce: REDUCED }
+  const st = useSiteStore.getState()
+  const at = st.podDropAt
+  // in its own section the Pod is on show: lifted off the deck and turning slowly, until it is dropped
+  return { show: true, dropped: at !== null, since: at === null ? 0 : podSince(at), reduce: REDUCED, spin: st.section === 'pod' }
 }
 
 export function DelphylaxModel() {
@@ -686,7 +689,7 @@ export function DelphylaxModel() {
       <group ref={root} rotation={[0, -Math.PI / 2, 0]} onClick={onClick}>
         <BoatParts />
       </group>
-      <Pod boat={root} control={podControl} />
+      <Pod boat={root} control={podControl} url={POD_MODEL} />
     </>
   )
 }

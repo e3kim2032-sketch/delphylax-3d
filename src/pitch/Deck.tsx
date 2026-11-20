@@ -2,7 +2,6 @@ import { Component, lazy, Suspense, useCallback, useEffect, useLayoutEffect, use
 import { AnimatePresence, motion, useReducedMotion, type Variants } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { live } from './live'
-import { SiteTabs } from '../components/ui/SiteTabs'
 import { SLIDES, ReduceContext } from './slides'
 
 // three.js loads after the first slide is on screen; once it is in, the deck needs no network
@@ -203,8 +202,6 @@ export function Deck() {
           </AnimatePresence>
         </ReduceContext.Provider>
       </main>
-
-      <SiteTabs current="pitch" root="../" className="pitch-tabs" />
 
       <nav className="pitch-controls" aria-label="Slides">
         <button type="button" onClick={back} disabled={atStart} aria-label="Back">

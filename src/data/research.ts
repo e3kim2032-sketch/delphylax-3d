@@ -296,8 +296,8 @@ export const PARTS_LEGEND = [
     name: 'Delphylax Pod',
     does: 'A dolphin-shaped float the robot drops next to a person. It glows when it touches water.',
     material: '',
-    more: 'After the drop the robot backs away, so a panicking person grabs the Pod and not the boat.',
-    color: '#ffd9cc',
+    more: 'About 372 mm long, 169 mm wide and 217 mm tall, with a dorsal fin, a tail and raised DELPHYLAX lettering. After the drop the robot backs away, so a panicking person grabs the Pod and not the boat.',
+    color: '#e8654f',
   },
 ] as const
 

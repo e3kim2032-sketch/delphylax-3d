@@ -4,11 +4,16 @@ import { POD } from '../../data/research'
 import { useSiteStore, useLive3d } from '../../store/useSiteStore'
 import { SectionShell, Kicker, Title, Reveal } from '../ui/primitives'
 
+/** a still render of the real Pod model (made with tools/render.html), for Read mode */
+const POD_SRC = `${import.meta.env.BASE_URL}pod.webp`
+const POD_ALT = 'The Delphylax Pod: a chunky coral dolphin-shaped float with a dorsal fin, a tail and raised DELPHYLAX lettering.'
+
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /**
- * The Delphylax Pod. The words are the team's own (from the funding pitch); the
- * 3D boat behind the text acts them out: the Pod drops, glows, and the boat backs away.
+ * The Delphylax Pod. The words are the team's own; the 3D scene behind the text shows
+ * the real Pod model turning slowly, then acts the words out: the Pod drops into the
+ * water, glows, and the boat moves away. In Read mode a still render stands in.
  */
 export function PodSection() {
   const live3d = useLive3d()
@@ -20,12 +25,12 @@ export function PodSection() {
   const resetPod = useSiteStore((s) => s.resetPod)
   const dropped = podDropAt !== null
 
-  // the drop plays by itself a moment after you arrive (never with reduced motion)
+  // the Pod turns slowly on show first; the drop then plays by itself (never with reduced motion)
   useEffect(() => {
     if (!live3d || section !== 'pod' || prefersReducedMotion()) return
     const id = window.setTimeout(() => {
       if (useSiteStore.getState().podDropAt === null) dropPod()
-    }, 1300)
+    }, 4200)
     return () => window.clearTimeout(id)
   }, [live3d, section, dropPod])
 
@@ -51,7 +56,7 @@ export function PodSection() {
 
   const replay = () => {
     resetPod()
-    window.setTimeout(dropPod, 750)
+    window.setTimeout(dropPod, 2600)
   }
 
   return (
@@ -63,6 +68,8 @@ export function PodSection() {
             The <span className="text-gradient">Delphylax Pod.</span>
           </Title>
         </Reveal>
+        {/* Read mode on phones: the still render sits under the title */}
+        {!live3d && <img src={POD_SRC} alt={POD_ALT} width={1200} height={900} className="mt-6 h-auto w-full max-w-xs lg:hidden" draggable={false} />}
         <Reveal delay={1}>
           <blockquote className="card mt-7 border-l-4 !border-l-[#e8654f] card-pad">
             <p className="font-display text-xl font-600 leading-snug text-[#f3ede1]">“{POD.quote}”</p>
@@ -110,6 +117,18 @@ export function PodSection() {
           )}
         </Reveal>
       </div>
+      {/* Read mode, wide screens: a still render of the Pod where the live one would turn */}
+      {!live3d && (
+        <img
+          src={POD_SRC}
+          alt={POD_ALT}
+          width={1200}
+          height={900}
+          className="pointer-events-none absolute right-[8%] top-1/2 hidden h-auto w-[34%] max-w-[560px] -translate-y-1/2 lg:block"
+          style={{ filter: 'drop-shadow(0 30px 40px rgba(0,0,0,0.5))' }}
+          draggable={false}
+        />
+      )}
     </SectionShell>
   )
 }

@@ -355,7 +355,7 @@ function World() {
         <Halo key={i} def={def} boat={boat} />
       ))}
       <SonarWaves boat={boat} />
-      <Pod boat={boat} control={podControl} />
+      <Pod boat={boat} control={podControl} url="../models/delphylax_pod.glb" />
       <Effects />
     </>
   )
