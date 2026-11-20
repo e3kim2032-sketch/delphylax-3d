@@ -291,6 +291,14 @@ export const PARTS_LEGEND = [
     more: '',
     color: '#ff9a3c',
   },
+  {
+    id: 'pod',
+    name: 'Delphylax Pod',
+    does: 'A dolphin-shaped float the robot drops next to a person. It glows when it touches water.',
+    material: '',
+    more: 'After the drop the robot backs away, so a panicking person grabs the Pod and not the boat.',
+    color: '#ffd9cc',
+  },
 ] as const
 
 export type PartId = (typeof PARTS_LEGEND)[number]['id']
@@ -304,8 +312,24 @@ export const RESCUE_STEPS = [
   { title: 'Delphylax launches', body: 'One person carries Delphylax to the water and sets it down.' },
   { title: 'It sweeps the street', body: 'It crosses the flooded street back and forth, like mowing a lawn, while sonar looks for objects under the water.' },
   { title: 'It marks the spot', body: 'The heat sensor spots a person at the surface beside a semi-basement window, and Delphylax drops a glowing marker there.' },
+  { title: 'It drops the Pod', body: 'Delphylax drops the Delphylax Pod, a dolphin-shaped float that glows when it touches water, then backs away so a panicking person grabs the Pod and not the boat.' },
   { title: 'Rescuers go straight there', body: 'The crew heads directly to the marker instead of searching every street.' },
 ] as const
+
+/**
+ * The Delphylax Pod. The wording is the team's own, from the funding pitch:
+ * what firefighters said in the interviews, and what the team designed in answer.
+ */
+export const POD = {
+  quote: 'A person who is drowning panics and pushes down with far more strength than normal. Your robot needs a float.',
+  quoteBy: 'What firefighters told us',
+  intro: 'So we designed the Delphylax Pod',
+  lines: [
+    'A dolphin-shaped float the robot drops next to a person.',
+    'It glows when it touches water so rescuers can see it from far away.',
+    'The robot then backs away, so a panicking person grabs the Pod and not the boat.',
+  ],
+} as const
 
 export const RESCUE_NOTE =
   'This shows the idea, not a real mission. Today a rescuer steers Delphylax by remote control; the automatic sweep is planned, not built.'
@@ -643,9 +667,10 @@ export const SECTIONS = [
   { id: 'hero', index: '01', label: 'Guardian', depth: 0 },
   { id: 'crisis', index: '02', label: 'The Crisis', depth: -0.6 },
   { id: 'engineering', index: '03', label: 'Engineering', depth: -1.4 },
-  { id: 'sandbox', index: '04', label: 'Field Test', depth: -2.2 },
-  { id: 'matrix', index: '05', label: 'Comparison', depth: -2.7 },
-  { id: 'business', index: '06', label: 'Business', depth: -3.0 },
+  { id: 'pod', index: '04', label: 'The Pod', depth: -0.3 },
+  { id: 'sandbox', index: '05', label: 'Field Test', depth: -2.2 },
+  { id: 'matrix', index: '06', label: 'Comparison', depth: -2.7 },
+  { id: 'business', index: '07', label: 'Business', depth: -3.0 },
 ] as const
 
 /** Street-flood depth for the HUD gauge (m). */

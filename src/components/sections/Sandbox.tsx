@@ -57,8 +57,8 @@ export function Sandbox() {
       <div className="pointer-events-none grid w-full max-w-7xl gap-6 lg:grid-cols-[minmax(0,400px)_1fr_minmax(0,320px)] lg:items-center">
         <div className="pointer-events-auto">
           <Reveal className="text-scrim">
-            <Kicker index="04">Field test mode</Kicker>
-            <Title className="!text-3xl sm:!text-4xl lg:!text-5xl">
+            <Kicker index="05">Field test mode</Kicker>
+            <Title className="!text-3xl sm:!text-4xl lg:!text-[2.75rem]">
               Try the <span className="text-gradient">search</span> yourself.
             </Title>
             <Lead>
@@ -68,7 +68,7 @@ export function Sandbox() {
           </Reveal>
           {live3d ? (
             <Reveal delay={1}>
-              <div className="card card-pad mt-6 space-y-5">
+              <div className="card card-pad mt-5 space-y-4">
                 <div>
                   <div className="label mb-2 flex items-center gap-2">
                     <Boxes size={13} aria-hidden /> Clutter
@@ -177,9 +177,6 @@ export function Sandbox() {
                   {sparsity
                     ? `The filter keeps the ${SONAR.sparsityK} strongest returns per sweep and drops the scattered echoes from sediment.`
                     : 'Filter off: every echo is kept. Sediment speckle floods the return, and confidence falls below the lock threshold.'}
-                </p>
-                <p className="text-sm leading-relaxed text-[#c3ced6]">
-                  {SONAR.roles} {SONAR.integration}
                 </p>
                 <p className="font-mono text-xs text-[#aab8c2]">
                   LIGHTS {lights ? 'ON' : 'OFF'} · CLUTTER {clutter === 'extreme' ? 'DEBRIS' : 'LOW'} · FILTER {sparsity ? 'ON' : 'OFF'}

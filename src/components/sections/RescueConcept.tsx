@@ -14,21 +14,25 @@ import { CardTitle } from '../ui/primitives'
 
 const W = 1600
 const H = 900
-const DURATION = 14000 // one run, ms
+const DURATION = 16500 // one run, ms
 const HOLD = 1800 // pause on the final frame before looping
 
-/** step boundaries as fractions of one run: arrive, launch, sweep, mark, rescue */
-const B = [0, 0.143, 0.229, 0.629, 0.743, 1] as const
+/** step boundaries as fractions of one run: arrive, launch, sweep, mark, drop the Pod, rescue */
+const B = [0, 0.12, 0.195, 0.54, 0.64, 0.78, 1] as const
+const STEPS = B.length - 1
 
 // Delphylax: off the truck, into the water, then three lawnmower passes along the flooded boulevard
 const SWEEP = 'M706,470 C742,470 742,526 780,526 L1092,526 a24,24 0 0 0 0,-48 L792,478 a24,24 0 0 1 0,-48 L958,430'
 // the rescuers' straight line to the marker
-const ROUTE_A = { x: 722, y: 486 }
-const ROUTE_B = { x: 884, y: 446 }
+const ROUTE_A = { x: 722, y: 498 }
+const ROUTE_B = { x: 946, y: 458 }
 const ROUTE = `M${ROUTE_A.x},${ROUTE_A.y} L${ROUTE_B.x},${ROUTE_B.y}`
 const ROUTE_ANGLE = (Math.atan2(ROUTE_B.y - ROUTE_A.y, ROUTE_B.x - ROUTE_A.x) * 180) / Math.PI
 const TARGET = { x: 992, y: 390 }
 const MARKER = { x: 1006, y: 420 }
+// where the Pod floats, next to the person, and how far Delphylax backs away from it
+const POD_AT = { x: 968, y: 398 }
+const BACK_OFF = 112
 // where the flood begins (everything to the right is under water)
 const SHORE = 'M760,0 C742,90 700,210 716,330 C728,420 708,500 696,600 C686,690 740,790 722,900'
 
@@ -36,8 +40,8 @@ const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
 const easeOut = (k: number) => 1 - Math.pow(1 - k, 3)
 const easeInOut = (k: number) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2)
 const stepAt = (t: number) => {
-  for (let i = 0; i < 5; i++) if (t < B[i + 1]) return i
-  return 4
+  for (let i = 0; i < STEPS; i++) if (t < B[i + 1]) return i
+  return STEPS - 1
 }
 
 /* ------------------------------------------------------------------ scene data */
@@ -244,6 +248,9 @@ export function RescueConcept() {
   const heatRing = useRef<SVGCircleElement>(null)
   const marker = useRef<SVGGElement>(null)
   const markerRings = useRef<(SVGCircleElement | null)[]>([])
+  const pod = useRef<SVGGElement>(null)
+  const podGlow = useRef<SVGCircleElement>(null)
+  const podRing = useRef<SVGCircleElement>(null)
   const crew = useRef<SVGGElement>(null)
   const crewWake = useRef<SVGGElement>(null)
   const ripple = useRef<SVGPatternElement>(null)
@@ -277,7 +284,10 @@ export function RescueConcept() {
 
     // 2 + 3. Delphylax slides off the truck and sweeps the boulevard
     const kBoat = easeInOut(clamp01((t - B[1]) / (B[3] - B[1])))
-    const d = kBoat * sweepLen
+    const swept = kBoat * sweepLen
+    // 5b. once the Pod is in the water, Delphylax reverses back along its own track
+    const kBack = easeInOut(clamp01((t - (B[4] + 0.05)) / (B[5] - B[4] - 0.056)))
+    const d = swept - BACK_OFF * kBack
     const a = sw.getPointAtLength(d)
     const ahead = sw.getPointAtLength(Math.min(sweepLen, d + 3))
     const behind = sw.getPointAtLength(Math.max(0, d - 3))
@@ -291,7 +301,7 @@ export function RescueConcept() {
     for (const p of [trail.current, swath.current]) {
       if (!p) continue
       p.setAttribute('stroke-dasharray', `${sweepLen}`)
-      p.setAttribute('stroke-dashoffset', String(sweepLen - d))
+      p.setAttribute('stroke-dashoffset', String(sweepLen - swept))
     }
 
     // sonar pings while it sweeps
@@ -324,15 +334,33 @@ export function RescueConcept() {
       ring.setAttribute('opacity', String((1 - ph) * 0.7))
     })
 
-    // 5. the rescuers take the straight line to the marker
-    const kGo = easeInOut(clamp01((t - B[4]) / (0.95 - B[4])))
+    // 5. the Pod leaves the boat, lands beside the person and lights up
+    const kDrop = clamp01((t - (B[4] + 0.008)) / 0.032)
+    const kGlow = clamp01((t - (B[4] + 0.04)) / 0.03)
+    if (pod.current) {
+      const from = sw.getPointAtLength(sweepLen)
+      const e = easeOut(kDrop)
+      const px = from.x + (POD_AT.x - from.x) * e
+      const py = from.y + (POD_AT.y - from.y) * e - Math.sin(Math.PI * kDrop) * 10
+      pod.current.setAttribute('transform', `translate(${px.toFixed(1)} ${py.toFixed(1)}) rotate(-24)`)
+      pod.current.setAttribute('opacity', String(clamp01(kDrop * 5)))
+    }
+    podGlow.current?.setAttribute('opacity', String(kGlow))
+    if (podRing.current) {
+      const ph = (now / 1000) % 1
+      podRing.current.setAttribute('r', String(12 + ph * 26))
+      podRing.current.setAttribute('opacity', String((1 - ph) * 0.8 * kGlow))
+    }
+
+    // 6. the rescuers take the straight line to the marker
+    const kGo = easeInOut(clamp01((t - B[5]) / (0.96 - B[5])))
     const c = rt.getPointAtLength(kGo * routeLen)
     if (crew.current) {
       crew.current.setAttribute('transform', `translate(${c.x.toFixed(1)} ${c.y.toFixed(1)}) rotate(${ROUTE_ANGLE.toFixed(1)})`)
-      crew.current.setAttribute('opacity', String(clamp01((t - B[4]) / 0.015)))
+      crew.current.setAttribute('opacity', String(clamp01((t - B[5]) / 0.015)))
     }
     crewWake.current?.setAttribute('opacity', kGo > 0.02 && kGo < 0.98 ? '0.7' : '0')
-    routeLine.current?.setAttribute('opacity', String(clamp01((t - B[4] + 0.01) / 0.03)))
+    routeLine.current?.setAttribute('opacity', String(clamp01((t - B[5] + 0.01) / 0.03)))
 
     // water texture drifts slowly
     ripple.current?.setAttribute('patternTransform', `translate(${((now / 70) % 96).toFixed(1)} ${((now / 160) % 48).toFixed(1)})`)
@@ -435,13 +463,14 @@ export function RescueConcept() {
         </div>
       </div>
 
-      <div className="relative mt-4 aspect-[4/5] overflow-hidden rounded-[10px] border border-white/10 bg-[#141c22] sm:aspect-video">
+      <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-start">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[10px] border border-white/10 bg-[#141c22] sm:aspect-video">
         <svg
           viewBox={`0 0 ${W} ${H}`}
           preserveAspectRatio="xMidYMid slice"
           className="absolute inset-0 h-full w-full"
           role="img"
-          aria-label="Concept animation, seen from above. A red 119 rescue truck parks at the edge of a flooded street grid. Delphylax launches, sweeps the flooded boulevard back and forth with sonar, finds a heat signature beside a semi-basement window and drops a glowing marker. A rescue boat then goes straight to the marker."
+          aria-label="Concept animation, seen from above. A red 119 rescue truck parks at the edge of a flooded street grid. Delphylax launches, sweeps the flooded boulevard back and forth with sonar, finds a heat signature beside a semi-basement window and drops a glowing marker. It then drops the Delphylax Pod, a glowing float, beside the person and backs away. A rescue boat goes straight to the marker."
         >
           <defs>
             <linearGradient id="rc-water" gradientUnits="userSpaceOnUse" x1="690" y1="0" x2="1600" y2="0">
@@ -462,6 +491,11 @@ export function RescueConcept() {
             <radialGradient id="rc-marker">
               <stop offset="0" stopColor="#ff2d55" stopOpacity="0.95" />
               <stop offset="1" stopColor="#ff2d55" stopOpacity="0" />
+            </radialGradient>
+            <radialGradient id="rc-pod">
+              <stop offset="0" stopColor="#fff1e8" stopOpacity="0.95" />
+              <stop offset="0.4" stopColor="#ff9d85" stopOpacity="0.6" />
+              <stop offset="1" stopColor="#ff8a73" stopOpacity="0" />
             </radialGradient>
             <radialGradient id="rc-vignette" cx="0.5" cy="0.5" r="0.75">
               <stop offset="0.6" stopColor="#0f1519" stopOpacity="0" />
@@ -589,6 +623,15 @@ export function RescueConcept() {
             <circle r="6.5" fill="#ff2d55" stroke="#fff" strokeWidth="2" />
           </g>
 
+          {/* the Delphylax Pod: a small dolphin-shaped float that glows in the water */}
+          <g ref={pod} transform={`translate(${POD_AT.x} ${POD_AT.y}) rotate(-24)`}>
+            <circle ref={podGlow} r="34" fill="url(#rc-pod)" />
+            <circle ref={podRing} r="16" fill="none" stroke="#ffc9b8" strokeWidth="2" />
+            <path d="M-15,0 C-10,-7 6,-8 15,-1 L20,0 L15,1 C6,8 -10,7 -15,0 Z" fill="#fff6ee" stroke="#ff8a73" strokeWidth="1.2" />
+            <path d="M-15,0 L-23,-6 L-20,0 L-23,6 Z" fill="#ff8a73" />
+            <path d="M-1,-6 L-6,-12 L4,-7 Z" fill="#ff8a73" />
+          </g>
+
           {/* sonar pings */}
           {[0, 1, 2].map((i) => (
             <circle
@@ -669,7 +712,7 @@ export function RescueConcept() {
 
           <rect width={W} height={H} fill="url(#rc-vignette)" pointerEvents="none" />
 
-          {/* still picture (reduced motion): number the five steps on the scene */}
+          {/* still picture (reduced motion): number the six steps on the scene */}
           {reduce && (
             <g fontFamily="Inter, system-ui, sans-serif" fontSize="20" fontWeight="700" textAnchor="middle">
               {(
@@ -678,7 +721,8 @@ export function RescueConcept() {
                   [748, 556],
                   [1126, 560],
                   [1052, 396],
-                  [800, 438],
+                  [938, 362],
+                  [948, 506],
                 ] as const
               ).map(([x, y], i) => (
                 <g key={i} transform={`translate(${x} ${y})`}>
@@ -693,49 +737,53 @@ export function RescueConcept() {
         </svg>
       </div>
 
-      {/* steps as a progress bar, synced to the scene; each step is a button */}
-      <ol className="mt-4 grid grid-cols-5 gap-1.5 sm:gap-2">
-        {RESCUE_STEPS.map((s, i) => {
-          const on = i === step
-          return (
-            <li key={s.title}>
-              <button
-                type="button"
-                onClick={() => seek(i)}
-                aria-current={on ? 'step' : undefined}
-                aria-label={`Step ${i + 1}: ${s.title}`}
-                className="group block w-full rounded-md pb-1 text-left"
-              >
-                <span className="block h-1.5 overflow-hidden rounded-full bg-white/10">
-                  <span
-                    ref={(el) => {
-                      fills.current[i] = el
-                    }}
-                    className="block h-full rounded-full bg-[#e8654f]"
-                    style={{ width: '100%' }}
-                  />
-                </span>
-                <span className={`mt-2 flex items-center gap-2 text-sm font-semibold transition-colors ${on ? 'text-white' : 'text-[#aab8c2] group-hover:text-white'}`}>
-                  <span
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-mono text-xs transition-colors"
-                    style={on ? { background: '#e8654f', color: '#0f1519' } : { border: '1px solid #55646e', color: '#c3ced6' }}
-                  >
-                    {i + 1}
+      {/* the steps, synced to the scene; each one is a button that jumps there */}
+      <div>
+        <ol className="space-y-1">
+          {RESCUE_STEPS.map((s, i) => {
+            const on = i === step
+            return (
+              <li key={s.title}>
+                <button
+                  type="button"
+                  onClick={() => seek(i)}
+                  aria-current={on ? 'step' : undefined}
+                  className={`group block w-full rounded-[10px] px-3 py-2 text-left transition-colors ${on ? 'bg-[rgba(232,101,79,0.12)]' : 'hover:bg-white/[0.04]'}`}
+                >
+                  <span className="flex items-center gap-3">
+                    <span
+                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-mono text-xs transition-colors"
+                      style={on ? { background: '#e8654f', color: '#0f1519' } : { border: '1px solid #55646e', color: '#c3ced6' }}
+                      aria-hidden
+                    >
+                      {i + 1}
+                    </span>
+                    <span className={`text-base font-semibold leading-tight transition-colors ${on ? 'text-white' : 'text-[#c3ced6] group-hover:text-white'}`}>
+                      <span className="sr-only">Step {i + 1}: </span>
+                      {s.title}
+                    </span>
                   </span>
-                  <span className="hidden leading-tight md:inline">{s.title}</span>
-                </span>
-              </button>
-            </li>
-          )
-        })}
-      </ol>
-      <p className="mt-3 min-h-[3rem] text-base leading-relaxed text-[#eef3f6]" aria-live="polite">
-        <span className="font-semibold text-[#ff8a73]">
-          {step + 1}. {RESCUE_STEPS[step].title}:
-        </span>{' '}
-        {RESCUE_STEPS[step].body}
-      </p>
-      <p className="mt-1 text-sm leading-relaxed text-[#aab8c2]">{RESCUE_NOTE}</p>
+                  <span className="ml-9 mt-2 block h-1 overflow-hidden rounded-full bg-white/10">
+                    <span
+                      ref={(el) => {
+                        fills.current[i] = el
+                      }}
+                      className="block h-full rounded-full bg-[#e8654f]"
+                      style={{ width: '100%' }}
+                    />
+                  </span>
+                  {on && <span className="ml-9 mt-2 block text-base leading-relaxed text-[#eef3f6]">{s.body}</span>}
+                </button>
+              </li>
+            )
+          })}
+        </ol>
+        <p className="sr-only" aria-live="polite">
+          Step {step + 1}: {RESCUE_STEPS[step].title}. {RESCUE_STEPS[step].body}
+        </p>
+        <p className="mt-3 px-3 text-sm leading-relaxed text-[#aab8c2]">{RESCUE_NOTE}</p>
+      </div>
+      </div>
     </div>
   )
 }

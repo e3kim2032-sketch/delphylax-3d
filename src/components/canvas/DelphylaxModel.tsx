@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { useSiteStore } from '../../store/useSiteStore'
 import { PARTS_LEGEND, type PartId } from '../../data/research'
 import { sceneRefs, MM } from './sceneRefs'
+import { Pod, POD_DOCK_MM, POD_EXPLODE, type PodControl } from './Pod'
 
 /**
  * DELPHYLAX — procedural model of the real boat, ported from the design
@@ -610,8 +611,20 @@ export function BoatParts() {
       <DeckAndCabin m={m} />
       <MarkerRack m={m} />
       <SonarFloat m={m} />
+      {/* the Pod itself is drawn by <Pod/> in world space; this is its numbered pin */}
+      <Part explode={POD_EXPLODE}>
+        <Pin id="pod" at={mm(POD_DOCK_MM[0], POD_DOCK_MM[1], POD_DOCK_MM[2] + 52)} />
+      </Part>
     </>
   )
+}
+
+const REDUCED = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+/** seconds since the Pod was dropped on the main site (a huge number with reduced motion: final state at once) */
+const podSince = (at: number) => (REDUCED ? 1e6 : (performance.now() - at) / 1000)
+const podControl = (): PodControl => {
+  const at = useSiteStore.getState().podDropAt
+  return { show: true, dropped: at !== null, since: at === null ? 0 : podSince(at), reduce: REDUCED }
 }
 
 export function DelphylaxModel() {
@@ -620,6 +633,7 @@ export function DelphylaxModel() {
   const noseLocal = useMemo(() => new THREE.Vector3(...mm(0, -277, -20)), [])
   const sternLocal = useMemo(() => new THREE.Vector3(...mm(0, 330, 60)), [])
   const tmp = useMemo(() => new THREE.Vector3(), [])
+  const back = useRef(0)
 
   useFrame(({ clock }, dt) => {
     const g = root.current
@@ -635,6 +649,10 @@ export function DelphylaxModel() {
     g.position.y = waterY + 16 * S + Math.sin(t * 0.9) * 0.025 * (1 - depth * 0.6)
     g.rotation.z = Math.sin(t * 0.7) * 0.02
     g.rotation.x = Math.sin(t * 0.55 + 1) * 0.015
+    // after the Pod is in the water the robot backs away from it
+    const away = st.podDropAt === null ? 0 : THREE.MathUtils.smoothstep(podSince(st.podDropAt), 1.9, 5.4)
+    back.current = REDUCED ? -2.9 * away : THREE.MathUtils.lerp(back.current, -2.9 * away, 1 - Math.exp(-dt * 5))
+    g.position.x = back.current
     const yaw = -Math.PI / 2 + st.pointer.x * 0.1
     g.rotation.y = THREE.MathUtils.lerp(g.rotation.y, yaw, 1 - Math.exp(-dt * 2))
     sceneRefs.heading = ((178 + st.pointer.x * 12 + 360) % 360 + 360) % 360
@@ -664,8 +682,11 @@ export function DelphylaxModel() {
   }
 
   return (
-    <group ref={root} rotation={[0, -Math.PI / 2, 0]} onClick={onClick}>
-      <BoatParts />
-    </group>
+    <>
+      <group ref={root} rotation={[0, -Math.PI / 2, 0]} onClick={onClick}>
+        <BoatParts />
+      </group>
+      <Pod boat={root} control={podControl} />
+    </>
   )
 }

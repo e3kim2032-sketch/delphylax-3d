@@ -46,7 +46,7 @@
   html {
     scroll-behavior: auto;
     /* jumping to an anchor never lands it under the fixed header */
-    scroll-padding-top: 76px;
+    scroll-padding-top: 108px;
   }
   html.lenis,
   html.lenis body {
@@ -280,6 +280,86 @@
       text-decoration-color 0.18s;
   }
 
+  /* ---- page tabs (Robot / Team / Pitch): the same control on every page ---- */
+  .site-tabs {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 999px;
+    border: 1px solid #2f3d47;
+    background: rgba(20, 28, 34, 0.85);
+  }
+  .site-tab {
+    padding: 0.38rem 0.9rem;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--text-2);
+    white-space: nowrap;
+    transition:
+      color 0.18s,
+      background 0.18s;
+  }
+  .site-tab:hover {
+    color: #fff;
+  }
+  .site-tab[aria-current='page'] {
+    background: var(--coral);
+    color: #0f1519;
+  }
+  @media (max-width: 420px) {
+    .site-tab {
+      padding: 0.38rem 0.66rem;
+    }
+  }
+
+  /* ---- tabbed card: one panel shows at a time ---- */
+  .tab-list {
+    display: flex;
+    gap: 4px;
+    padding: 6px;
+    border-bottom: 1px solid var(--card-border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tab-list::-webkit-scrollbar {
+    display: none;
+  }
+  .tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 9px;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    line-height: 1.2;
+    color: var(--text-2);
+    white-space: nowrap;
+    transition:
+      color 0.18s,
+      background 0.18s,
+      box-shadow 0.18s;
+  }
+  .tab:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .tab[aria-selected='true'] {
+    color: #fff;
+    background: rgba(232, 101, 79, 0.18);
+    box-shadow: inset 0 0 0 1px var(--coral);
+  }
+
+  /* reading width: a paragraph never runs much past 65 characters */
+  main p {
+    max-width: 68ch;
+  }
+  main p.text-center {
+    margin-inline: auto;
+  }
+
   /* FAQ rows: hide the default disclosure triangle (a chevron icon replaces it) */
   .faq-item > summary::-webkit-details-marker {
     display: none;
@@ -311,6 +391,11 @@
     background: radial-gradient(ellipse at 35% 45%, rgba(15, 21, 25, 0.78) 0%, rgba(15, 21, 25, 0.55) 45%, transparent 75%);
   }
 
+  /* team page: the design-cycle steps light up one after another */
+  .cycle-step {
+    animation: cycle-step 7s linear infinite;
+  }
+
   .sonar-ring {
     animation: sonar-ring 2.6s cubic-bezier(0.1, 0.6, 0.3, 1) infinite;
   }
@@ -329,6 +414,23 @@
     opacity: 0;
   }
 }
+@keyframes cycle-step {
+  0%,
+  22%,
+  100% {
+    border-color: #3a4852;
+    background: #141c22;
+    color: #fff;
+    box-shadow: none;
+  }
+  4%,
+  16% {
+    border-color: #ff8a73;
+    background: #e8654f;
+    color: #0f1519;
+    box-shadow: 0 0 24px rgba(232, 101, 79, 0.5);
+  }
+}
 @keyframes blink {
   0%,
   100% {
@@ -341,7 +443,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .sonar-ring,
-  .blink {
+  .blink,
+  .cycle-step {
     animation: none;
   }
   .btn-primary,

@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import type { PartId } from '../data/research'
 
 export type Clutter = 'low' | 'extreme'
-export type Section = 'hero' | 'crisis' | 'engineering' | 'sandbox' | 'matrix' | 'business'
+export type Section = 'hero' | 'crisis' | 'engineering' | 'pod' | 'sandbox' | 'matrix' | 'business'
 
 export interface Ping {
   id: number
@@ -50,6 +50,8 @@ interface SiteState {
   /** fast text-first page: the 3D canvas and post-processing are off */
   readMode: boolean
   victimSeed: number
+  /** performance.now() when the Pod was dropped, or null while it rides on the deck */
+  podDropAt: number | null
 
   setScroll: (p: number, depth: number, section: Section) => void
   toggleExploded: (v?: boolean) => void
@@ -67,6 +69,8 @@ interface SiteState {
   setWebglOk: (v: boolean) => void
   setReadMode: (v: boolean) => void
   rehideVictim: () => void
+  dropPod: () => void
+  resetPod: () => void
 }
 
 const READ_KEY = 'dlx-read-mode'
@@ -117,6 +121,7 @@ export const useSiteStore = create<SiteState>((set, get) => ({
   webglOk: true,
   readMode: initialReadMode(),
   victimSeed: 3,
+  podDropAt: null,
 
   setScroll: (scrollProgress, depthM, section) => {
     const s = get()
@@ -153,9 +158,11 @@ export const useSiteStore = create<SiteState>((set, get) => ({
     } catch {
       /* storage blocked: the choice just lasts for this visit */
     }
-    set(readMode ? { readMode, explodedOn: false, selectedPart: null } : { readMode })
+    set(readMode ? { readMode, explodedOn: false, selectedPart: null, podDropAt: null } : { readMode })
   },
   rehideVictim: () => set((s) => ({ victimSeed: s.victimSeed + 1, pings: [] })),
+  dropPod: () => set({ podDropAt: performance.now() }),
+  resetPod: () => set((s) => (s.podDropAt === null ? {} : { podDropAt: null })),
 }))
 
 /** True when the live 3D scene is on screen (WebGL works and Read mode is off). */

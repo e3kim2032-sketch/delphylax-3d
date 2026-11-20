@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Layers, Lightbulb, Anchor, FlaskConical, History } from 'lucide-react'
+import { Layers, Lightbulb, Anchor, FlaskConical, Boxes, Droplets } from 'lucide-react'
 import { useSiteStore, useLive3d } from '../../store/useSiteStore'
-import { PARTS_LEGEND, HULL, SPECS, TIMELINE, PIVOT_REASON, WATER_TEST, BIOACOUSTICS, CONTROL_MODE, buoyancy, hullSpeed } from '../../data/research'
+import { PARTS_LEGEND, HULL, SPECS, WATER_TEST, BIOACOUSTICS, CONTROL_MODE, buoyancy, hullSpeed } from '../../data/research'
 import { SectionShell, Kicker, Title, Reveal } from '../ui/primitives'
+import { Tabs } from '../ui/Tabs'
 import { RescueConcept } from './RescueConcept'
 
 /** Buoyancy chart — one measure (kg) against the two-pipe capacity line. */
@@ -67,16 +68,14 @@ function HullLab() {
   const b = useMemo(() => buoyancy(payload), [payload])
   const vHull = hullSpeed(HULL.waterlineLengthM)
   return (
-    <div className="card card-pad">
+    <div>
       <div className="mb-3 flex items-center justify-between">
-        <span className="flex items-center gap-2 label">
-          <FlaskConical size={11} /> Hull lab · buoyancy & hull speed
-        </span>
+        <span className="label">Buoyancy &amp; hull speed</span>
         <span className={`font-mono text-xs ${b.used < 0.85 ? 'text-[#7fb3d5]' : 'text-[#ff6b57]'}`}>
           {b.used < 0.85 ? `${Math.round((1 - b.used) * 100)}% RESERVE` : 'OVERLOADED'}
         </span>
       </div>
-      <label className="text-sm text-white/72">
+      <label className="text-base text-[#c3ced6]">
         <span className="font-mono">
           Payload · <span className="text-white">{payload.toFixed(1)} kg</span>
         </span>
@@ -103,10 +102,117 @@ function HullLab() {
           </div>
         </div>
       </div>
-      <p className="mt-2 text-sm leading-relaxed text-[#c3ced6]">
+      <p className="mt-3 text-base leading-relaxed text-[#c3ced6]">
         The boat floats about three times its own weight, but a 0.9 m displacement hull is capped near 1.25·√L ≈ {vHull.toFixed(1)} m/s, so it suits slow street floods, not
         fast rivers. Thrust (0.4–1.0 kgf per thruster) is an estimate until it is tied to a scale.
       </p>
+    </div>
+  )
+}
+
+/** Parts as a compact numbered grid; the picked part's details show underneath. */
+function PartsPanel() {
+  const selected = useSiteStore((s) => s.selectedPart)
+  const select = useSiteStore((s) => s.selectPart)
+  const explodedOn = useSiteStore((s) => s.explodedOn)
+  const toggleExploded = useSiteStore((s) => s.toggleExploded)
+  const live3d = useLive3d()
+  const index = PARTS_LEGEND.findIndex((p) => p.id === selected)
+  const part = index >= 0 ? PARTS_LEGEND[index] : null
+  return (
+    <div>
+      <ol className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {PARTS_LEGEND.map((p, i) => {
+          const on = selected === p.id
+          return (
+            <li key={p.id}>
+              <button
+                type="button"
+                aria-pressed={on}
+                onClick={() => {
+                  select(on ? null : p.id)
+                  if (live3d && !on && !explodedOn) toggleExploded(true)
+                }}
+                className="card-action flex w-full items-center gap-2.5 rounded-[10px] border border-[#2a3740] bg-[rgba(15,21,25,0.55)] px-2.5 py-2 text-left"
+                style={{ borderColor: on ? p.color : undefined, boxShadow: on ? `0 0 18px ${p.color}40` : undefined }}
+              >
+                <span
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-mono text-xs font-semibold"
+                  style={on ? { background: p.color, color: '#0f1519' } : { border: `1.5px solid ${p.color}`, color: '#fff' }}
+                  aria-hidden
+                >
+                  {i + 1}
+                </span>
+                <span className="min-w-0 text-[0.9375rem] font-semibold leading-[1.15] text-white">
+                  <span className="sr-only">{i + 1}. </span>
+                  {p.name}
+                </span>
+              </button>
+            </li>
+          )
+        })}
+      </ol>
+      <div className="mt-4 min-h-[6.5rem] border-t border-white/10 pt-4" aria-live="polite">
+        {part ? (
+          <>
+            <div className="font-display text-lg font-700 text-white">
+              {index + 1}. {part.name}
+            </div>
+            <p className="mt-1 text-base leading-relaxed text-[#dbe2e8]">{part.does}</p>
+            {part.material && (
+              <p className="mt-2 text-base leading-relaxed text-[#c3ced6]">
+                <span className="font-semibold text-[#ff8a73]">Made of: </span>
+                {part.material}
+              </p>
+            )}
+            {part.more && <p className="mt-2 text-base leading-relaxed text-[#eef3f6]">{part.more}</p>}
+          </>
+        ) : (
+          <p className="text-base leading-relaxed text-[#c3ced6]">
+            {live3d
+              ? 'Pick a part to read what it does. The numbers match the pins on the exploded 3D model.'
+              : 'Pick a part to read what it does. With Read mode off, the same numbers appear as pins on the exploded 3D model.'}
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function SpecsPanel() {
+  return (
+    <dl className="divide-y divide-white/10">
+      {SPECS.map((spec) => (
+        <div key={spec.spec} className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-3 py-2.5 first:pt-0 last:pb-0">
+          <dt className="text-base leading-snug text-[#c3ced6]">{spec.spec}</dt>
+          <dd>
+            <div className="font-mono text-[0.9375rem] text-white">
+              {spec.value}
+              {spec.estimate && <span className="chip ml-2 !px-1.5 !py-0 !text-[#ffb4a6]">est.</span>}
+            </div>
+            <div className="mt-0.5 text-sm leading-snug text-[#aab8c2]">{spec.how}</div>
+          </dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
+
+function WaterTestsPanel() {
+  return (
+    <div>
+      <span className="chip" style={{ color: '#ffb4a6', borderColor: 'rgba(255,107,87,0.4)', background: 'rgba(255,107,87,0.1)' }}>
+        First water test pending
+      </span>
+      <p className="mt-3 text-base leading-relaxed text-[#dbe2e8]">Delphylax has not been in the water yet. This is what the first test will measure.</p>
+      <dl className="mt-3 divide-y divide-white/10">
+        {WATER_TEST.map((w) => (
+          <div key={w.test} className="py-3 first:pt-0 last:pb-0">
+            <dt className="font-display text-base font-700 text-white">{w.test}</dt>
+            <dd className="mt-0.5 text-base leading-relaxed text-[#c3ced6]">{w.measure}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   )
 }
@@ -116,21 +222,19 @@ export function Engineering() {
   const toggleExploded = useSiteStore((s) => s.toggleExploded)
   const lights = useSiteStore((s) => s.lights)
   const toggleLights = useSiteStore((s) => s.toggleLights)
-  const selected = useSiteStore((s) => s.selectedPart)
   const live3d = useLive3d()
-  const select = useSiteStore((s) => s.selectPart)
 
   return (
     <SectionShell id="engineering" className="!items-start">
-      <div className="pointer-events-auto grid w-full max-w-7xl grid-cols-1 gap-8 lg:grid-cols-[minmax(0,410px)_1fr_minmax(0,400px)] [&>*]:min-w-0">
+      <div className="pointer-events-auto grid w-full max-w-7xl grid-cols-1 gap-x-8 gap-y-8 lg:grid-cols-[minmax(0,440px)_1fr_minmax(0,520px)] [&>*]:min-w-0">
         <div>
           <Reveal className="text-scrim">
             <Kicker index="03">Biomimicry & engineering</Kicker>
-            <Title>
+            <Title className="lg:!text-[3rem]">
               Listen, <span className="text-gradient">don’t look.</span>
             </Title>
-            <p className="mt-4 text-base leading-relaxed text-[#d7dde3]">{BIOACOUSTICS.principle}</p>
-            <p className="mt-3 text-base leading-relaxed text-[#d7dde3]">{CONTROL_MODE}</p>
+            <p className="mt-5 text-base leading-relaxed text-[#dbe2e8]">{BIOACOUSTICS.principle}</p>
+            <p className="mt-3 text-base leading-relaxed text-[#dbe2e8]">{CONTROL_MODE}</p>
           </Reveal>
           {live3d && (
             <Reveal delay={1}>
@@ -144,125 +248,21 @@ export function Engineering() {
               </div>
             </Reveal>
           )}
-          <Reveal delay={2}>
-            <h3 className="mt-7 font-display text-lg font-700 text-[#f3ede1]">Parts, by number</h3>
-            <p className="mt-1 text-sm leading-relaxed text-[#c3ced6]">
-              {live3d
-                ? 'The numbers match the pins on the exploded model. Pick a part to highlight it.'
-                : 'Pick a part to read more. With Read mode off, the same numbers appear as pins on the exploded 3D model.'}
-            </p>
-            <ol className="mt-3 space-y-2">
-              {PARTS_LEGEND.map((part, i) => {
-                const on = selected === part.id
-                return (
-                  <li key={part.id}>
-                    <button
-                      type="button"
-                      aria-pressed={on}
-                      onClick={() => {
-                        select(on ? null : part.id)
-                        if (live3d && !on && !explodedOn) toggleExploded(true)
-                      }}
-                      className="card card-action flex w-full items-start gap-3 px-3.5 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff8a73]"
-                      style={{ borderColor: on ? part.color : undefined, boxShadow: on ? `0 0 24px ${part.color}44` : undefined }}
-                    >
-                      <span
-                        className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-mono text-xs font-semibold"
-                        style={on ? { background: part.color, color: '#0f1519' } : { border: `1.5px solid ${part.color}`, color: '#fff' }}
-                        aria-hidden
-                      >
-                        {i + 1}
-                      </span>
-                      <span className="flex-1">
-                        <span className="block font-display text-base font-700 text-white">
-                          <span className="sr-only">{i + 1}. </span>
-                          {part.name}
-                        </span>
-                        <span className="mt-0.5 block text-sm leading-snug text-[#c3ced6]">{part.does}</span>
-                        {on && (
-                          <span className="mt-2 block border-t border-white/10 pt-2 text-sm leading-relaxed text-[#c3ced6]">
-                            <span className="font-semibold text-[#ff8a73]">Made of: </span>
-                            {part.material}
-                            {part.more && <span className="mt-1.5 block text-[#eef3f6]">{part.more}</span>}
-                          </span>
-                        )}
-                      </span>
-                    </button>
-                  </li>
-                )
-              })}
-            </ol>
-          </Reveal>
         </div>
 
         <div className="hidden lg:block" />
 
-        <div className="space-y-4">
-          <Reveal delay={1}>
-            <HullLab />
-          </Reveal>
-          <Reveal delay={2}>
-            <div className="card card-pad">
-              <div className="mb-2 flex items-center gap-2 label">
-                <Anchor size={11} /> Specifications
-              </div>
-              <dl className="divide-y divide-white/10">
-                {SPECS.map((spec) => (
-                  <div key={spec.spec} className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-3 py-2.5">
-                    <dt className="text-sm text-[#c3ced6]">{spec.spec}</dt>
-                    <dd>
-                      <div className="font-mono text-sm text-white">
-                        {spec.value}
-                        {spec.estimate && <span className="chip ml-2 !px-1.5 !py-0 !text-[#ffb4a6]">est.</span>}
-                      </div>
-                      <div className="mt-0.5 text-sm leading-snug text-[#aab8c2]">{spec.how}</div>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          </Reveal>
-          <Reveal delay={3}>
-            <div className="card card-pad">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="flex items-center gap-2 label">
-                  <History size={11} /> From Floodscout to Delphylax
-                </span>
-                <span className="chip" style={{ color: '#ffb4a6', borderColor: 'rgba(255,107,87,0.4)', background: 'rgba(255,107,87,0.1)' }}>
-                  First water test pending
-                </span>
-              </div>
-              <p className="mb-3 text-sm leading-relaxed text-[#c3ced6]">{PIVOT_REASON}</p>
-              <ol className="relative ml-2 max-h-56 space-y-2 overflow-y-auto border-l border-white/10 pl-4 pr-1 hide-scrollbar">
-                {TIMELINE.map((t, i) => (
-                  <li key={i} className="relative">
-                    <span
-                      className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full"
-                      style={{
-                        background: t.state === 'active' ? '#ff2d55' : t.state === 'dropped' ? '#475569' : '#5b8fb8',
-                        boxShadow: t.state === 'active' ? '0 0 8px #ff2d55' : t.state === 'dropped' ? 'none' : '0 0 8px #5b8fb8',
-                      }}
-                    />
-                    <div className="font-display text-base font-700 text-white">
-                      <span className="mr-2 font-mono text-xs text-[#aab8c2]">{t.date} </span>
-                      {t.version}
-                    </div>
-                    <div className="text-sm text-[#c3ced6]">{t.change}</div>
-                  </li>
-                ))}
-              </ol>
-              <div className="mt-3 border-t border-white/10 pt-2">
-                <div className="mb-1 font-mono text-xs text-white/60">First water test · what we will measure</div>
-                {WATER_TEST.map((w) => (
-                  <div key={w.test} className="flex justify-between gap-3 py-0.5 text-sm">
-                    <span className="text-white">{w.test}</span>
-                    <span className="text-right text-[#c3ced6]">{w.measure}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Reveal>
-        </div>
+        <Reveal delay={1}>
+          <Tabs
+            label="Engineering details"
+            tabs={[
+              { id: 'parts', label: 'Parts', icon: <Boxes size={15} aria-hidden />, content: <PartsPanel /> },
+              { id: 'specs', label: 'Specs', icon: <Anchor size={15} aria-hidden />, content: <SpecsPanel /> },
+              { id: 'tests', label: 'Water tests', icon: <Droplets size={15} aria-hidden />, content: <WaterTestsPanel /> },
+              { id: 'hull', label: 'Hull lab', icon: <FlaskConical size={15} aria-hidden />, content: <HullLab /> },
+            ]}
+          />
+        </Reveal>
 
         <Reveal className="lg:col-span-3">
           <RescueConcept />

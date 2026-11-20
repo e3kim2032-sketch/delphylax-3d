@@ -158,6 +158,18 @@
     transform: translateY(-2px);
   }
 
+  /* ---- page tabs (Robot / Team / Pitch): top right, out of the way while presenting ---- */
+  .pitch-tabs {
+    position: absolute;
+    right: 12px;
+    top: 10px;
+    z-index: 20;
+    opacity: 0.9;
+  }
+  :fullscreen .pitch-tabs {
+    display: none;
+  }
+
   /* ---- presenter controls: real pixels, not scaled with the frame ---- */
   .pitch-controls {
     position: absolute;

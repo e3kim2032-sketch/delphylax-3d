@@ -11,8 +11,8 @@ export function Faq() {
       <h3 className="flex items-center gap-2 font-display text-xl font-700 text-[#f3ede1]">
         <HelpCircle size={18} className="text-[#ff8a73]" aria-hidden /> Questions a judge might ask
       </h3>
-      <p className="mt-1 text-sm text-[#c3ced6]">Straight answers. Where something is untested or unknown, we say so.</p>
-      <div className="mt-4 grid gap-2 lg:grid-cols-2 lg:items-start">
+      <p className="mt-1 text-base text-[#c3ced6]">Straight answers. Where something is untested or unknown, we say so.</p>
+      <div className="mt-4 grid gap-2 lg:grid-cols-2 lg:items-start xl:grid-cols-3">
         {FAQ.map((item) => (
           <details key={item.q} className="faq-item group rounded-md border border-[#26323a] bg-[rgba(22,30,36,0.7)] open:border-[#3a4852]">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-md px-4 py-3 font-display text-base font-700 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff8a73]">

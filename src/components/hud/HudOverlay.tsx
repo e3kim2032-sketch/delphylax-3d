@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Radio, Crosshair, Menu, X, BookOpen } from 'lucide-react'
+import { Radio, Crosshair, BookOpen } from 'lucide-react'
 import { DelphylaxMark } from '../ui/DelphylaxLogo'
+import { SiteTabs } from '../ui/SiteTabs'
 import { SensorMonitor } from './SensorMonitor'
 import { useSiteStore, useLive3d, type Section } from '../../store/useSiteStore'
 import { SECTIONS, MAX_DEPTH_M } from '../../data/research'
@@ -74,7 +75,8 @@ function Reticle() {
 }
 
 /**
- * Fixed chrome. The header is a solid bar, so page content never shows through it.
+ * Fixed chrome. The header is a solid bar with two rows: the three pages of the site
+ * (Robot, Team, Pitch) and, smaller, the sections of this page.
  * The only other fixed pieces are instruments that live in the page gutters:
  * the depth gauge (hero and Field Test, wide screens) and the sensor monitor
  * (hero only, extra-wide screens). Neither ever sits over a card.
@@ -87,45 +89,34 @@ export function HudOverlay() {
   const readMode = useSiteStore((s) => s.readMode)
   const setReadMode = useSiteStore((s) => s.setReadMode)
   const readOn = readMode || !webglOk
-  const [menu, setMenu] = useState(false)
+  const sectionNav = useRef<HTMLElement>(null)
   const inHero = section === 'hero'
   const inSandbox = section === 'sandbox'
 
-  const jump = (id: Section) => {
-    setMenu(false)
-    scrollToSection(id)
-  }
+  const jump = (id: Section) => scrollToSection(id)
+
+  // on phones the section row scrolls sideways: keep the current section in view
+  useEffect(() => {
+    const nav = sectionNav.current
+    const btn = nav?.querySelector<HTMLElement>(`[data-section="${section}"]`)
+    if (!nav || !btn || nav.scrollWidth <= nav.clientWidth) return
+    nav.scrollTo({ left: btn.offsetLeft - (nav.clientWidth - btn.offsetWidth) / 2, behavior: 'smooth' })
+  }, [section])
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-30 border-b border-white/10 bg-[#0f1519]/90 backdrop-blur-md">
-        <div className="flex h-[60px] items-center justify-between gap-3 px-4 sm:px-6">
-          <button type="button" onClick={() => jump('hero')} className="flex items-center gap-3 rounded-md" aria-label="Delphylax home">
-            <DelphylaxMark size={36} />
-            <span className="hidden whitespace-nowrap font-display text-base font-700 tracking-[-0.02em] text-white sm:inline lg:hidden xl:inline">DELPHYLAX</span>
-          </button>
+      <header className="fixed inset-x-0 top-0 z-30 border-b border-white/10 bg-[#0f1519]/92 backdrop-blur-md">
+        {/* row 1: logo, the three pages, and the scene controls */}
+        <div className="flex h-[56px] items-center justify-between gap-2 px-3 sm:gap-3 sm:px-6">
+          <div className="flex min-w-0 items-center gap-2.5 sm:gap-5">
+            <button type="button" onClick={() => jump('hero')} className="flex shrink-0 items-center gap-3 rounded-md" aria-label="Delphylax, top of page">
+              <DelphylaxMark size={34} />
+              <span className="hidden whitespace-nowrap font-display text-base font-700 tracking-[-0.02em] text-white md:inline">DELPHYLAX</span>
+            </button>
+            <SiteTabs current="robot" root="./" />
+          </div>
 
-          <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Sections">
-            {SECTIONS.map((s) => {
-              const active = s.id === section
-              return (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => jump(s.id as Section)}
-                  aria-current={active ? 'true' : undefined}
-                  className={`relative whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${active ? 'text-white' : 'text-[#b9c4cc] hover:text-white'}`}
-                >
-                  {active && (
-                    <motion.span layoutId="nav-pill" className="absolute inset-0 rounded-full bg-[rgba(232,101,79,0.24)]" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />
-                  )}
-                  <span className="relative">{s.label}</span>
-                </button>
-              )
-            })}
-          </nav>
-
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <button
               type="button"
               onClick={() => setReadMode(!readMode)}
@@ -133,45 +124,41 @@ export function HudOverlay() {
               aria-pressed={readOn}
               aria-label="Read mode"
               title={webglOk ? 'Read mode turns the 3D scene off for a fast, text-first page' : 'This device cannot run the 3D scene, so Read mode stays on'}
-              className="btn-secondary btn-sm"
+              className="btn-secondary btn-sm !px-2.5 sm:!px-3.5"
               data-active={readOn}
             >
               <BookOpen size={15} aria-hidden />
               <span className="hidden sm:inline">Read mode</span>
-              <span className="sm:hidden">Read</span>
               <span className="font-mono text-xs text-[#aab8c2]">{readOn ? 'on' : 'off'}</span>
             </button>
             {live3d && (
-              <button type="button" onClick={() => emitPing(sceneRefs.nose.x, sceneRefs.nose.y, sceneRefs.nose.z)} className="btn-primary btn-sm" aria-label="Emit sonar ping">
+              <button type="button" onClick={() => emitPing(sceneRefs.nose.x, sceneRefs.nose.y, sceneRefs.nose.z)} className="btn-primary btn-sm !px-2.5 sm:!px-3.5" aria-label="Emit sonar ping">
                 <Radio size={15} aria-hidden />
-                <span>Ping</span>
+                <span className="hidden sm:inline">Ping</span>
               </button>
             )}
-            <button type="button" onClick={() => setMenu((m) => !m)} className="btn-secondary btn-sm !px-2.5 lg:hidden" aria-label="Toggle navigation" aria-expanded={menu}>
-              {menu ? <X size={17} aria-hidden /> : <Menu size={17} aria-hidden />}
-            </button>
           </div>
         </div>
 
-        <AnimatePresence>
-          {menu && (
-            <motion.nav
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.18 }}
-              className="card absolute right-4 top-[66px] flex min-w-52 flex-col p-2 lg:hidden"
-              aria-label="Sections"
-            >
-              {SECTIONS.map((s) => (
-                <button key={s.id} type="button" onClick={() => jump(s.id as Section)} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-left text-base text-white hover:bg-white/5">
-                  <span className="font-mono text-xs text-[#ff8a73]">{s.index}</span>
-                  {s.label}
-                </button>
-              ))}
-            </motion.nav>
-          )}
-        </AnimatePresence>
+        {/* row 2: the sections of this page, smaller; it scrolls sideways on phones */}
+        <nav ref={sectionNav} className="hide-scrollbar flex h-[40px] items-center gap-0.5 overflow-x-auto border-t border-white/[0.06] px-2 sm:px-5 lg:justify-center" aria-label="Sections of this page">
+          {SECTIONS.map((s) => {
+            const active = s.id === section
+            return (
+              <button
+                key={s.id}
+                type="button"
+                data-section={s.id}
+                onClick={() => jump(s.id as Section)}
+                aria-current={active ? 'true' : undefined}
+                className={`relative shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-[0.8125rem] font-medium transition-colors ${active ? 'text-white' : 'text-[#aab8c2] hover:text-white'}`}
+              >
+                {active && <motion.span layoutId="nav-pill" className="absolute inset-0 rounded-full bg-[rgba(232,101,79,0.24)]" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />}
+                <span className="relative">{s.label}</span>
+              </button>
+            )
+          })}
+        </nav>
       </header>
 
       {live3d && (
@@ -184,7 +171,7 @@ export function HudOverlay() {
               </motion.div>
             )}
             {inHero && (
-              <motion.div key="monitor" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }} transition={{ duration: 0.3 }} className="absolute right-4 top-[84px] hidden w-[292px] xl:block">
+              <motion.div key="monitor" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }} transition={{ duration: 0.3 }} className="absolute right-4 top-[116px] hidden w-[292px] xl:block">
                 <SensorMonitor />
               </motion.div>
             )}

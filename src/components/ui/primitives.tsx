@@ -34,11 +34,11 @@ export function Reveal({ children, className = '', delay = 0, once = true }: { c
   )
 }
 
-/** One section of the page. Top padding clears the fixed header; spacing is the same for every section. */
+/** One section of the page. Top padding clears the two-row fixed header; spacing is the same for every section. */
 export function SectionShell({ id, children, className = '', align = 'left' }: { id: string; children: ReactNode; className?: string; align?: 'left' | 'right' | 'center' }) {
   const justify = align === 'left' ? 'lg:justify-start' : align === 'right' ? 'lg:justify-end' : 'justify-center'
   return (
-    <section id={id} className={`pointer-events-none relative flex min-h-screen w-full items-center overflow-x-clip ${justify} px-4 pb-24 pt-28 sm:px-8 sm:pb-28 sm:pt-32 lg:px-20 ${className}`}>
+    <section id={id} className={`pointer-events-none relative flex min-h-screen w-full items-center overflow-x-clip ${justify} px-4 pb-10 pt-[7.25rem] sm:px-8 sm:pb-12 sm:pt-[7.5rem] lg:px-20 ${className}`}>
       {children}
     </section>
   )
@@ -59,7 +59,7 @@ export function Title({ children, className = '' }: { children: ReactNode; class
 }
 
 export function Lead({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <p className={`mt-5 max-w-2xl text-[1.0625rem] leading-relaxed text-[#dbe2e8] sm:text-lg ${className}`}>{children}</p>
+  return <p className={`mt-5 max-w-[60ch] text-[1.0625rem] leading-relaxed text-[#dbe2e8] sm:text-lg ${className}`}>{children}</p>
 }
 
 export function CardTitle({ children, icon, className = '' }: { children: ReactNode; icon?: ReactNode; className?: string }) {
@@ -103,7 +103,7 @@ export function Stat({ value, unit, label, accent = 'blue' }: { value: string; u
           </span>
         )}
       </div>
-      <div className="mt-1.5 text-sm leading-snug text-[#c3ced6]">{label}</div>
+      <div className="mt-1.5 text-[0.9375rem] leading-snug text-[#c3ced6]">{label}</div>
     </div>
   )
 }
@@ -156,16 +156,16 @@ export function Counter({
     }
   }, [value])
   return (
-    <div className="card px-5 py-4">
-      <div className="font-mono text-3xl font-semibold text-white" aria-label={`${prefix}${value}${suffix}`}>
+    <div className="card px-4 py-3">
+      <div className="font-mono text-2xl font-semibold text-white" aria-label={`${prefix}${value}${suffix}`}>
         <span aria-hidden>
           {prefix}
           <span ref={num}>{value}</span>
           {suffix}
         </span>
       </div>
-      <div className="mt-1.5 text-sm leading-snug text-[#c3ced6]">{label}</div>
-      <SourceLink href={source.href} className="mt-2 text-sm text-[#aab8c2]">
+      <div className="mt-1 text-sm leading-snug text-[#c3ced6]">{label}</div>
+      <SourceLink href={source.href} className="mt-1.5 text-sm text-[#aab8c2]">
         {source.label}
       </SourceLink>
     </div>

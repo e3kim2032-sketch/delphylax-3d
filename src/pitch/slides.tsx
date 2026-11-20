@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowRight, Lightbulb, RotateCcw, Sprout, Users } from 'lucide-react'
 import { useLogo } from './offline'
+import { POD } from '../data/research'
 
 /** true when the viewer prefers reduced motion: everything is simply in its final state */
 export const ReduceContext = createContext(false)
@@ -317,11 +318,7 @@ function HowSlide({ step }: SlideProps) {
 /* ------------------------------------------------------------------ */
 /* 6  What firefighters told us + the Pod                               */
 /* ------------------------------------------------------------------ */
-const POD_LINES = [
-  'A dolphin-shaped float the robot drops next to a person.',
-  'It glows when it touches water so rescuers can see it from far away.',
-  'The robot then backs away, so a panicking person grabs the Pod and not the boat.',
-]
+const POD_LINES = POD.lines
 
 function PodSlide({ step }: SlideProps) {
   const reduce = useContext(ReduceContext)
@@ -353,7 +350,7 @@ function PodSlide({ step }: SlideProps) {
         </Head>
         <Build i={2} className="p-card mt-[34px] !border-l-[6px] !border-l-[#e8654f]">
           <p className="font-display text-[37px] font-600 leading-[1.32] text-[#f3ede1]">
-            “A person who is drowning panics and pushes down with far more strength than normal. Your robot needs a float.”
+            “{POD.quote}”
           </p>
         </Build>
         <Build i={3}>

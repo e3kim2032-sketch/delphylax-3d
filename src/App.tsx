@@ -5,6 +5,8 @@ import { HudOverlay } from './components/hud/HudOverlay'
 import { Hero } from './components/sections/Hero'
 import { Crisis } from './components/sections/Crisis'
 import { Engineering } from './components/sections/Engineering'
+import { PodSection } from './components/sections/PodSection'
+import { BuildPhotos } from './components/sections/BuildPhotos'
 import { Sandbox } from './components/sections/Sandbox'
 import { Matrix } from './components/sections/Matrix'
 import { Business } from './components/sections/Business'
@@ -41,6 +43,7 @@ export default function App() {
   const section = useSiteStore((s) => s.section)
   const setSandbox = useSiteStore((s) => s.setSandbox)
   const toggleExploded = useSiteStore((s) => s.toggleExploded)
+  const resetPod = useSiteStore((s) => s.resetPod)
   // the scene mounts only after the text has painted, so words always come first
   const [sceneReady, setSceneReady] = useState(false)
 
@@ -70,7 +73,8 @@ export default function App() {
     setSandbox(section === 'sandbox')
     document.documentElement.dataset.section = section
     if (section !== 'engineering') toggleExploded(false)
-  }, [section, setSandbox, toggleExploded])
+    if (section !== 'pod') resetPod()
+  }, [section, setSandbox, toggleExploded, resetPod])
 
   return (
     <>
@@ -91,6 +95,8 @@ export default function App() {
         <Hero />
         <Crisis />
         <Engineering />
+        <PodSection />
+        <BuildPhotos />
         <Sandbox />
         <Matrix />
         <Business />

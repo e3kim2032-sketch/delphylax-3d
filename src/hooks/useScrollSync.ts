@@ -9,11 +9,24 @@ gsap.registerPlugin(ScrollTrigger)
 
 let lenisInstance: Lenis | null = null
 
+/**
+ * Lenis stops short of an element by the page's scroll-padding-top. Sections already carry
+ * their own top padding for the fixed header, so that amount is added back: a section lands
+ * with its top edge at the top of the window.
+ */
+const headerAllowance = () => parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0
+
 export function scrollToSection(id: Section, offset = 0) {
   const el = document.getElementById(id)
   if (!el) return
-  if (lenisInstance) lenisInstance.scrollTo(el, { offset, duration: 1.6, easing: (t) => 1 - Math.pow(1 - t, 4) })
+  if (lenisInstance) lenisInstance.scrollTo(el, { offset: offset + headerAllowance(), duration: 1.6, easing: (t) => 1 - Math.pow(1 - t, 4) })
   else el.scrollIntoView({ behavior: 'smooth' })
+}
+
+/** Freeze or release page scrolling (used while a full-screen photo is open). */
+export function lockScroll(locked: boolean) {
+  if (locked) lenisInstance?.stop()
+  else lenisInstance?.start()
 }
 
 /**
@@ -54,12 +67,22 @@ export function useScrollSync() {
     }
     lenis.on('scroll', compute)
     compute()
+
+    // a link such as ../#pod (from the Team page) opens the page at that section
+    const wanted = window.location.hash.slice(1)
+    const jump = ids.includes(wanted as Section)
+      ? window.setTimeout(() => {
+          const el = document.getElementById(wanted)
+          if (el) lenis.scrollTo(el, { immediate: true, force: true, offset: headerAllowance() })
+        }, 80)
+      : 0
     const onResize = () => {
       compute()
       ScrollTrigger.refresh()
     }
     window.addEventListener('resize', onResize)
     return () => {
+      window.clearTimeout(jump)
       window.removeEventListener('resize', onResize)
       gsap.ticker.remove(tick)
       lenis.destroy()

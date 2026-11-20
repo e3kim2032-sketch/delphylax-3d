@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Delphylax: still render (development tool)</title>
+    <style>
+      html, body, #root { margin: 0; width: 100%; height: 100%; background: transparent; }
+    </style>
+  </head>
+  <body>
+    <!-- Development only: draws the 3D boat on a transparent background so a still
+         image can be saved to public/boat.webp. It is not part of the built site. -->
+    <div id="root"></div>
+    <script type="module" src="/src/tools/render.tsx"></script>
+  </body>
+</html>

@@ -18,6 +18,8 @@ const WAYPOINTS: Record<string, Waypoint> = {
   crisis: { pos: new THREE.Vector3(-3.4, -0.5, 3.8), look: new THREE.Vector3(0.6, -0.25, 0), fov: 44 },
   // surface level, exploded parts rise above
   engineering: { pos: new THREE.Vector3(3.4, 2.1, 7.2), look: new THREE.Vector3(0.1, 0.74, 0), fov: 40 },
+  // ahead of the bow, looking back: the Pod lands in front and the boat backs away into the distance
+  pod: { pos: new THREE.Vector3(4.3, 1.3, 2.7), look: new THREE.Vector3(-0.75, 0.15, 1.5), fov: 38 },
   // diver's view: hulls overhead, sonar field on the riverbed ahead
   sandbox: { pos: new THREE.Vector3(-0.2, -0.8, 7.6), look: new THREE.Vector3(3.0, -1.9, -0.6), fov: 50 },
   matrix: { pos: new THREE.Vector3(5.6, -0.6, -4.2), look: new THREE.Vector3(0.7, -1.0, 1.3), fov: 38 },

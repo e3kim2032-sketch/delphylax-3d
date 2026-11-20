@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Droplets, Moon, AlertTriangle, EyeOff, MapPinned } from 'lucide-react'
+import { Droplets, Moon, AlertTriangle, EyeOff, MapPinned, CalendarDays } from 'lucide-react'
 import { CRISIS, INCIDENTS, INCIDENTS_NOTE, FVI, BUSINESS } from '../../data/research'
 import { SectionShell, Kicker, Title, Reveal, SimTag, SourceLink } from '../ui/primitives'
+import { Tabs } from '../ui/Tabs'
 
 const ICONS = [Droplets, Moon, AlertTriangle, EyeOff]
 
@@ -107,37 +108,52 @@ function VisibilityCompare() {
   )
 }
 
-/** Real past floods, oldest first, each with linked sources. */
+/** Real past floods, oldest first, each with linked sources. One shows at a time. */
 function IncidentTimeline() {
+  const [picked, setPicked] = useState(0)
+  const inc = INCIDENTS[picked]
   return (
-    <div className="mt-14">
-      <h3 className="font-display text-2xl font-700 leading-tight text-[#f3ede1] sm:text-3xl">Three floods where rescuers could not see or reach people</h3>
-      <ol className="relative mt-6 grid gap-4 md:grid-cols-3">
-        <span className="absolute left-0 right-0 top-[9px] hidden h-px bg-white/15 md:block" aria-hidden />
-        {INCIDENTS.map((inc) => (
-          <li key={inc.date} className="relative md:pt-7">
-            <span className="absolute left-0 top-0.5 hidden h-4 w-4 rounded-full border-2 border-[#e8654f] bg-[#0f1519] md:block" aria-hidden />
-            <article className="card h-full card-pad">
-              <div className="font-mono text-xs text-[#ff8a73]">{inc.date}</div>
-              <h4 className="mt-1 font-display text-base font-700 text-white">{inc.place}</h4>
-              <p className="mt-2 text-base leading-relaxed text-[#eef3f6]/90">{inc.what}</p>
-              <p className="mt-3 text-sm leading-relaxed text-[#c3ced6]">
-                <span className="font-semibold text-[#eef3f6]">Why rescuers could not see or reach them: </span>
-                {inc.why}
-              </p>
-              <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-sm text-[#aab8c2]">
-                <span>Sources:</span>
-                {inc.sources.map((src) => (
-                  <SourceLink key={src.href} href={src.href}>
-                    {src.label}
-                  </SourceLink>
-                ))}
-              </p>
-            </article>
-          </li>
-        ))}
-      </ol>
-      <p className="card mt-4 px-4 py-3 text-sm leading-relaxed text-[#d7dde3]">{INCIDENTS_NOTE}</p>
+    <div>
+      <h3 className="font-display text-xl font-700 leading-tight text-[#f3ede1]">Three floods where rescuers could not see or reach people</h3>
+      <div className="relative mt-4 grid grid-cols-3 gap-2 sm:gap-3" role="group" aria-label="Choose a flood">
+        {INCIDENTS.map((x, k) => {
+          const on = k === picked
+          return (
+            <button
+              key={x.date}
+              type="button"
+              aria-pressed={on}
+              onClick={() => setPicked(k)}
+              className="card-action rounded-[10px] border px-3 py-2 text-left"
+              style={{ borderColor: on ? '#e8654f' : '#2a3740', background: on ? 'rgba(232,101,79,0.14)' : 'rgba(15,21,25,0.55)' }}
+            >
+              <span className="block font-mono text-xs text-[#ff8a73]">{x.date}</span>
+              <span className="mt-0.5 block font-display text-base font-700 text-white">{x.place.split(' · ')[0]}</span>
+            </button>
+          )
+        })}
+      </div>
+      <article className="mt-5 grid gap-x-10 gap-y-3 md:grid-cols-2" aria-live="polite">
+        <div>
+          <h4 className="font-display text-lg font-700 text-white">{inc.place}</h4>
+          <p className="mt-2 text-base leading-relaxed text-[#eef3f6]/90">{inc.what}</p>
+        </div>
+        <div>
+          <p className="text-base leading-relaxed text-[#c3ced6]">
+            <span className="font-semibold text-[#eef3f6]">Why rescuers could not see or reach them: </span>
+            {inc.why}
+          </p>
+          <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-sm text-[#aab8c2]">
+            <span>Sources:</span>
+            {inc.sources.map((src) => (
+              <SourceLink key={src.href} href={src.href}>
+                {src.label}
+              </SourceLink>
+            ))}
+          </p>
+        </div>
+      </article>
+      <p className="mt-5 border-t border-white/10 pt-4 text-base leading-relaxed text-[#c3ced6]">{INCIDENTS_NOTE}</p>
     </div>
   )
 }
@@ -146,14 +162,12 @@ function IncidentTimeline() {
 function FviCard() {
   const luna = BUSINESS.team.find((m) => m.name === 'Luna')
   return (
-    <div className="card mt-8 card-pad">
+    <div>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="flex items-center gap-2 font-display text-xl font-700 text-[#f3ede1]">
-          <MapPinned size={18} className="text-[#ff8a73]" aria-hidden /> Flood Vulnerability Index: where to search first
-        </h3>
+        <h3 className="font-display text-xl font-700 text-[#f3ede1]">Flood Vulnerability Index: where to search first</h3>
         {luna && <span className="chip">{luna.name} · FVI program developer</span>}
       </div>
-      <div className="mt-4 grid gap-5 md:grid-cols-3">
+      <div className="mt-4 grid gap-x-8 gap-y-5 md:grid-cols-3">
         <div>
           <div className="font-mono text-xs text-[#ff8a73]">What it is</div>
           <p className="mt-1 text-base leading-relaxed text-[#eef3f6]/90">{FVI.what}</p>
@@ -174,27 +188,48 @@ function FviCard() {
   )
 }
 
+function WhyDeadly() {
+  return (
+    <div>
+      <ul className="grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-4">
+        {CRISIS.whyDeadly.map((w, i) => {
+          const Icon = ICONS[i]
+          return (
+            <li key={w.title}>
+              <div className="flex items-center gap-2 font-display text-base font-700 text-white">
+                <Icon size={16} className="shrink-0 text-[#ff8a73]" aria-hidden /> {w.title}
+              </div>
+              <p className="mt-1 text-base leading-relaxed text-[#c3ced6]">{w.body}</p>
+            </li>
+          )
+        })}
+      </ul>
+      <p className="label mt-5">Monsoon window · {CRISIS.monsoonWindow} · every summer</p>
+    </div>
+  )
+}
+
 export function Crisis() {
   return (
     <SectionShell id="crisis" align="right">
       <div className="pointer-events-auto w-full max-w-6xl">
-      <div className="grid w-full gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+      <div className="grid w-full gap-8 lg:grid-cols-[1.15fr_1fr] lg:items-center">
         <div>
           <Reveal className="text-scrim">
             <Kicker index="02">The crisis & the muddy-water gap</Kicker>
-            <Title>
+            <Title className="lg:!text-[3.1rem]">
               The first <span className="text-gradient">minutes</span> are lost to blind water.
             </Title>
           </Reveal>
           <Reveal delay={1}>
-            <div className="mt-8 grid grid-cols-2 gap-4">
+            <div className="mt-6 grid grid-cols-2 gap-4">
               <div className="card card-pad">
                 <div className="font-mono text-4xl font-semibold text-white">{CRISIS.recordYears}</div>
-                <div className="mt-2 text-sm leading-snug text-[#dbe2e8]">years: {CRISIS.recordLabel}</div>
+                <div className="mt-2 text-base leading-snug text-[#dbe2e8]">years: {CRISIS.recordLabel}</div>
               </div>
               <div className="card card-pad" style={{ borderColor: 'rgba(255,107,87,0.4)' }}>
                 <div className="font-mono text-4xl font-semibold text-[#ff6b57]">{CRISIS.livesLost}</div>
-                <div className="mt-2 text-sm leading-snug text-[#dbe2e8]">lives {CRISIS.livesLabel}</div>
+                <div className="mt-2 text-base leading-snug text-[#dbe2e8]">lives {CRISIS.livesLabel}</div>
               </div>
             </div>
             <div className="mt-6 border-l-2 border-[#e8654f] pl-4 text-base leading-relaxed text-[#eef3f6]">
@@ -210,38 +245,25 @@ export function Crisis() {
               </div>
             </div>
           </Reveal>
-          <Reveal delay={2}>
-            <ul className="mt-6 grid grid-cols-2 gap-3">
-              {CRISIS.whyDeadly.map((w, i) => {
-                const Icon = ICONS[i]
-                return (
-                  <li key={w.title} className="card card-pad">
-                    <div className="flex items-center gap-2 font-display text-base font-700 text-white">
-                      <Icon size={14} className="text-[#ff8a73]" /> {w.title}
-                    </div>
-                    <p className="mt-1 text-sm leading-relaxed text-[#c3ced6]">{w.body}</p>
-                  </li>
-                )
-              })}
-            </ul>
-            <p className="label mt-5">
-              Monsoon window · {CRISIS.monsoonWindow} · every summer
-            </p>
-          </Reveal>
         </div>
         <Reveal delay={2}>
           <VisibilityCompare />
-          <p className="mt-3 text-sm text-[#c3ced6]">
+          <p className="mt-4 text-base leading-relaxed text-[#c3ced6]">
             A rescuer wading in cannot see what is under the water, and tethered ROVs rely on cameras that struggle in muddy water. Delphylax floats
             in: sonar finds objects under the water, the AMG8833 heat sensor spots people at the surface, and it drops a glowing marker where rescuers should look.
           </p>
         </Reveal>
       </div>
       <Reveal>
-        <IncidentTimeline />
-      </Reveal>
-      <Reveal>
-        <FviCard />
+        <Tabs
+          className="mt-8"
+          label="More about the problem"
+          tabs={[
+            { id: 'floods', label: 'Three floods', icon: <CalendarDays size={15} aria-hidden />, content: <IncidentTimeline /> },
+            { id: 'why', label: 'Why floods are deadly', icon: <AlertTriangle size={15} aria-hidden />, content: <WhyDeadly /> },
+            { id: 'fvi', label: 'Where to search first', icon: <MapPinned size={15} aria-hidden />, content: <FviCard /> },
+          ]}
+        />
       </Reveal>
       </div>
     </SectionShell>

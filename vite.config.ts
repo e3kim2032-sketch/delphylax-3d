@@ -1,15 +1,50 @@
-import { defineConfig } from 'vite'
+import { readdirSync } from 'node:fs'
+import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
+/**
+ * Build photos: lists the image files in public/photos/ as the module `virtual:photos`,
+ * so the gallery fills itself in when a photo is dropped into the folder, and the
+ * section is left out while the folder is empty.
+ */
+function photos(): Plugin {
+  const id = 'virtual:photos'
+  const dir = 'public/photos'
+  const list = () => {
+    try {
+      return readdirSync(dir)
+        .filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(f))
+        .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
+    } catch {
+      return []
+    }
+  }
+  return {
+    name: 'delphylax-photos',
+    resolveId: (source) => (source === id ? `\0${id}` : null),
+    load: (resolved) => (resolved === `\0${id}` ? `export default ${JSON.stringify(list())}` : null),
+    configureServer(server) {
+      // in dev, adding or removing a photo refreshes the page
+      const refresh = (file: string) => {
+        if (!file.replace(/\\/g, '/').includes(`/${dir}/`)) return
+        const mod = server.moduleGraph.getModuleById(`\0${id}`)
+        if (mod) server.moduleGraph.invalidateModule(mod)
+        server.ws.send({ type: 'full-reload' })
+      }
+      server.watcher.on('add', refresh).on('unlink', refresh)
+    },
+  }
+}
+
 export default defineConfig({
   base: './',
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), photos()],
   build: {
     chunkSizeWarningLimit: 1600,
     rollupOptions: {
-      // two pages: the main site and the funding pitch deck at /pitch/
-      input: { main: 'index.html', pitch: 'pitch/index.html' },
+      // three pages: the robot (main site), the team at /team/ and the funding pitch deck at /pitch/
+      input: { main: 'index.html', team: 'team/index.html', pitch: 'pitch/index.html' },
       output: {
         /**
          * Keep the 3D engine out of the first load. Anything the text pages need

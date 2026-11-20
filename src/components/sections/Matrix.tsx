@@ -21,27 +21,29 @@ function Score({ n }: { n: number }) {
 export function Matrix() {
   const [hover, setHover] = useState<string | null>(null)
   return (
-    <SectionShell id="matrix" align="center">
+    <SectionShell id="matrix" align="center" className="!min-h-0">
       <div className="pointer-events-auto w-full max-w-6xl">
         <Reveal className="text-scrim">
-          <Kicker index="05">Competitive matrix</Kicker>
-          <Title className="max-w-3xl">
+          <Kicker index="06">Competitive matrix</Kicker>
+          <div className="grid gap-x-12 gap-y-4 lg:grid-cols-2 lg:items-end">
+          <Title className="lg:!text-[3rem]">
             About <span className="text-gradient">1/{COST.ratio} the price</span> of a proven rescue robot.
           </Title>
-          <p className="mt-5 max-w-3xl text-[1.0625rem] leading-relaxed text-[#dbe2e8] sm:text-lg">
+          <p className="text-base leading-relaxed text-[#dbe2e8] sm:text-[1.0625rem]">
             EMILY, used by navies and lifeguards, sells for about ${COST.emilyUsd.toLocaleString()} ({COST.emilySource}). Delphylax costs {COST.line}.
             EMILY is a finished product that reaches {COST.emilySpeedMph} mph, so this compares price, not ability. It shows that a basic flood scout could be
             cheap enough for towns that can’t afford professional rescue robots.
           </p>
+          </div>
         </Reveal>
         <Reveal delay={1}>
-          <div className="card mt-8 overflow-x-auto" style={{ background: 'rgba(19, 27, 33, 0.92)' }}>
+          <div className="card mt-6 overflow-x-auto" style={{ background: 'rgba(19, 27, 33, 0.92)' }}>
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead>
                 <tr className="text-sm text-[#aab8c2]">
-                  <th className="px-4 py-4 font-medium">Criterion</th>
+                  <th className="px-4 py-3 font-medium">Criterion</th>
                   {COMPETITORS.map((c) => (
-                    <th key={c.name} className="px-4 py-4 font-medium" style={c.highlight ? { color: '#ffb4a6', background: 'linear-gradient(180deg, rgba(232,101,79,0.12), transparent)' } : undefined}>
+                    <th key={c.name} className="px-4 py-3 font-medium" style={c.highlight ? { color: '#ffb4a6', background: 'linear-gradient(180deg, rgba(232,101,79,0.12), transparent)' } : undefined}>
                       <div className="font-display text-base font-800 tracking-normal text-white normal-case">{c.name}</div>
                       <div>{c.kind}</div>
                     </th>
@@ -51,11 +53,11 @@ export function Matrix() {
               <tbody>
                 {MATRIX_COLUMNS.map((col) => (
                   <tr key={col.key} onMouseEnter={() => setHover(col.key)} onMouseLeave={() => setHover(null)} className="border-t border-white/8 transition-colors" style={{ background: hover === col.key ? 'rgba(127,179,213,0.06)' : undefined }}>
-                    <td className="px-4 py-3 font-display text-base font-700 text-white">{col.label}</td>
+                    <td className="px-4 py-2.5 font-display text-base font-700 text-white">{col.label}</td>
                     {COMPETITORS.map((c) => (
-                      <td key={c.name} className="px-4 py-3 align-top" style={c.highlight ? { background: 'rgba(232,101,79,0.06)' } : undefined}>
+                      <td key={c.name} className="px-4 py-2.5 align-top" style={c.highlight ? { background: 'rgba(232,101,79,0.06)' } : undefined}>
                         <Score n={c.scores[col.key]} />
-                        <div className="mt-1.5 text-sm leading-snug text-[#dbe2e8]">{c[col.key]}</div>
+                        <div className="mt-1 text-[0.9375rem] leading-snug text-[#dbe2e8]">{c[col.key]}</div>
                       </td>
                     ))}
                   </tr>
@@ -63,7 +65,7 @@ export function Matrix() {
               </tbody>
             </table>
           </div>
-          <p className="mt-4 text-center text-sm text-[#aab8c2]">
+          <p className="mt-3 text-center text-sm text-[#aab8c2]">
             Scores 1–5 · icons carry the rating alongside color · Delphylax cost is a planning estimate, not receipts
           </p>
         </Reveal>

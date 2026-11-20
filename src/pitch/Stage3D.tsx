@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { AbyssalEnvironment } from '../components/canvas/AbyssalEnvironment'
 import { Effects } from '../components/canvas/Effects'
 import { BoatParts, LIDAR_AT, PinsContext, mm, BOAT_S as S } from '../components/canvas/DelphylaxModel'
+import { Pod, type PodControl } from '../components/canvas/Pod'
 import { sceneRefs } from '../components/canvas/sceneRefs'
 import { useSiteStore } from '../store/useSiteStore'
 import { live, sinceStep, SLIDE } from './live'
@@ -325,212 +326,16 @@ function SonarWaves({ boat }: { boat: RefObject<THREE.Group | null> }) {
 }
 
 /* ------------------------------------------------------------------ */
-/* The Delphylax Pod: a dolphin-shaped float                            */
-/* ------------------------------------------------------------------ */
-const POD_LEN = 300 // mm
-
-function podBodyGeometry() {
-  // radius (mm) along the body, beak tip first
-  const profile: [number, number][] = [
-    [0.6, 0],
-    [6, 5],
-    [9, 24],
-    [12, 42],
-    [27, 58],
-    [37, 84],
-    [44, 122],
-    [45, 152],
-    [40, 192],
-    [30, 232],
-    [18, 266],
-    [10, 290],
-    [7, POD_LEN],
-  ]
-  const curve = new THREE.SplineCurve(profile.map(([r, y]) => new THREE.Vector2(r * S, y * S)))
-  const g = new THREE.LatheGeometry(curve.getPoints(60), 40)
-  g.rotateX(Math.PI / 2) // length along +z, beak first
-  g.translate(0, 0, (-POD_LEN / 2) * S)
-  g.scale(0.9, 1, 1)
-  return g
-}
-function podFinGeometry() {
-  const s = new THREE.Shape()
-  s.moveTo(0, 0)
-  s.lineTo(70, 0)
-  s.lineTo(64, 50)
-  s.quadraticCurveTo(52, 60, 38, 52)
-  s.lineTo(0, 0)
-  const g = new THREE.ExtrudeGeometry(s, { depth: 8, bevelEnabled: true, bevelThickness: 2, bevelSize: 2, bevelSegments: 2 })
-  g.translate(0, 0, -4)
-  g.scale(S, S, S)
-  g.rotateY(-Math.PI / 2) // shape x runs toward the tail
-  return g
-}
-function podFlukeGeometry() {
-  const s = new THREE.Shape()
-  s.moveTo(0, 0)
-  s.quadraticCurveTo(34, 2, 66, 40)
-  s.quadraticCurveTo(30, 26, 0, 30)
-  s.quadraticCurveTo(-30, 26, -66, 40)
-  s.quadraticCurveTo(-34, 2, 0, 0)
-  const g = new THREE.ExtrudeGeometry(s, { depth: 7, bevelEnabled: true, bevelThickness: 2, bevelSize: 2, bevelSegments: 2 })
-  g.translate(0, 0, -3.5)
-  g.scale(S, S, S)
-  g.rotateX(Math.PI / 2) // lies flat, shape y runs toward the tail
-  return g
-}
-function glowTexture() {
-  const c = document.createElement('canvas')
-  c.width = c.height = 128
-  const ctx = c.getContext('2d')
-  if (ctx) {
-    const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64)
-    grad.addColorStop(0, 'rgba(255,214,196,1)')
-    grad.addColorStop(0.25, 'rgba(255,150,125,0.55)')
-    grad.addColorStop(1, 'rgba(255,138,115,0)')
-    ctx.fillStyle = grad
-    ctx.fillRect(0, 0, 128, 128)
-  }
-  const tex = new THREE.CanvasTexture(c)
-  tex.colorSpace = THREE.SRGBColorSpace
-  return tex
-}
-
-/** where the Pod rides before the drop: on the rescue ring, starboard side of the deck */
-const POD_DOCK: V3 = mm(150, 60, 158)
-const FALL = 0.9 // seconds from the deck to the water
-
-function Pod({ boat }: { boat: RefObject<THREE.Group | null> }) {
-  const g = useRef<THREE.Group>(null)
-  const light = useRef<THREE.PointLight>(null)
-  const halo = useRef<THREE.Sprite>(null)
-  const ripples = useRef<(THREE.Mesh | null)[]>([])
-  const body = useMemo(podBodyGeometry, [])
-  const fin = useMemo(podFinGeometry, [])
-  const fluke = useMemo(podFlukeGeometry, [])
-  const tex = useMemo(glowTexture, [])
-  const skin = useMemo(() => new THREE.MeshPhysicalMaterial({ color: '#f3ede1', roughness: 0.35, clearcoat: 0.6, emissive: '#ff9478', emissiveIntensity: 0 }), [])
-  const trim = useMemo(() => new THREE.MeshPhysicalMaterial({ color: '#ff7f66', roughness: 0.42, clearcoat: 0.6, emissive: '#ff7f66', emissiveIntensity: 0 }), [])
-  const dock = useMemo(() => new THREE.Vector3(), [])
-  const water = useMemo(() => new THREE.Vector3(), [])
-  const start = useMemo(() => new THREE.Vector3(), [])
-  const show = useRef(0)
-  const released = useRef(false)
-
-  useFrame(({ clock }, dt) => {
-    const grp = g.current
-    const b = boat.current
-    if (!grp || !b) return
-    const t = clock.elapsedTime
-    const onSlide = live.slide === SLIDE.pod
-    show.current = live.reduce ? (onSlide ? 1 : 0) : THREE.MathUtils.lerp(show.current, onSlide ? 1 : 0, 1 - Math.exp(-dt * 6))
-    grp.visible = show.current > 0.01
-    const drop = onSlide && live.step >= 1
-    const e = drop ? sinceStep() : -1
-
-    dock.set(...POD_DOCK)
-    b.localToWorld(dock)
-    if (!drop) released.current = false
-    else if (!released.current) {
-      // remember where it left the deck and where it will float
-      released.current = true
-      start.copy(dock)
-      start.x -= b.position.x // measured from where the boat floats, even if it has already backed off
-      water.set(start.x + 0.04, 0.035, start.z + 0.66)
-    }
-
-    let glow = 0
-    grp.rotation.order = 'YXZ'
-    if (!drop) {
-      grp.position.copy(dock)
-      grp.rotation.set(0, b.rotation.y, 0)
-    } else if (e < FALL) {
-      const u = e / FALL
-      grp.position.set(
-        THREE.MathUtils.lerp(start.x, water.x, u),
-        start.y + (water.y - start.y) * u * u + Math.sin(Math.PI * u) * 0.14,
-        THREE.MathUtils.lerp(start.z, water.z, u * (2 - u)),
-      )
-      grp.rotation.set(Math.sin(Math.PI * u) * 0.2, HOME_YAW, Math.sin(Math.PI * u) * 0.8)
-    } else {
-      const s = e - FALL
-      const settle = Math.exp(-Math.min(s, 20) * 2.2)
-      const idle = live.reduce ? 0 : 1
-      grp.position.set(water.x, water.y - 0.1 * settle * Math.cos(s * 7) + Math.sin(t * 1.3) * 0.012 * idle, water.z)
-      grp.rotation.set(Math.sin(t * 1.1) * 0.04 * idle, HOME_YAW + Math.sin(t * 0.4) * 0.08 * idle, Math.sin(t * 0.9) * 0.06 * idle + 0.35 * settle * Math.sin(s * 6))
-      glow = smooth(s, 0, 0.9)
-    }
-    grp.scale.setScalar(Math.max(0.001, show.current))
-
-    // it lights up when it touches the water
-    const breathe = live.reduce ? 1 : 0.85 + 0.15 * Math.sin(t * 3)
-    skin.emissiveIntensity = glow * 0.8 * breathe
-    trim.emissiveIntensity = glow * 1.2 * breathe
-    if (light.current) light.current.intensity = glow * 1.8 * breathe
-    if (halo.current) {
-      halo.current.material.opacity = glow * 0.42 * breathe * show.current
-      halo.current.scale.setScalar(1.15 + 0.12 * breathe)
-    }
-    for (let i = 0; i < 3; i++) {
-      const m = ripples.current[i]
-      if (!m) continue
-      const s = e - FALL
-      m.visible = drop && s > 0 && grp.visible
-      if (!m.visible) continue
-      const ph = live.reduce ? (i + 1) / 4 : (s * 0.38 + i / 3) % 1
-      m.position.set(water.x, 0.045, water.z)
-      m.scale.setScalar(0.16 + ph * 0.9)
-      ;(m.material as THREE.MeshBasicMaterial).opacity = (1 - ph) * 0.55 * Math.max(glow, 0.3)
-    }
-  })
-
-  return (
-    <>
-      <group ref={g} visible={false}>
-        <mesh geometry={body} material={skin} />
-        {/* dorsal fin */}
-        <mesh geometry={fin} material={trim} position={[0, 40 * S, -34 * S]} />
-        {/* tail flukes */}
-        <mesh geometry={fluke} material={trim} position={[0, 0, (POD_LEN / 2 - 20) * S]} />
-        {/* flippers */}
-        {[-1, 1].map((side) => (
-          <mesh key={side} material={trim} position={[side * 40 * S, -20 * S, -50 * S]} rotation={[0.35, side * -0.35, side * -0.75]} scale={[26 * S, 5 * S, 44 * S]}>
-            <sphereGeometry args={[1, 16, 12]} />
-          </mesh>
-        ))}
-        {/* eyes */}
-        {[-1, 1].map((side) => (
-          <mesh key={side} position={[side * 24 * S, 10 * S, -86 * S]}>
-            <sphereGeometry args={[4 * S, 10, 10]} />
-            <meshBasicMaterial color="#0f1519" />
-          </mesh>
-        ))}
-        <pointLight ref={light} color="#ff9d85" intensity={0} distance={5} decay={1.6} position={[0, 0.12, 0]} />
-        <sprite ref={halo} renderOrder={25}>
-          <spriteMaterial map={tex} transparent opacity={0} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
-        </sprite>
-      </group>
-      {[0, 1, 2].map((i) => (
-        <mesh
-          key={i}
-          ref={(el) => {
-            ripples.current[i] = el
-          }}
-          rotation={[-Math.PI / 2, 0, 0]}
-          visible={false}
-          renderOrder={8}
-        >
-          <ringGeometry args={[0.94, 1, 64]} />
-          <meshBasicMaterial color="#ffb4a6" transparent opacity={0} depthWrite={false} toneMapped={false} />
-        </mesh>
-      ))}
-    </>
-  )
-}
-
-/* ------------------------------------------------------------------ */
 /* Stage                                                                */
 /* ------------------------------------------------------------------ */
+/** the Pod rides on the deck on every slide, and drops on the firefighter slide's extra click */
+const podControl = (): PodControl => ({
+  show: true,
+  dropped: live.slide === SLIDE.pod && live.step >= 1,
+  since: sinceStep(),
+  reduce: live.reduce,
+})
+
 function World() {
   const boat = useRef<THREE.Group>(null)
   return (
@@ -550,7 +355,7 @@ function World() {
         <Halo key={i} def={def} boat={boat} />
       ))}
       <SonarWaves boat={boat} />
-      <Pod boat={boat} />
+      <Pod boat={boat} control={podControl} />
       <Effects />
     </>
   )
